@@ -1,1 +1,7 @@
 .RData
+NSFG_validation/
+.Rhistory
+.RDataTmp
+.Rproj.user/
+nsfg_childfree.R
+ReadEDER2017_old.R

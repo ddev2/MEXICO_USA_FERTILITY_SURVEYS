@@ -2,20 +2,19 @@ setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source (path.expand("~/Dropbox/RStudioData/TransitionsPPR/KaplanMeierLib.R"))
 #### MEXICO ####
 # First union
-# WFS is not very accurate for union history
-# ENADID 1992 has no info on first unions
-MEXICO_ENADID <- cleanENADID(MEXICO_ENADID)
-MEX_union1_marr <- subset(MEXICO_ENADID, !(survey %in% c("WFS", "ENADID1992")))
+# WFS has no information on cohabitation before marriage
+# ENADID 1992 has no information on unions
+MEX_union1_marr <- subset(MEXICO_ENADID, !(survey %in% c("WFS", "ENADID1992",  "ENADID2006")))
 MEX_union1_marr <- MEX_union1_marr[,c("country","survey","surveyDate_cmc",
                                       "union_start_type1","union_start_cmc1","union_end_cmc1","union_end_motive1","marriage_start_cmc1",
-                                     "yBirth","reweight","indiv_weight")]
+                                     "yBirth","indiv_weight")]
 MEX_union1_marr$yUnion1 <- yearFrom_cmc(MEX_union1_marr$union_start_cmc1)
 
 # Second union: only ENADID 1997 and EDER 2017
 MEX_union2_marr <- subset(MEXICO_ENADID, (survey %in% c("ENADID1997", "EDER2017")))
 MEX_union2_marr <- MEX_union2_marr[,c("country","survey","surveyDate_cmc",
                                       "union_start_type2","union_start_cmc2","union_end_cmc2","union_end_motive2","marriage_start_cmc2",
-                                     "yBirth","reweight","indiv_weight")]
+                                     "yBirth","indiv_weight")]
 MEX_union2_marr$yUnion2 <- yearFrom_cmc(MEX_union2_marr$union_start_cmc2)
 
 ##### 0. cleaning ... #####
@@ -24,13 +23,6 @@ MEX_union1_marr$varUnionCens1 <- ifelse(!is.na(MEX_union1_marr$union_end_cmc1),
                                        MEX_union1_marr$union_end_cmc1,MEX_union1_marr$surveyDate_cmc)
 MEX_union2_marr$varUnionCens2 <- ifelse(!is.na(MEX_union2_marr$union_end_cmc2),
                                        MEX_union2_marr$union_end_cmc2,MEX_union2_marr$surveyDate_cmc)
-# dates with NA values (coded as 9999)
-MEX_union1_marr <- subset(MEX_union1_marr, (is.na(union_start_cmc1))|(union_start_cmc1 != 9999))
-MEX_union1_marr <- subset(MEX_union1_marr, (is.na(marriage_start_cmc1))|(marriage_start_cmc1!=9999))
-MEX_union1_marr <- subset(MEX_union1_marr, (is.na(varUnionCens1))|(varUnionCens1!=9999))
-MEX_union2_marr <- subset(MEX_union2_marr, (is.na(union_start_cmc2))|(union_start_cmc2 != 9999))
-MEX_union2_marr <- subset(MEX_union2_marr, (is.na(marriage_start_cmc2))|(marriage_start_cmc2!=9999))
-MEX_union2_marr <- subset(MEX_union2_marr, (is.na(varUnionCens2))|(varUnionCens2!=9999))
 
 cohortsListMex <- c(
   c(1940,1949),
@@ -55,54 +47,58 @@ cohortsListMex_Marr <- c(
 ###### MEXICO WFS & ALL ENADID ######
 
 plot_marriage_union1_mod_MEX <- KaplanMeierPlot (df=MEX_union1_marr, varEnter="union_start_cmc1",
-                                                 varEvent="marriage_start_cmc1", varCens="varUnionCens1", var_yBirth = "yUnion1", varWeight="reweight",
+                                                 varEvent="marriage_start_cmc1", varCens="varUnionCens1", var_yBirth = "yUnion1", varWeight="indiv_weight",
                                                  varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex_Marr,
                                                  Title="Mexico: transition of first union to marriage, by union cohort",
                                                  xTitle = "Duration in years after first union", maxX = 20, popWeight = TRUE, confInt=TRUE)
 plot_marriage_union1_mod_MEX
 
 plot_marriage_union2_mod_MEX <- KaplanMeierPlot (df=MEX_union2_marr, varEnter="union_start_cmc2",
-                                                 varEvent="marriage_start_cmc2", varCens="varUnionCens2", var_yBirth = "yUnion2", varWeight="reweight",
+                                                 varEvent="marriage_start_cmc2", varCens="varUnionCens2", var_yBirth = "yUnion2", varWeight="indiv_weight",
                                                  varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex_Marr,
                                                  Title="Mexico: transition of second union to marriage, by union cohort",
                                                  xTitle = "Duration in years after second union", maxX = 20, popWeight = TRUE, confInt=TRUE)
 
 plot_marriage_union2_mod_MEX
 
-###### MEXICO: EDER 2017 ######
-EDER_marr_union=EDER_ENADID[,c("country","survey","surveyDate_cmc","union_start_cmc1","union_end_cmc1","marriage_start_cmc1",
-                                 "union_start_cmc2","union_end_cmc2","union_end_motive1","marriage_start_cmc2","yBirth","indiv_weight")]
-
-EDER_marr_union$varUnionCens1 <- ifelse(!is.na(EDER_marr_union$union_end_cmc1),
-                                        EDER_marr_union$union_end_cmc1,EDER_marr_union$surveyDate_cmc)
-EDER_marr_union$varUnionCens2 <- ifelse(!is.na(EDER_marr_union$union_end_cmc2),
-                                       EDER_marr_union$union_end_cmc2,EDER_marr_union$surveyDate_cmc)
-cohortsListMexEDER <- c(
-  c(1960,1969),
-  c(1970,1979),
-  c(1980,1989),
-  c(1990,1999)
-)
-
-EDER_marr_union <- subset(EDER_marr_union, (is.na(union_start_cmc1))|(union_start_cmc1 != 9999))
-EDER_marr_union <- subset(EDER_marr_union, (is.na(marriage_start_cmc1))|(marriage_start_cmc1!=9999))
-EDER_marr_union <- subset(EDER_marr_union, (is.na(varUnionCens1))|(varUnionCens1!=9999))
-EDER_marr_union <- subset(EDER_marr_union, (is.na(union_start_cmc2))|(union_start_cmc2 != 9999))
-EDER_marr_union <- subset(EDER_marr_union, (is.na(marriage_start_cmc2))|(marriage_start_cmc2!=9999))
-EDER_marr_union <- subset(EDER_marr_union, (is.na(varUnionCens2))|(varUnionCens2!=9999))
-
-plot_marriage_union1_mod_MEX_EDER <- KaplanMeierPlot (df=EDER_marr_union, varEnter="union_start_cmc1",
-                                                 varEvent="marriage_start_cmc1", varCens="varUnionCens1", varWeight="indiv_weight",
-                                                 varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMexEDER,
-                                                 xTitle = "Duration in years after first union", maxX = 20, popWeight = TRUE, confInt=TRUE)
-plot_marriage_union2_mod_MEX_EDER <- KaplanMeierPlot (df=EDER_marr_union, varEnter="union_start_cmc2",
-                                                 varEvent="marriage_start_cmc2", varCens="varUnionCens2", varWeight="indiv_weight",
-                                                 varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMexEDER,
-                                                 xTitle = "Duration in years after second union", maxX = 20, popWeight = TRUE, confInt=TRUE)
+#### MEXICO: EDER 2017 ####
+# EDER_marr_union=EDER_ENADID[,c("country","survey","surveyDate_cmc","union_start_cmc1","union_end_cmc1","marriage_start_cmc1",
+#                                  "union_start_cmc2","union_end_cmc2","union_end_motive1","marriage_start_cmc2","yBirth","indiv_weight")]
+# 
+# EDER_marr_union$varUnionCens1 <- ifelse(!is.na(EDER_marr_union$union_end_cmc1),
+#                                         EDER_marr_union$union_end_cmc1,EDER_marr_union$surveyDate_cmc)
+# EDER_marr_union$varUnionCens2 <- ifelse(!is.na(EDER_marr_union$union_end_cmc2),
+#                                        EDER_marr_union$union_end_cmc2,EDER_marr_union$surveyDate_cmc)
+# cohortsListMexEDER <- c(
+#   c(1960,1969),
+#   c(1970,1979),
+#   c(1980,1989),
+#   c(1990,1999)
+# )
+# 
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(union_start_cmc1))|(union_start_cmc1 != 9999))
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(marriage_start_cmc1))|(marriage_start_cmc1!=9999))
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(varUnionCens1))|(varUnionCens1!=9999))
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(union_start_cmc2))|(union_start_cmc2 != 9999))
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(marriage_start_cmc2))|(marriage_start_cmc2!=9999))
+# EDER_marr_union <- subset(EDER_marr_union, (is.na(varUnionCens2))|(varUnionCens2!=9999))
+# 
+# plot_marriage_union1_mod_MEX_EDER <- KaplanMeierPlot (df=EDER_marr_union, varEnter="union_start_cmc1",
+#                                                  varEvent="marriage_start_cmc1", varCens="varUnionCens1", varWeight="indiv_weight",
+#                                                  varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMexEDER,
+#                                                  xTitle = "Duration in years after first union", maxX = 20, popWeight = TRUE, confInt=TRUE)
+# plot_marriage_union2_mod_MEX_EDER <- KaplanMeierPlot (df=EDER_marr_union, varEnter="union_start_cmc2",
+#                                                  varEvent="marriage_start_cmc2", varCens="varUnionCens2", varWeight="indiv_weight",
+#                                                  varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMexEDER,
+#                                                  xTitle = "Duration in years after second union", maxX = 20, popWeight = TRUE, confInt=TRUE)
 
 ##### 2. Union ==> Separation #####
 # modify censored dates for widowhood
-MEX_union1_sep <- MEX_union1_marr
+MEX_union1_sep <- subset(MEXICO_ENADID, !(survey %in% c("ENADID1992",  "ENADID2006")))
+MEX_union1_sep <- MEX_union1_sep[,c("country","survey","surveyDate_cmc",
+                                      "union_start_type1","union_start_cmc1","union_end_cmc1","union_end_motive1","marriage_start_cmc1",
+                                      "yBirth","indiv_weight")]
+MEX_union1_sep$yUnion1 <- yearFrom_cmc(MEX_union1_sep$union_start_cmc1)
 MEX_union1_sep$varSepCens1 <- ifelse((!is.na(MEX_union1_sep$union_end_motive1)&(MEX_union1_sep$union_end_motive1=="widowhood")),
                                      MEX_union1_sep$union_end_cmc1,MEX_union1_sep$surveyDate_cmc)
 # widowhood is not the event, only separation is
@@ -113,7 +109,7 @@ MEX_union1_sep$union_endBySep_cmc1 <- ifelse((!is.na(MEX_union1_sep$union_end_mo
 MEX_union2_sep <- subset(MEXICO_ENADID, (survey %in% c("ENADID1997", "EDER2017")))
 MEX_union2_sep <- MEX_union2_sep[,c("country","survey","surveyDate_cmc",
                                       "union_start_cmc2","union_end_cmc2","union_end_motive2","marriage_start_cmc2",
-                                      "yBirth","reweight","indiv_weight")]
+                                      "yBirth","indiv_weight")]
 MEX_union2_sep$yUnion2 <- yearFrom_cmc(MEX_union2_sep$union_start_cmc2)
 MEX_union2_sep$varSepCens2 <- ifelse((!is.na(MEX_union2_sep$union_end_motive2)&(MEX_union2_sep$union_end_motive2=="widowhood")),
                                      MEX_union2_sep$union_end_cmc2,MEX_union2_sep$surveyDate_cmc)
@@ -130,24 +126,24 @@ cohortsListMex_Marr <- c(
 )
 
 plot_union_sep1_MEX <- KaplanMeierPlot (df=MEX_union1_sep, varEnter="union_start_cmc1",
-                                        varEvent="union_endBySep_cmc1", varCens="varSepCens1", var_yBirth = "yUnion1", varWeight="reweight",
+                                        varEvent="union_endBySep_cmc1", varCens="varSepCens1", var_yBirth = "yUnion1", varWeight="indiv_weight",
                                         varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex_Marr,
                                         Title="Mexico: Separation after first union, by union cohort",
                                         xTitle = "Duration in years after first union", yTitle="Proportion of separation",
                                         maxX = 20, popWeight = TRUE, confInt=TRUE,
                                         inverseFunction = TRUE)
 plot_union_sep2_MEX <- KaplanMeierPlot (df=MEX_union2_sep, varEnter="union_start_cmc2",
-                                        varEvent="union_endBySep_cmc2", varCens="varSepCens2", var_yBirth = "yUnion2", varWeight="reweight",
+                                        varEvent="union_endBySep_cmc2", varCens="varSepCens2", var_yBirth = "yUnion2", varWeight="indiv_weight",
                                         varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex,
                                         Title="Mexico: Separation after second union, by union cohort",
                                         xTitle = "Duration in years after second union", maxX = 20, popWeight = TRUE, confInt=TRUE,
                                         inverseFunction = TRUE)
 
-##### 3. First Separation ==> Second Union #####
-MEX_sep1_union2 <- subset(MEXICO_ENADID, (survey %in% c("ENADID1997", "EDER2017")))
+##### 3. First repartnering #####
+MEX_sep1_union2 <- subset(MEXICO_ENADID, (survey %in% c( "WFS", "ENADID1997", "EDER2017")))
 MEX_sep1_union2 <- MEX_sep1_union2[,c("country","survey","surveyDate_cmc",
                                       "union_end_cmc1","union_start_cmc2",
-                                      "yBirth","reweight","indiv_weight")]
+                                      "yBirth","indiv_weight")]
 MEX_sep1_union2$ySep1 <- yearFrom_cmc(MEX_sep1_union2$union_end_cmc1)
 
 cohortsListMex_Marr <- c(
@@ -160,20 +156,19 @@ cohortsListMex_Marr <- c(
 )
 
 plot_sep1_union2_MEX <- KaplanMeierPlot (df=MEX_sep1_union2, varEnter="union_end_cmc1",
-                                        varEvent="union_start_cmc2", varCens="surveyDate_cmc", var_yBirth = "ySep1", varWeight="reweight",
+                                        varEvent="union_start_cmc2", varCens="surveyDate_cmc", var_yBirth = "ySep1", varWeight="indiv_weight",
                                         varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex_Marr,
-                                        Title="Mexico: Second union after separation, by union cohort",
-                                        xTitle = "Duration in years after first separation", yTitle="Proportion of separation",
+                                        Title="Mexico: First repartnering, by union cohort",
+                                        xTitle = "Duration in years after first separation", yTitle="Proportion of first separation",
                                         maxX = 20, popWeight = TRUE, confInt=TRUE,
                                         inverseFunction = TRUE)
 
-##### 4. First cohabitation ==> separation with marriage as censored #####
-MEXICO_ENADID <- cleanENADID(MEXICO_ENADID)
-MEX_cohab1_sep_no_marr <- subset(MEXICO_ENADID, !(survey %in% c("WFS", "ENADID1992")))
+##### 4. First cohabitation ==> separation with marriage censored #####
+MEX_cohab1_sep_no_marr <- subset(MEXICO_ENADID, !(survey %in% c("WFS", "ENADID1992", "ENADID2006")))
 MEX_cohab1_sep_no_marr$survey <- factor (MEX_cohab1_sep_no_marr$survey)
 MEX_cohab1_sep_no_marr <- MEX_cohab1_sep_no_marr[,c("country","survey","surveyDate_cmc",
                                       "union_start_type1","union_start_type1","union_start_cmc1","union_end_cmc1","union_end_motive1","marriage_start_cmc1",
-                                      "yBirth","reweight","indiv_weight")]
+                                      "yBirth","indiv_weight")]
 MEX_cohab1_sep_no_marr$yUnion1 <- yearFrom_cmc(MEX_cohab1_sep_no_marr$union_start_cmc1)
 MEX_cohab1_sep_no_marr <- subset (MEX_cohab1_sep_no_marr, union_start_type1 %in% c("cohabitation", "cohabitation before marriage"))
 
@@ -198,7 +193,7 @@ cohortsListMex_Marr3 <- c(
 plot_cohab_sep1_MEX <- KaplanMeierPlot (df=MEX_cohab1_sep_no_marr, varEnter="union_start_cmc1",
                                         varEvent="union_endBySep_cmc1", varCens="varSepCens1", var_yBirth = "yUnion1", varWeight="indiv_weight",
                                         varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListMex_Marr3,
-                                        Title="Mexico: Separation after first cohabitation without marriage, by union cohort",
+                                        Title="Mexico: Separation of first cohabitation (marriage censored), by union cohort",
                                         xTitle = "Duration in years after first cohabitation", yTitle="Proportion of separation",
                                         maxX = 20, popWeight = TRUE, confInt=TRUE,
                                         inverseFunction = TRUE)
@@ -298,7 +293,6 @@ plot_union_sep1_mod <- KaplanMeierPlot (df=dd, varEnter="union_start_cmc1",
                                         xTitle = "Duration in years after first union", maxX = 20, popWeight = TRUE, confInt=TRUE)
 
 #### USA: NSFG surveys ####
-# First union
 # 1973: complete UH (up to 6), no CohabBefMar
 # 1976: complete UH (up to 3), no CohabBefMar
 # 1982: complete UH (up to 4), no CohabBefMar
@@ -310,7 +304,7 @@ plot_union_sep1_mod <- KaplanMeierPlot (df=dd, varEnter="union_start_cmc1",
 # 2013-15: complete UH (up to 10 unions), CohabBefMar
 # 2015-17: complete UH (up to 10 unions), CohabBefMar, year not cmc for dates
 # 2017-19: incomplete UH, year not cmc for dates
-# 2022-23: incomplete UH, year not cmc for dates
+# 2022-23: only first union, CohabBefMar, year not cmc for dates
 USA_union1_marr <- subset(NSFG_ENADID, !(survey %in% c("NSFG1973", "NSFG1976", "NSFG1982","NSFG2017_19")))
 USA_union1_marr <- USA_union1_marr[,c("country","survey","surveyDate_cmc",
                                       "union_start_cmc1","union_end_cmc1","union_end_motive1","marriage_start_cmc1",
@@ -423,7 +417,7 @@ plot_union_sep2_USA <- KaplanMeierPlot (df=USA_union2_sep, varEnter="union_start
                                         inverseFunction = TRUE)
 plot_union_sep2_USA
 
-##### 3. First Separation ==> Second Union #####
+##### 3. First repartnering #####
 USA_sep1_union2 <- subset(NSFG_ENADID, !(survey %in% c("NSFG1973", "NSFG1976", "NSFG1982", "NSFG1988","NSFG2017_19","NSFG2022_23")))
 USA_sep1_union2 <- USA_sep1_union2[,c("country","survey","surveyDate_cmc",
                                       "union_end_cmc1","union_start_cmc2",
@@ -441,8 +435,8 @@ cohortsListUSA_Marr3 <- c(
 plot_sep1_union2_USA <- KaplanMeierPlot (df=USA_sep1_union2, varEnter="union_end_cmc1",
                                          varEvent="union_start_cmc2", varCens="surveyDate_cmc", var_yBirth = "ySep1", varWeight="indiv_weight",
                                          varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListUSA_Marr3,
-                                         Title="USA: Second union after separation, by union cohort",
-                                         xTitle = "Duration in years after first separation", yTitle="Proportion of separation",
+                                         Title="USA: First repartnering, by union cohort",
+                                         xTitle = "Duration in years after first separation", yTitle="Proportion of first separation",
                                          maxX = 20, popWeight = TRUE, confInt=TRUE,
                                          inverseFunction = TRUE)
 plot_sep1_union2_USA
@@ -476,15 +470,15 @@ cohortsListUSA_Marr3 <- c(
 plot_cohab_sep1_USA <- KaplanMeierPlot (df=USA_cohab1_sep_no_marr, varEnter="union_start_cmc1",
                                         varEvent="union_endBySep_cmc1", varCens="varSepCens1", var_yBirth = "yUnion1", varWeight="indiv_weight",
                                         varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=cohortsListUSA_Marr3,
-                                        Title="USA: Separation after first cohabitation without marriage, by union cohort",
+                                        Title="USA: Separation of first cohabitation (marriage censored), by union cohort",
                                         xTitle = "Duration in years after first cohabitation", yTitle="Proportion of separation",
                                         maxX = 20, popWeight = TRUE, confInt=TRUE,
                                         inverseFunction = TRUE)
 plot_cohab_sep1_USA
 
 
-#### Mexico and USA plots combined
-# 1. First union ==> marriage
+#### Mexico and USA combined plots ####
+##### 1. First union ==> marriage #####
 library(patchwork)
 
 # Combine plots side-by-side
@@ -511,7 +505,10 @@ MEX_USA_union1_marriage_plot <- combined_plot +
     plot.caption = element_text(size = 10, face = "italic")
   )
 
-# 3. Second union ==> marriage
+pathFile <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/MEX_USA_Union1_marriage.pdf")
+ggsave(filename = pathFile, plot = MEX_USA_union1_marriage_plot, width = 29.7, height = 21, units = "cm", dpi = 300)
+
+##### 2. Second union ==> marriage #####
 combined_plot <-
   (plot_marriage_union2_mod_MEX + labs(title="MEXICO")) +
   (plot_marriage_union2_USA + labs(title="USA"))
@@ -533,3 +530,84 @@ MEX_USA_union2_marriage_plot <- combined_plot +
     legend.title = element_text(size = 13),
     plot.caption = element_text(size = 10, face = "italic")
   )
+
+pathFile <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/MEX_USA_Union2_marriage.pdf")
+ggsave(filename = pathFile, plot = MEX_USA_union2_marriage_plot, width = 29.7, height = 21, units = "cm", dpi = 300)
+
+##### 3. First union ==> separation ######
+combined_plot <-
+  (plot_union_sep1_MEX + labs(title="MEXICO")) +
+  (plot_union_sep1_USA + labs(title="USA"))
+
+MEX_USA_union_sep1_plot <- combined_plot + 
+  plot_annotation(
+    #title = "Separation of first union, by union cohort",
+    title = NULL,
+    caption = "Source: INEGI/ENADID-EDER and CDC/NSFG microdata",
+    theme = theme(
+      # Styling ONLY the NEW Main Title
+      plot.title = element_text(size = 24, family = "serif", face = "bold")
+    )    ) &
+  theme(
+    plot.title = element_text(size = 20, hjust=0.5),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    plot.caption = element_text(size = 10, face = "italic")
+  )
+
+pathFile <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/MEX_USA_Union_sep1.pdf")
+ggsave(filename = pathFile, plot = MEX_USA_union_sep1_plot, width = 29.7, height = 21, units = "cm", dpi = 300)
+
+##### 4. Separation of cohabitation, marriage censored #####
+combined_plot <-
+  (plot_cohab_sep1_MEX + labs(title="MEXICO")) +
+  (plot_cohab_sep1_USA + labs(title="USA"))
+
+MEX_USA_cohab_sep1_plot <- combined_plot + 
+  plot_annotation(
+    #title = "Separation of cohabitation, marriage censored, by union cohort",
+    title = NULL,
+    caption = "Source: INEGI/ENADID-EDER and CDC/NSFG microdata",
+    theme = theme(
+      # Styling ONLY the NEW Main Title
+      plot.title = element_text(size = 24, family = "serif", face = "bold")
+    )    ) &
+  theme(
+    plot.title = element_text(size = 20, hjust=0.5),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    plot.caption = element_text(size = 10, face = "italic")
+  )
+
+pathFile <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/MEX_USA_Cohabitation_sep1.pdf")
+ggsave(filename = pathFile, plot = MEX_USA_cohab_sep1_plot, width = 29.7, height = 21, units = "cm", dpi = 300)
+
+##### 5. First repartnering #####
+combined_plot <-
+  (plot_sep1_union2_MEX + labs(title="MEXICO")) +
+  (plot_sep1_union2_USA + labs(title="USA"))
+
+MEX_USA_sep1_union2_plot <- combined_plot + 
+  plot_annotation(
+    #title = "First repartnering, by union cohort",
+    title = NULL,
+    caption = "Source: INEGI/ENADID-EDER and CDC/NSFG microdata",
+    theme = theme(
+      # Styling ONLY the NEW Main Title
+      plot.title = element_text(size = 24, family = "serif", face = "bold")
+    )    ) &
+  theme(
+    plot.title = element_text(size = 20, hjust=0.5),
+    axis.title = element_text(size = 14),
+    axis.text = element_text(size = 12),
+    legend.text = element_text(size = 12),
+    legend.title = element_text(size = 13),
+    plot.caption = element_text(size = 10, face = "italic")
+  )
+
+pathFile <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/MEX_USA_sep1_union2.pdf")
+ggsave(filename = pathFile, plot = MEX_USA_sep1_union2_plot, width = 29.7, height = 21, units = "cm", dpi = 300)
