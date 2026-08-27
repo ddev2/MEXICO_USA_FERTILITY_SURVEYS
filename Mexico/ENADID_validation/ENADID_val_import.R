@@ -6,8 +6,10 @@
 
 source("ENADID_val_lib.R")
 
-# Data root — mirrors rootPath convention from the original scripts.
-data_root <- file.path(rootPath, "INEGI/Encuestas/ENADID")
+# Data root. dataPath comes from the project path block; source
+# ../../enadid_lib.R first, or set dataPath by hand, when running standalone.
+if (!exists("dataPath")) source(file.path("..", "..", "enadid_lib.R"))
+data_root <- dataPath
 
 
 # ── Shared birth-history helper ──────────────────────────────────────────────

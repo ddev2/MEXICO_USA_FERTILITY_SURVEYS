@@ -5,12 +5,12 @@ library (tidyverse)
 library (haven)
 library (purrr)
 
-rootPathGGS <- "~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys"
+rootPathGGS <- otherRoot
 pathHarmHist1 <- path.expand(paste0(rootPathGGS,"/GGS/Harmonized Histories/Harmonized_Histories/HARMONIZED-HISTORIES_ALL_GGSaccess.dta"))
 pathHarmHist2 <- path.expand(paste0(rootPathGGS,"/GGS/Harmonized Histories/Harmonized_Histories_I/HARMONIZED-HISTORIES_I.dta"))
 pathHarmHist3 <- path.expand(paste0(rootPathGGS,"/GGS/Harmonized Histories/HarmonizedHistories_II/HarmonizedHistoriesII_2025_09_01.dta"))
 
-pathGGS_ENADID <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/GGS_ENADID.Rdat"))
+pathGGS_ENADID <- path.expand(paste0(dataPath, "GGS_ENADID.Rdat"))
 
 GGS1 <- haven::read_dta(pathHarmHist1) # GGS
 GGS2 <- haven::read_dta(pathHarmHist2) # GGS

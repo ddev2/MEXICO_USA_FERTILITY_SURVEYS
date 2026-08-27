@@ -3,8 +3,8 @@ source ("enadid_lib.r")
 library(foreign)
 # convert Colombia DHS 2015 to ENADID format
 
-pathColDHS2015 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Angela/Trabajo DANE 2022/DHS/co2015.csv")
-pathCol2015_ENADID <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/DHS_Col2015_ENADID.Rdat"))
+pathColDHS2015 <- file.path(dhsRoot, "co2015.csv")
+pathCol2015_ENADID <- path.expand(paste0(dataPath, "DHS_Col2015_ENADID.Rdat"))
 
 col2015 <- computeYearBirth (read.csv(pathColDHS2015))
 col2015$weight <- col2015$weight / 1000000
@@ -107,7 +107,7 @@ DHS_col <- cleanENADID(DHS_col)
 DHS_col <- reorder_birthHistory(DHS_col)
 
 save(DHS_col, file=pathCol2015_ENADID)
-pathGGS_ENADID <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/GGS_ENADID.Rdat"))
+pathGGS_ENADID <- path.expand(paste0(dataPath, "GGS_ENADID.Rdat"))
 GGS_ENADID <- subset(GGS_ENADID, (country!="COLOMBIA"))
 GGS_ENADID <- join_with_harmonized(df1=GGS_ENADID, df2=DHS_col, aSurvey="DHS")
 

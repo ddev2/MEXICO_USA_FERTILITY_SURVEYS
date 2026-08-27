@@ -4,7 +4,7 @@ source ("NSFG_harmonize_types.R")
 source ("NSFG_lib.R")
 source ("NSFG_impute_dissolution.R")
 source ("NSFG_impute_dissolution_model.R")
-source (path.expand("~/Dropbox/RStudioData/TransitionsPPR/KaplanMeierLib.R"))
+source("lib/KaplanMeierLib.R")
 # Read US NSFG surveys
 # Some have sps import files
 # Some not
@@ -43,7 +43,7 @@ capMonth <- TRUE
 # NO info on cohabitation before marriage
 # complete date (cmc)
 getDatos_1973 <- function (childSex=TRUE) {
-  path_1973 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/1973/1973NSFGData.dat")
+  path_1973 <- paste0(nsfgPath, "1973/1973NSFGData.dat")
   
   adjust_cmc <- function (cmc) {
     cmcRes <- cmc
@@ -266,7 +266,7 @@ NSFG_ENADID_1973 <- getDatos_1973()
 NSFG_ENADID_1973 <- cleanENADID(NSFG_ENADID_1973)
 NSFG_ENADID_1973 <-  reorder_birthHistory(NSFG_ENADID_1973)
 
-pathNSFG_ENADID_1973 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_1973.Rdat"))
+pathNSFG_ENADID_1973 <- path.expand(paste0(dataPath, "NSFG_ENADID_1973.Rdat"))
 save(NSFG_ENADID_1973, file = pathNSFG_ENADID_1973)
 
 #### 1976 ####
@@ -276,7 +276,7 @@ save(NSFG_ENADID_1973, file = pathNSFG_ENADID_1973)
 # NO info on cohabitation before marriage
 # complete date (cmc)
 getDatos_1976 <- function () {
-  path_1976 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/1976/1976NSFGData.dat")
+  path_1976 <- paste0(nsfgPath, "1976/1976NSFGData.dat")
 
   adjust_cmc <- function (cmc, closeEvent=TRUE) {
     cmcRes <- cmc
@@ -497,7 +497,7 @@ NSFG_ENADID_1976 <- getDatos_1976()
 NSFG_ENADID_1976 <- cleanENADID(NSFG_ENADID_1976)
 NSFG_ENADID_1976 <-  reorder_birthHistory(NSFG_ENADID_1976)
 
-pathNSFG_ENADID_1976 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_1976.Rdat"))
+pathNSFG_ENADID_1976 <- path.expand(paste0(dataPath, "NSFG_ENADID_1976.Rdat"))
 save(NSFG_ENADID_1976, file = pathNSFG_ENADID_1976)
 
 #### 1982 ####
@@ -506,7 +506,7 @@ save(NSFG_ENADID_1976, file = pathNSFG_ENADID_1976)
 # NO info on cohabitation before marriage
 # complete date (cmc)
 getDatos_1982 <- function () {
-  path_1982 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/1982/1982NSFGData.dat")
+  path_1982 <- paste0(nsfgPath, "1982/1982NSFGData.dat")
   
   adjust_cmc <- function (cmc) {
     cmc <- ifelse(cmc %in% c(9797,9898,9999), 9999, cmc)
@@ -836,7 +836,7 @@ getDatos_1982 <- function () {
 NSFG_ENADID_1982 <- getDatos_1982()
 NSFG_ENADID_1982 <- cleanENADID(NSFG_ENADID_1982)
 
-pathNSFG_ENADID_1982 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_1982.Rdat"))
+pathNSFG_ENADID_1982 <- path.expand(paste0(dataPath, "NSFG_ENADID_1982.Rdat"))
 save(NSFG_ENADID_1982, file = pathNSFG_ENADID_1982)
 
 readNoSep <- function (pathFile, line_length) {
@@ -864,7 +864,7 @@ readNoSep <- function (pathFile, line_length) {
 # no transition sep1 -> union2
 # info on cohabitation before marriage for the first union only
 getDatos_1988 <- function () {
-  path_1988 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/1988/")
+  path_1988 <- paste0(nsfgPath, "1988/")
   
   wd <- getwd()
   setwd(path_1988)
@@ -1206,7 +1206,7 @@ NSFG_ENADID_1988 <- getDatos_1988()
 NSFG_ENADID_1988 <- cleanENADID(NSFG_ENADID_1988)
 NSFG_ENADID_1988 <-  reorder_birthHistory(NSFG_ENADID_1988)
 
-pathNSFG_ENADID_1988 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_1988.Rdat"))
+pathNSFG_ENADID_1988 <- path.expand(paste0(dataPath, "NSFG_ENADID_1988.Rdat"))
 save(NSFG_ENADID_1988, file = pathNSFG_ENADID_1988)
 
 #### 1995 ####
@@ -1214,7 +1214,7 @@ save(NSFG_ENADID_1988, file = pathNSFG_ENADID_1988)
 # complete marriage and cohabitation histories (but no information for cohabitations on death of partner, only on separation)
 # info on cohabitation before marriage
 getDatos_1995 <- function () {
-  path_1995 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/1995/")
+  path_1995 <- paste0(nsfgPath, "1995/")
   
   raw <- readLines(paste0(path_1995,"1995FemRespData.dat"))
   raw_preg <- readLines(paste0(path_1995,"1995PregData.dat"))
@@ -1688,7 +1688,7 @@ NSFG_ENADID_1995 <- getDatos_1995()
 NSFG_ENADID_1995 <- cleanENADID(NSFG_ENADID_1995)
 NSFG_ENADID_1995 <-  reorder_birthHistory(NSFG_ENADID_1995)
 
-pathNSFG_ENADID_1995 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_1995.Rdat"))
+pathNSFG_ENADID_1995 <- path.expand(paste0(dataPath, "NSFG_ENADID_1995.Rdat"))
 save(NSFG_ENADID_1995, file = pathNSFG_ENADID_1995)
 
 adjust_cmc_2002_after <- function (cmc) {
@@ -1760,7 +1760,7 @@ nsfg_husb_priorKids <- function(df, kidshx_names) {
 }
 
 getDatos_2002 <- function (correctDissolution=TRUE) {
-  path_2002 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2002/")
+  path_2002 <- paste0(nsfgPath, "2002/")
 
   wd <- getwd()
   setwd(path_2002)
@@ -1915,7 +1915,7 @@ NSFG_ENADID_2002 <- getDatos_2002()
 NSFG_ENADID_2002 <- cleanENADID(NSFG_ENADID_2002)
 NSFG_ENADID_2002 <-  reorder_birthHistory(NSFG_ENADID_2002)
 
-pathNSFG_ENADID_2002 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2002.Rdat"))
+pathNSFG_ENADID_2002 <- path.expand(paste0(dataPath, "NSFG_ENADID_2002.Rdat"))
 save(NSFG_ENADID_2002, file = pathNSFG_ENADID_2002)
 
 #### 2006-10 ####
@@ -1924,7 +1924,7 @@ save(NSFG_ENADID_2002, file = pathNSFG_ENADID_2002)
 # info on cohabitation before marriage
 # complete date (cmc)
 getDatos_2006_10 <- function () {
-  path_2006_10 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2006-10/")
+  path_2006_10 <- paste0(nsfgPath, "2006-10/")
 
   wd <- getwd()
   setwd(path_2006_10)
@@ -2033,7 +2033,7 @@ NSFG_ENADID_2006_10 <- getDatos_2006_10()
 NSFG_ENADID_2006_10 <- cleanENADID(NSFG_ENADID_2006_10)
 NSFG_ENADID_2006_10 <-  reorder_birthHistory(NSFG_ENADID_2006_10)
 
-pathNSFG_ENADID_2006_10 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2006_10.Rdat"))
+pathNSFG_ENADID_2006_10 <- path.expand(paste0(dataPath, "NSFG_ENADID_2006_10.Rdat"))
 save(NSFG_ENADID_2006_10, file = pathNSFG_ENADID_2006_10)
 
 #### 2011-13 ####
@@ -2043,7 +2043,7 @@ save(NSFG_ENADID_2006_10, file = pathNSFG_ENADID_2006_10)
 # info on cohabitation before marriage
 # complete date (cmc)
 getDatos_2011_13 <- function () {
-  path_2011_13 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2011-13/")
+  path_2011_13 <- paste0(nsfgPath, "2011-13/")
   
   wd <- getwd()
   setwd(path_2011_13)
@@ -2153,7 +2153,7 @@ NSFG_ENADID_2011_13 <- getDatos_2011_13()
 NSFG_ENADID_2011_13 <- cleanENADID(NSFG_ENADID_2011_13)
 NSFG_ENADID_2011_13 <-  reorder_birthHistory(NSFG_ENADID_2011_13)
 
-pathNSFG_ENADID_2011_13 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2011_13.Rdat"))
+pathNSFG_ENADID_2011_13 <- path.expand(paste0(dataPath, "NSFG_ENADID_2011_13.Rdat"))
 save(NSFG_ENADID_2011_13, file = pathNSFG_ENADID_2011_13)
 
 
@@ -2164,7 +2164,7 @@ save(NSFG_ENADID_2011_13, file = pathNSFG_ENADID_2011_13)
 # info on cohabitation before marriage
 # complete date (cmc)
 getDatos_2013_15 <- function () {
-  path_2013_15 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2013-15/")
+  path_2013_15 <- paste0(nsfgPath, "2013-15/")
   
   wd <- getwd()
   setwd(path_2013_15)
@@ -2270,7 +2270,7 @@ NSFG_ENADID_2013_15 <- getDatos_2013_15()
 NSFG_ENADID_2013_15 <- cleanENADID(NSFG_ENADID_2013_15)
 NSFG_ENADID_2013_15 <-  reorder_birthHistory(NSFG_ENADID_2013_15)
 
-pathNSFG_ENADID_2013_15 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2013_15.Rdat"))
+pathNSFG_ENADID_2013_15 <- path.expand(paste0(dataPath, "NSFG_ENADID_2013_15.Rdat"))
 save(NSFG_ENADID_2013_15, file = pathNSFG_ENADID_2013_15)
 
 
@@ -2281,7 +2281,7 @@ save(NSFG_ENADID_2013_15, file = pathNSFG_ENADID_2013_15)
 # info on cohabitation before marriage
 # year, not cmc, for dates
 getDatos_2015_17 <- function () {
-  path_2015_17 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2015-17/")
+  path_2015_17 <- paste0(nsfgPath, "2015-17/")
 
   wd <- getwd()
   setwd(path_2015_17)
@@ -2386,7 +2386,7 @@ NSFG_ENADID_2015_17 <- getDatos_2015_17()
 NSFG_ENADID_2015_17 <- cleanENADID(NSFG_ENADID_2015_17)
 NSFG_ENADID_2015_17 <-  reorder_birthHistory(NSFG_ENADID_2015_17)
 
-pathNSFG_ENADID_2015_17 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2015_17.Rdat"))
+pathNSFG_ENADID_2015_17 <- path.expand(paste0(dataPath, "NSFG_ENADID_2015_17.Rdat"))
 save(NSFG_ENADID_2015_17, file = pathNSFG_ENADID_2015_17)
 
 #### 2017-19 ####
@@ -2397,7 +2397,7 @@ save(NSFG_ENADID_2015_17, file = pathNSFG_ENADID_2015_17)
 # therefore NO information on first union NOR Union History
 # the information necessary for a complete Union History is in Restricted Use files...
 getDatos_2017_19 <- function () {
-  path_2017_19 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2017-19/")
+  path_2017_19 <- paste0(nsfgPath, "2017-19/")
 
   wd <- getwd()
   setwd(path_2017_19)
@@ -2494,7 +2494,7 @@ NSFG_ENADID_2017_19 <- getDatos_2017_19()
 NSFG_ENADID_2017_19 <- cleanENADID(NSFG_ENADID_2017_19)
 NSFG_ENADID_2017_19 <-  reorder_birthHistory(NSFG_ENADID_2017_19)
 
-pathNSFG_ENADID_2017_19 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2017_19.Rdat"))
+pathNSFG_ENADID_2017_19 <- path.expand(paste0(dataPath, "NSFG_ENADID_2017_19.Rdat"))
 save(NSFG_ENADID_2017_19, file = pathNSFG_ENADID_2017_19)
 
 #### 2022-23 ####
@@ -2639,8 +2639,8 @@ getDatos_2022_23 <- function () {
     return (datos_UH)
   }
 
-  path_2022_23 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2022-23/NSFG-2022-2023-FemRespPUFData.sas7bdat")
-  path_2022_23_preg <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2022-23/NSFG-2022-2023-FemPregPUFData.sas7bdat")
+  path_2022_23 <- paste0(nsfgPath, "2022-23/NSFG-2022-2023-FemRespPUFData.sas7bdat")
+  path_2022_23_preg <- paste0(nsfgPath, "2022-23/NSFG-2022-2023-FemPregPUFData.sas7bdat")
   if (!exists("df_NSFG_2022_23")) df_NSFG_2022_23 <<- haven::read_sas(path_2022_23)
   if (!exists("df_NSFG_2022_23_preg")) df_NSFG_2022_23_preg <<- haven::read_sas(path_2022_23_preg)
   
@@ -2746,7 +2746,7 @@ NSFG_ENADID_2022_23 <- getDatos_2022_23()
 NSFG_ENADID_2022_23 <- cleanENADID(NSFG_ENADID_2022_23)
 NSFG_ENADID_2022_23 <-  reorder_birthHistory(NSFG_ENADID_2022_23)
 
-pathNSFG_ENADID_2022_23 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2022_23.Rdat"))
+pathNSFG_ENADID_2022_23 <- path.expand(paste0(dataPath, "NSFG_ENADID_2022_23.Rdat"))
 save(NSFG_ENADID_2022_23, file = pathNSFG_ENADID_2022_23)
 
 surveys_list <- list(
@@ -2958,7 +2958,7 @@ NSFG_ENADID <- NSFG_ENADID %>%
 
 
 #### save NSFG_ENADID ####
-pathNSFG_ENADID <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID.Rdat"))
+pathNSFG_ENADID <- path.expand(paste0(dataPath, "NSFG_ENADID.Rdat"))
 save(NSFG_ENADID, file = pathNSFG_ENADID)
 
 print (DATE_QUALITY_SUMMARY)

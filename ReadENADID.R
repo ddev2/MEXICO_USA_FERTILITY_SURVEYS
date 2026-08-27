@@ -261,7 +261,7 @@ popMex <- PopAgeMex()
 MEXICO_ENADID <- addWeights (MEXICO_ENADID, popMex)
 rm(popMex)
 
-path_MEXICO_ENADID <- paste0(rootPath, "/INEGI/Encuestas/ENADID/MEXICO_ENADID.Rdat")
+path_MEXICO_ENADID <- paste0(dataPath, "MEXICO_ENADID.Rdat")
 save(MEXICO_ENADID, file = path_MEXICO_ENADID)
 
 rm(WFS_ENADID1977_full)

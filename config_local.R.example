@@ -1,0 +1,23 @@
+# ==== Local data locations ====
+#
+# Copy this file to config_local.R (which git ignores) and edit the paths if
+# your survey data is NOT under <project>/data. Every variable is optional:
+# anything left out falls back to the default layout described at the top of
+# enadid_lib.R. Restart R after editing, so the values are recomputed.
+#
+#   dataRoot    parent of everything below; set this alone if the whole data
+#               tree simply lives somewhere else
+#   mexicoRoot  holds ENADID/, EDER/ and WFS_ENADID1977.Rdat (INEGI files),
+#               and receives the derived .Rdat files in its ENADID/ subfolder
+#   nsfgRoot    holds one folder per NSFG cycle: 1973, 1976, ... 2022-23 (CDC)
+#   otherRoot   optional GGS and Spanish survey files
+#   dhsRoot     optional DHS files and co2015.csv
+#   outputPath  where the analysis scripts write their plots
+
+# dataRoot   <- "/Volumes/Data/Mexico-USA/data"
+
+# mexicoRoot <- "~/Surveys/Mexico"
+# nsfgRoot   <- "~/Surveys/USA/NSFG"
+# otherRoot  <- "~/Surveys/other"
+# dhsRoot    <- "~/Surveys/other/DHS"
+# outputPath <- "~/Surveys/output"

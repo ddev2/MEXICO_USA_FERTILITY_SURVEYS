@@ -3,11 +3,11 @@ source ("enadid_lib.r")
 library (tidyverse)
 library (haven)
 library (purrr)
-source (path.expand("~/Dropbox/RStudioData/TransitionsPPR/KaplanMeierLib.R"))
-path_output_plots <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/")
+source("lib/KaplanMeierLib.R")
+path_output_plots <- paste0(outputPath, "/")
 
-pathColDHS <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Angela/Trabajo DANE 2022/DHS")
-source(paste0(pathColDHS,"/DHS_lib.r"))
+pathColDHS <- dhsRoot
+source("lib/DHS_lib.R")
 
 convert_ENADID_DHStype <- function(dfIN=NULL) {
   # create a data.frame with the fields necessaries to compute TFR and PPRs using code for DHS

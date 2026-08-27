@@ -29,3 +29,6 @@ NSFG_validation/questionnaire/PDF/
 
 # backups
 *.bak
+
+# local machine configuration (see config_local.R.example)
+config_local.R

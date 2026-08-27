@@ -1,8 +1,64 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-#rootPath <- sub("/INEGI/.*", "", getwd())
-rootPath <- "/Users/daniel/My Drive (ddevolder@ced.uab.es)/Pachuca"
-mainPath <- "/INEGI/Encuestas/"
-dataPath <- paste0(rootPath, "/INEGI/Encuestas/ENADID/")
+
+# ==== Project paths ====
+#
+# Every data location is derived from the folder holding this file (the R/
+# folder of the repository), so the code runs on any machine. Default layout:
+#
+#   <project>/R/                this code
+#   <project>/data/Mexico/      INEGI: ENADID/, EDER/, WFS_ENADID1977.Rdat
+#   <project>/data/USA/NSFG/    CDC NSFG, one folder per cycle
+#   <project>/data/other/       optional GGS, DHS and Spanish survey files
+#   <project>/output/           plots written by the analysis scripts
+#
+# The derived .Rdat files (ENADID1992.Rdat ... MEXICO_ENADID.Rdat,
+# NSFG_ENADID.Rdat) are written to data/Mexico/ENADID/.
+#
+# To keep the data elsewhere, create R/config_local.R (not tracked by git)
+# and set any of dataRoot, mexicoRoot, nsfgRoot, otherRoot, dhsRoot or
+# outputPath there. See config_local.R.example. Restart R after editing it.
+
+scriptDir <- getwd()
+if (!file.exists(file.path(scriptDir, "enadid_lib.R"))) {
+  d <- scriptDir
+  for (i in 1:4) {
+    d <- dirname(d)
+    if (file.exists(file.path(d, "enadid_lib.R"))) { scriptDir <- d; break }
+  }
+}
+projectRoot <- dirname(scriptDir)
+
+.cfgEnv <- new.env()
+if (file.exists(file.path(scriptDir, "config_local.R"))) {
+  sys.source(file.path(scriptDir, "config_local.R"), envir = .cfgEnv)
+}
+.cfg <- function(name, default) {
+  if (exists(name, envir = .cfgEnv, inherits = FALSE)) get(name, envir = .cfgEnv) else default
+}
+
+dataRoot   <- .cfg("dataRoot",   file.path(projectRoot, "data"))
+mexicoRoot <- .cfg("mexicoRoot", file.path(dataRoot, "Mexico"))
+nsfgRoot   <- .cfg("nsfgRoot",   file.path(dataRoot, "USA", "NSFG"))
+otherRoot  <- .cfg("otherRoot",  file.path(dataRoot, "other"))
+dhsRoot    <- .cfg("dhsRoot",    file.path(otherRoot, "DHS"))
+outputPath <- .cfg("outputPath", file.path(projectRoot, "output"))
+
+# Compatibility aliases used by every reader:
+#   paste0(rootPath, mainPath, "ENADID/1992/...")  ->  <mexicoRoot>/ENADID/1992/...
+rootPath <- mexicoRoot
+mainPath <- "/"
+dataPath <- paste0(file.path(mexicoRoot, "ENADID"), "/")
+nsfgPath <- paste0(nsfgRoot, "/")
+
+
+# ==== Shared helper library ====
+#
+# Supplies stripLabels(), tabNA(), tNA(), chgLabels(), check_bind_conflicts(),
+# library2() and the ggplot theme helpers used across this project. It used to
+# be loaded from Dropbox by a personal .Rprofile, which meant the code could
+# not run on any other machine. It is now bundled in lib/.
+
+source(file.path(scriptDir, "lib", "lib.R"))
 
 library (tidyverse)
 library (haven)

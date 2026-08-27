@@ -1,6 +1,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source (path.expand("~/Dropbox/RStudioData/TransitionsPPR/KaplanMeierLib.R"))
-path_output_plots <- path.expand("~/My Drive (ddevolder@ced.uab.es)/Pachuca/INEGI/Encuestas/USA-MEXICO/")
+source("enadid_lib.R")
+source("lib/KaplanMeierLib.R")
+path_output_plots <- paste0(outputPath, "/")
 
 #### MEXICO ####
 # First union

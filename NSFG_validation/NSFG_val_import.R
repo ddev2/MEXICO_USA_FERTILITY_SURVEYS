@@ -34,10 +34,10 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source("NSFG_val_lib.R")
 
-# Data file paths — adjust root as needed
-data_root <- path.expand(
-  "~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG"
-)
+# Data file paths. nsfgRoot comes from the project path block; source
+# ../enadid_lib.R first, or set nsfgRoot by hand, when running standalone.
+if (!exists("nsfgRoot")) source(file.path("..", "enadid_lib.R"))
+data_root <- nsfgRoot
 
 codebook_root <- file.path(dirname(rstudioapi::getActiveDocumentContext()$path), "codebooks")
 

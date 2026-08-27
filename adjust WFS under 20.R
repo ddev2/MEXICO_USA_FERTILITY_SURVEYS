@@ -1,5 +1,8 @@
+setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+source("enadid_lib.R")
+
 #### BEFORE ####
-path_MEXICO_ENADID <- paste0(rootPath, "/INEGI/Encuestas/ENADID/MEXICO_ENADID.Rdat")
+path_MEXICO_ENADID <- paste0(dataPath, "MEXICO_ENADID.Rdat")
 load(file=path_MEXICO_ENADID)
 wfs=subset(MEXICO_ENADID,survey=="WFS")
 
