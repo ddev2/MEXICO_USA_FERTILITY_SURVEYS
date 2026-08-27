@@ -1,0 +1,31 @@
+# R session and IDE files
+.RData
+.RDataTmp
+.RDataTmp*
+.Rhistory
+.Rproj.user/
+.Rprofile
+R.Rproj
+
+# macOS
+.DS_Store
+
+# helper scripts, local only
+push.sh
+apply_gitignore.sh
+
+# superseded / scratch scripts
+ReadEDER2017_old.R
+nsfg_childfree.R
+PTAT.pdf
+
+# Claude working files
+.claude/
+**/.claude/
+
+# NSFG_validation: track the R code and the OCR text, not the large scans
+NSFG_validation/codebooks/PDF/
+NSFG_validation/questionnaire/PDF/
+
+# backups
+*.bak
