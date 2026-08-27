@@ -1,4 +1,7 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source ("enadid_lib.r")
 #### Read ENADID 1992 ####
 library (tidyverse)
@@ -6,10 +9,20 @@ library (foreign)
 library(janitor)
 library(bit64) # Necessary for the integer64 type
 
-path_mujer <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1992/base_datos_enadid92_dbf/BASESDBF/FECUNDIDAD_1.DBF"))
-path_embarazos <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1992/base_datos_enadid92_dbf/BASESDBF/FECUNDIDAD_2.DBF"))
-path_ENADID1992 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID1992.Rdat"))
-path_ENADID1992_mujeres <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID1992_mujeres.Rdat"))
+# ==== Month-imputation mode (per-survey switch) ====
+# FALSE = legacy (missing months imputed uniformly, as before).
+# TRUE  = constrained: imputed months capped to the survey date and ordered
+#         within a union (marriage >= union start; union end >= union start and
+#         >= marriage). 1992 has no union dates, so only the births cap binds.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- TRUE
+if (!exists("capMonth")) capMonth <- FALSE
+
+path_mujer <- path.expand(paste0(rootPath,mainPath,"ENADID/1992/base_datos_enadid92_dbf/BASESDBF/FECUNDIDAD_1.DBF"))
+path_embarazos <- path.expand(paste0(rootPath,mainPath,"ENADID/1992/base_datos_enadid92_dbf/BASESDBF/FECUNDIDAD_2.DBF"))
+path_ENADID1992 <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID1992.Rdat"))
+path_ENADID1992_mujeres <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID1992_mujeres.Rdat"))
 # read everything as character
 mujeres1992 <- foreign::read.dbf (path_mujer, as.is = TRUE)
 # Convert columns 9 to end to integer
@@ -119,7 +132,7 @@ getDatos1992 <- function (mujeres) {
   return (datos)
 }
 
-ENADID1992 <- bigDataWomen ( getDatos1992 (mujeres1992) )
+ENADID1992 <- bigDataWomen ( getDatos1992 (mujeres1992), capMonth = capMonth )
 
 # live births
 bigDataChildbirths <- function (embarazos) {
@@ -129,7 +142,7 @@ bigDataChildbirths <- function (embarazos) {
   ENADID_P$sex <- ifelse(!is.na(embarazos$P9_18), embarazos$P9_18, ENADID_P$sex)
   embarazos$P9_20B <- ifelse(embarazos$P9_20B == 99, 9999, embarazos$P9_20B)
   embarazos$P9_20B <- ifelse(embarazos$P9_20B %in% seq(47,92,1), embarazos$P9_20B + 1900, embarazos$P9_20B)
-  ENADID_P$dob_cmc <- compute_cmc(embarazos$P9_20A, embarazos$P9_20B)
+  ENADID_P$dob_cmc <- compute_cmc(embarazos$P9_20A, embarazos$P9_20B, survey_cmc = if (isTRUE(capMonth)) compute_cmc(12L, 1992L) else NULL, capped = capMonth)
   ENADID_P$dob_cmc_I <- imputed_date(embarazos$P9_20A, embarazos$P9_20B)
   ENADID_P$orden <- embarazos$P9_29
   ##### date of death #####
@@ -229,6 +242,7 @@ if (!isTRUE(
   ENADID1992_full$diff <- NULL
   }
 
+ENADID1992_full <- split_birth_vs_union(ENADID1992_full, capMonth = capMonth)
 ENADID1992_full <- cleanENADID(ENADID1992_full)
 ENADID1992_full <- reorder_birthHistory(ENADID1992_full)
 

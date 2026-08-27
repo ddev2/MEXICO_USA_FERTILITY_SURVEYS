@@ -1,6 +1,18 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 library(tidyverse)
 library(haven)
+
+source ("enadid_lib.R")
+
+# ==== Month-imputation mode (MASTER switch) ====
+# Applies to all readers sourced below (each reader only sets its own default
+# when run standalone, via `if (!exists("capMonth"))`).
+# FALSE = legacy (missing months imputed uniformly, as before).
+# TRUE  = constrained: imputed months capped at the survey date and ordered
+#         within a union (marriage >= union start; union end >= union start
+#         and >= marriage).
+capMonth <- TRUE
+
 source ("WFS_to_ENADID.r")
 source ("ReadMujeres1992.r")
 source ("ReadMujeres1997.r")
@@ -21,9 +33,11 @@ rm(mujeres2023)
 rm(embarazos)
 rm(hogar)
 
-MEXICO_ENADID <- WFS_ENADID1977_full
+MEXICO_ENADID <- compute_lastYear(WFS_ENADID1977_full)
+MEXICO_ENADID <- stripLabels(MEXICO_ENADID)
 MEXICO_ENADID$region <- NULL
 
+ENADID1992_full$nUnion <- ENADID1992_full$n_union
 MEXICO_ENADID <- ENADID1992_full %>%
   #select(any_of(names(MEXICO_ENADID))) %>%  # Select only columns present in MEXICO_ENADID
   bind_rows(MEXICO_ENADID, .)
@@ -73,8 +87,58 @@ MEXICO_ENADID <- EDER_ENADID25 %>%
 
 MEXICO_ENADID$survey <- factor (MEXICO_ENADID$survey)
 
+#### harmonize fields ####
+#MEXICO_ENADID <- harm_union_type (MEXICO_ENADID, 7)
+
+#### clean and reorder dataframe: keep only necessary columns ####
+selColumns <- c(
+  "country","survey","surveyDate_cmc","indiv_dob_cmc","indiv_dob_cmc_I","indiv_age_survey","yBirth","indiv_weight",
+  "nBioKids","nUnion","union_status","lastYear","llave_muj",
+  "pregnant","pregnant_wanted","pregnant_want_another","pregnant_ideal_number",
+  "nullipar_fecund","nullipar_want_another","nullipar_ideal_number",
+  "mother_fecund","mother_want_another","mother_ideal_number","mother_less","mother_unwanted",
+  "motive_no_child","ideal_number","want_another",
+  "age_first_sex","ever_had_sex","ever_contraception"
+)
+for (u in (1:7)) {
+  selColumns <- c(selColumns, paste0("union_start_type",u),
+                  paste0("union_start_cmc",u),
+                  paste0("union_start_cmc_I",u),
+                  paste0("marriage_start_cmc",u),
+                  paste0("marriage_start_cmc_I",u),
+                  paste0("union_end_cmc",u),
+                  paste0("union_end_cmc_I",u),
+                  paste0("union_end_motive",u)
+                  )
+}
+for (b in (1:25)) {
+  selColumns <- c(selColumns,
+                  paste0("dob_cmc",b),
+                  paste0("dob_cmc_I",b),
+                  paste0("dod_cmc",b),
+                  paste0("sex",b)
+                  )
+}
+
+MEXICO_ENADID <- MEXICO_ENADID %>%
+  select(any_of(selColumns))
+
 #### reweight the surveys ####
-PobEdadMex <- function () {
+# We use two kinds of weights:
+# 1. *weight* is the original weight of each individual in the survey DIVIDED by the mean value of the weights in the survey,
+# so that the mean of indiv_weight is 1 for each survey. This way, we keep the relative weights of individuals within each survey
+# We use indiv_weight when computing variance and confidence intervals of indicators, as it reflects the sampling design of the survey.
+# 2. *popWeigth* is the multiplier that we apply to each individual weight,
+# so that the sum of the reweighted weights (weight * popWeigth) for each survey matches
+# the population counts by age in the year of the survey.
+# This way, we ensure that the total weighted count of individuals in each age group matches the population counts.
+# We use popWeigth for computing the point estimates of indicators, as a pooling mechanism: it ensures that smaller surveys effectively balance larger ones
+
+# 1. Calculate *weight* by dividing the original weight (variable indiv_weight) by the mean weight of the survey
+MEXICO_ENADID <- reweight (MEXICO_ENADID)
+
+# 2. Calculate *popWeigth* by multiplying *weight* by the division of the population counts by age in the year of the survey by the sum of *weight* for each age group in the survey
+PopAgeMex <- function () {
   return (
     structure(list(
       Age = c(0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 
@@ -192,29 +256,10 @@ PobEdadMex <- function () {
       row.names = c(NA, -66L), class = "data.frame")
     )
 }
-pobMex <- PobEdadMex()
-pobMex_l <- pobMex %>%
-  as_tibble() %>%
-  pivot_longer(cols = -Age, names_to = "survey", values_to = "Freq")
-pobMex_l <- pobMex_l[order(pobMex_l$survey),]
-pobMex_l <- subset (pobMex_l, Age >= 14)
-pobMEX_ENADID <-  as.data.frame(xtabs(indiv_weight ~ ageSurvey + survey, data = MEXICO_ENADID))
-pobMEX_ENADID <- pobMEX_ENADID[order(pobMEX_ENADID$survey),]
+popMex <- PopAgeMex()
 
-reweight <- pobMEX_ENADID
-reweight[,3] <- pobMex_l[,3] / pobMEX_ENADID[,3]
-reweight[,3] <- ifelse(is.infinite(reweight[,3]),0,reweight[,3])
-reweight$ageSurvey <- as.numeric(as.character(reweight$ageSurvey))
-
-MEXICO_ENADID <- MEXICO_ENADID %>%
-  # Step 1: Join the multiplier to the individual data
-  left_join(reweight, by = c("ageSurvey", "survey")) %>%
-
-  # Step 2: Perform the vectorized multiplication
-  mutate(reweight = indiv_weight * Freq) %>%
-
-  # Step 3: Optional - remove the multiplier column to keep it clean
-  select(-Freq)
+MEXICO_ENADID <- addWeights (MEXICO_ENADID, popMex)
+rm(popMex)
 
 path_MEXICO_ENADID <- paste0(rootPath, "/INEGI/Encuestas/ENADID/MEXICO_ENADID.Rdat")
 save(MEXICO_ENADID, file = path_MEXICO_ENADID)
@@ -229,3 +274,5 @@ rm(EDER_ENADID)
 rm(ENADID2018_full)
 rm(ENADID2023_full)
 rm(EDER_ENADID25)
+
+print (summarizeDateQuality(MEXICO_ENADID))

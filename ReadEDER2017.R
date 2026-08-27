@@ -1,4 +1,7 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source("enadid_lib.r")
 # Read EDER 2017 file
 # imputed_month_capped() is defined in enadid_lib.r
@@ -7,11 +10,27 @@ library(haven)
 library(purrr)
 library(data.table)
 
+# ==== Month-imputation mode (per-survey switch) ====
+# EDER 2017 stores event dates as year only, so every month is imputed.
+# capMonth selects how months are drawn (via imp_cap(), used throughout):
+#   TRUE  = constrained: survey cap + strict-after ordering + probabilistic
+#           birth-vs-union split (the method designed for EDER).
+#   FALSE = simple: survey cap + strict-after ordering only (no prob. split).
+# Survey cap and strict-after are HARD constraints, always applied; only the
+# probabilistic layer is toggled. imp_cap() injects `capped` into every call
+# without altering the shared imputed_month_capped() in enadid_lib.r.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- FALSE
+if (!exists("capMonth")) capMonth <- TRUE
+imp_cap  <- function(..., capped = capMonth) imputed_month_capped(..., capped = capped)
+
+
 if (exists("DEBUG")) browser()
 
-path_EDER2017              <- path.expand(paste0(rootPath, "/INEGI/Encuestas/EDER/2017/eder2017_bases_sav/historiavida.sav"))
-path_EDER2017_antecedentes <- path.expand(paste0(rootPath, "/INEGI/Encuestas/EDER/2017/eder2017_bases_sav/antecedentes.sav"))
-path_EDER_ENADID2017       <- path.expand(paste0(rootPath, "/INEGI/Encuestas/ENADID/EDER_ENADID2017.Rdat"))
+path_EDER2017              <- path.expand(paste0(rootPath, mainPath,"EDER/2017/eder2017_bases_sav/historiavida.sav"))
+path_EDER2017_antecedentes <- path.expand(paste0(rootPath, mainPath,"EDER/2017/eder2017_bases_sav/antecedentes.sav"))
+path_EDER_ENADID2017       <- path.expand(paste0(rootPath, mainPath,"ENADID/EDER_ENADID2017.Rdat"))
 
 
 # ==== 1. Load & merge historiavida + antecedentes ====
@@ -316,13 +335,13 @@ for (u in seq_len(5)) {
 
   df_unions_final[[Ustart]] <- ifelse(
     !is.na(u_yrs),
-    compute_cmc(imputed_month_capped(N, u_yrs, survey_cmc = surv_cmc), u_yrs),
+    compute_cmc(imp_cap(N, u_yrs, survey_cmc = surv_cmc), u_yrs),
     NA_integer_
   )
 
   df_unions_final[[Mstart]] <- ifelse(
     !is.na(m_yrs),
-    compute_cmc(imputed_month_capped(N, m_yrs, survey_cmc = surv_cmc), m_yrs),
+    compute_cmc(imp_cap(N, m_yrs, survey_cmc = surv_cmc), m_yrs),
     NA_integer_
   )
 
@@ -339,10 +358,10 @@ for (u in seq_len(5)) {
   if (any(idx)) {
     n <- sum(idx)
     df_unions_final[[Ustart]][idx] <- compute_cmc(
-      imputed_month_capped(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
+      imp_cap(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
       u_yrs[idx])
     df_unions_final[[Mstart]][idx] <- compute_cmc(
-      imputed_month_capped(n, m_yrs[idx], survey_cmc = surv_cmc[idx],
+      imp_cap(n, m_yrs[idx], survey_cmc = surv_cmc[idx],
                            after_cmc = df_unions_final[[Ustart]][idx], range = 2:12),
       m_yrs[idx])
   }
@@ -352,10 +371,10 @@ for (u in seq_len(5)) {
   if (any(idx)) {
     n <- sum(idx)
     df_unions_final[[Ustart]][idx] <- compute_cmc(
-      imputed_month_capped(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
+      imp_cap(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
       u_yrs[idx])
     df_unions_final[[Uend]][idx] <- compute_cmc(
-      imputed_month_capped(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
+      imp_cap(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
                            after_cmc = df_unions_final[[Ustart]][idx], range = 2:12),
       e_yrs[idx])
   }
@@ -367,10 +386,10 @@ for (u in seq_len(5)) {
   if (any(idx)) {
     n <- sum(idx)
     df_unions_final[[Mstart]][idx] <- compute_cmc(
-      imputed_month_capped(n, m_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
+      imp_cap(n, m_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:11),
       m_yrs[idx])
     df_unions_final[[Uend]][idx] <- compute_cmc(
-      imputed_month_capped(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
+      imp_cap(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
                            after_cmc = df_unions_final[[Mstart]][idx], range = 2:12),
       e_yrs[idx])
     idx_no_ustart <- idx & is.na(df_unions_final[[Ustart]])
@@ -393,14 +412,14 @@ for (u in seq_len(5)) {
   if (any(idx)) {
     n <- sum(idx)
     df_unions_final[[Ustart]][idx] <- compute_cmc(
-      imputed_month_capped(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:4),
+      imp_cap(n, u_yrs[idx], survey_cmc = surv_cmc[idx], range = 1:4),
       u_yrs[idx])
     df_unions_final[[Mstart]][idx] <- compute_cmc(
-      imputed_month_capped(n, m_yrs[idx], survey_cmc = surv_cmc[idx],
+      imp_cap(n, m_yrs[idx], survey_cmc = surv_cmc[idx],
                            after_cmc = df_unions_final[[Ustart]][idx], range = 5:8),
       m_yrs[idx])
     df_unions_final[[Uend]][idx] <- compute_cmc(
-      imputed_month_capped(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
+      imp_cap(n, e_yrs[idx], survey_cmc = surv_cmc[idx],
                            after_cmc = df_unions_final[[Mstart]][idx], range = 9:12),
       e_yrs[idx])
   }
@@ -412,7 +431,7 @@ for (u in seq_len(5)) {
   uend_missing  <- is.na(df_unions_final[[Uend]]) & !is.na(e_yrs)
   if (any(uend_missing)) {
     df_unions_final[[Uend]][uend_missing] <- compute_cmc(
-      imputed_month_capped(sum(uend_missing),
+      imp_cap(sum(uend_missing),
                            e_yrs[uend_missing],
                            survey_cmc = surv_cmc[uend_missing],
                            after_cmc  = end_after_cmc[uend_missing]),
@@ -425,10 +444,24 @@ for (u in seq_len(5)) {
     !is.na(u_yrs), df_unions_final[[UendMotive]], NA_character_
   )
 
-  # Imputation flags: 1 when CMC is non-missing (month was imputed)
-  df_unions_final[[Ustart_I]] <- ifelse(is.na(df_unions_final[[Ustart]]), NA_integer_, 1L)
-  df_unions_final[[Uend_I]]   <- ifelse(is.na(df_unions_final[[Uend]]),   NA_integer_, 1L)
-  df_unions_final[[Mstart_I]] <- ifelse(is.na(df_unions_final[[Mstart]]), NA_integer_, 1L)
+  # Imputation flags: EDER records years only, so months are always imputed (flag 1).
+  # Exception: if the year itself is DK / out of range (> 9000), flag is 10 so that
+  # union_end_9999_to_NA and filterDateQuality(dropBadUnionDates) treat it correctly.
+  df_unions_final[[Ustart_I]] <- dplyr::case_when(
+    is.na(df_unions_final[[Ustart]])          ~ NA_integer_,
+    !is.na(u_yrs) & u_yrs > 9000L            ~ 10L,
+    TRUE                                       ~ 1L
+  )
+  df_unions_final[[Uend_I]] <- dplyr::case_when(
+    is.na(df_unions_final[[Uend]])            ~ NA_integer_,
+    !is.na(e_yrs) & e_yrs > 9000L            ~ 10L,
+    TRUE                                       ~ 1L
+  )
+  df_unions_final[[Mstart_I]] <- dplyr::case_when(
+    is.na(df_unions_final[[Mstart]])          ~ NA_integer_,
+    !is.na(m_yrs) & m_yrs > 9000L            ~ 10L,
+    TRUE                                       ~ 1L
+  )
 
   # --- Diagnostic columns: imputed month extracted from CMC ---
   # Allows year / month / CMC / code to be inspected side by side.
@@ -570,7 +603,7 @@ df_summary <- EDER[, {
       first_birth_row <- birth_idx[which.min(anio_retro[birth_idx])]
       birth_yr <- anio_retro[first_birth_row]
       dob <- compute_cmc(
-        imputed_month_capped(1L, birth_yr,
+        imp_cap(1L, birth_yr,
                              survey_cmc = surv,
                              after_cmc  = prev_dob),
         birth_yr
@@ -597,7 +630,7 @@ df_summary <- EDER[, {
       first_death_row <- death_idx[which.min(anio_retro[death_idx])]
       death_yr <- anio_retro[first_death_row]
       results[[paste0("dod_cmc",   i)]] <-
-        compute_cmc(imputed_month_capped(1L, death_yr, survey_cmc = surv), death_yr)
+        compute_cmc(imp_cap(1L, death_yr, survey_cmc = surv), death_yr)
       results[[paste0("dod_cmc_I", i)]] <- 1L
     } else {
       results[[paste0("dod_cmc",   i)]] <- NA_integer_
@@ -611,6 +644,46 @@ EDER_ENADID <- EDER_ENADID %>%
   dplyr::left_join(df_summary, by = "llave_muj")
 rm(df_summary)
 
+# ==== 4.2 Impute month of birth again in case it occurs in the same year than a union start or a union end ====
+impute_month_same_year <- function (df, cmc_birth_str="dob_cmc1") {
+  N <- nrow(df)
+  for (u in 1:5) {
+    Ustart <- paste0("union_start_cmc", u)
+    Uend   <- paste0("union_end_cmc",   u)
+    
+    birth_year <- cmc_to_year(df[[cmc_birth_str]])
+    
+    # Impute month of birth when it occurs in the same year than a union start
+    same_year_start <- !is.na(df[[Ustart]]) & birth_year == cmc_to_year(df[[Ustart]])
+    df[[cmc_birth_str]] <- ifelse(
+      same_year_start,
+      compute_cmc(imp_cap(N, birth_year, survey_cmc = df$surveyDate_cmc, after_cmc = df[[Ustart]], after_cmc_imp = 1), birth_year),
+      df[[cmc_birth_str]]
+    )
+    
+    # Impute month of birth when it occurs in the same year than a union end
+    same_year_end <- !is.na(df[[Uend]]) & birth_year == cmc_to_year(df[[Uend]])
+    df[[cmc_birth_str]] <- ifelse(
+      same_year_end,
+      compute_cmc(imp_cap(N, birth_year, survey_cmc = df$surveyDate_cmc, after_cmc = df[[Uend]], after_cmc_imp = 1), birth_year),
+      df[[cmc_birth_str]]
+    )
+  }
+  return(df)
+}
+# first 10 births
+for (b in (1:10)) {
+  cmc_birth_str <- paste0("dob_cmc", b)
+  if (cmc_birth_str %in% names(EDER_ENADID)) {
+    EDER_ENADID <- impute_month_same_year(EDER_ENADID, cmc_birth_str)
+  }
+}
+
+chk <- EDER_ENADID %>%
+  dplyr::filter(!is.na(dob_cmc1), !is.na(union_start_cmc1),
+                cmc_to_year(dob_cmc1) == cmc_to_year(union_start_cmc1))
+cat("n same-year cases:", nrow(chk),
+    " | share before union start:", mean(chk$dob_cmc1 < chk$union_start_cmc1), "\n")
 
 # ==== 5. Finalise & save ====
 

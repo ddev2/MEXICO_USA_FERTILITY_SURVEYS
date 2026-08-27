@@ -1,10 +1,39 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source ("enadid_lib.r")
+
+# Check for file, prompt if missing
+find_or_choose_file <- function(filename, search_dir = ".") {
+  
+  filepath <- file.path(search_dir, filename)
+  
+  if (file.exists(filepath)) {
+    return(normalizePath(filepath))
+  }
+  
+  result <- rstudioapi::showQuestion(
+    title   = paste0("File not found"),
+    message = paste0("WFS file ", filename, " not found in ", normalizePath(search_dir),"\nPlease locate it manually."),
+    ok      = "OK",
+    cancel  = "Cancel"
+  )
+  
+  if (result) {
+  } else {
+    stop("File not found and user cancelled the operation.")
+  }
+
+  chosen <- file.choose()
+  
+  if (!nzchar(chosen)) stop("No file selected.")
+  
+  return(chosen)
+}
+
 # Convert Mexico WHS file to ENADID format
-dataFileName <- file.choose()
+dataFileName <- find_or_choose_file("mxsr02.Rdat")
 load(file=dataFileName)
 
-path_ENADID1977 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/WFS_ENADID1977.Rdat"))
+path_ENADID1977 <- path.expand(paste0(rootPath,mainPath,"WFS_ENADID1977.Rdat"))
 
 keeps <- c(
   "region"="V701",
@@ -111,6 +140,16 @@ getDatos1977 <- function (mujeresWFS) {
   datos$union_start_cmc3 <- ifelse(datos$union_start_cmc3==8888, NA, datos$union_start_cmc3)
   datos$union_start_cmc4 <- ifelse(datos$union_start_cmc4==8888, NA, datos$union_start_cmc4)
   datos$union_start_cmc5 <- ifelse(datos$union_start_cmc5==8888, NA, datos$union_start_cmc5)
+  datos$marriage_start_cmc1 <- ifelse(datos$union_start_type1==1, datos$union_start_cmc1, NA)
+  datos <- relocate(datos, marriage_start_cmc1, .after = union_start_cmc1)
+  datos$marriage_start_cmc2 <- ifelse(datos$union_start_type2==1, datos$union_start_cmc2, NA)
+  datos <- relocate(datos, marriage_start_cmc2, .after = union_start_cmc2)
+  datos$marriage_start_cmc3 <- ifelse(datos$union_start_type3==1, datos$union_start_cmc3, NA)
+  datos <- relocate(datos, marriage_start_cmc3, .after = union_start_cmc3)
+  datos$marriage_start_cmc4 <- ifelse(datos$union_start_type4==1, datos$union_start_cmc4, NA)
+  datos <- relocate(datos, marriage_start_cmc4, .after = union_start_cmc4)
+  datos$marriage_start_cmc5 <- ifelse(datos$union_start_type5==1, datos$union_start_cmc5, NA)
+  datos <- relocate(datos, marriage_start_cmc5, .after = union_start_cmc5)
   datos$union_end_cmc1 <- ifelse(datos$union_end_cmc1==8888, NA, datos$union_end_cmc1)
   datos$union_end_cmc2 <- ifelse(datos$union_end_cmc2==8888, NA, datos$union_end_cmc2)
   datos$union_end_cmc3 <- ifelse(datos$union_end_cmc3==8888, NA, datos$union_end_cmc3)

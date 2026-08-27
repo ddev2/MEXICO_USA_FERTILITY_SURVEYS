@@ -1,4 +1,7 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source("enadid_lib.r")
 # Read EDER 2025 file
 # imputed_month_capped() is defined in enadid_lib.r
@@ -7,11 +10,27 @@ library(haven)
 library(purrr)
 library(data.table)
 
+# ==== Month-imputation mode (per-survey switch) ====
+# EDER 2025 stores event dates as year only, so every month is imputed.
+# capMonth selects how months are drawn (via imp_cap(), used throughout):
+#   TRUE  = constrained: survey cap + strict-after ordering + probabilistic
+#           birth-vs-union split (the method designed for EDER).
+#   FALSE = simple: survey cap + strict-after ordering only (no prob. split).
+# Survey cap and strict-after are HARD constraints, always applied; only the
+# probabilistic layer is toggled. imp_cap() injects `capped` into every call
+# without altering the shared imputed_month_capped() in enadid_lib.r.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- FALSE
+if (!exists("capMonth")) capMonth <- TRUE
+imp_cap  <- function(..., capped = capMonth) imputed_month_capped(..., capped = capped)
+
+
 if (exists("DEBUG25")) browser()
 
-path_EDER2025            <- path.expand(paste0(rootPath, "/INEGI/Encuestas/EDER/2025/eder2025_bases_sav/historiavida.sav"))
-path_EDER2025_informante <- path.expand(paste0(rootPath, "/INEGI/Encuestas/EDER/2025/eder2025_bases_sav/informante.sav"))
-path_EDER_ENADID2025     <- path.expand(paste0(rootPath, "/INEGI/Encuestas/ENADID/EDER_ENADID2025.Rdat"))
+path_EDER2025            <- path.expand(paste0(rootPath, mainPath,"EDER/2025/eder2025_bases_sav/historiavida.sav"))
+path_EDER2025_informante <- path.expand(paste0(rootPath, mainPath,"EDER/2025/eder2025_bases_sav/informante.sav"))
+path_EDER_ENADID2025     <- path.expand(paste0(rootPath, mainPath,"ENADID/EDER_ENADID2025.Rdat"))
 
 
 # ==== 1. Load & merge historiavida + informante ====
@@ -292,7 +311,7 @@ for (u in seq_len(5)) {
   # --- Union start: capped at survey date ---
   df_unions_final[[Ustart]] <- ifelse(
     !is.na(u_yrs),
-    compute_cmc(imputed_month_capped(N, u_yrs, survey_cmc = surv_cmc), u_yrs),
+    compute_cmc(imp_cap(N, u_yrs, survey_cmc = surv_cmc), u_yrs),
     NA_integer_
   )
 
@@ -303,7 +322,7 @@ for (u in seq_len(5)) {
   df_unions_final[[Mstart]] <- ifelse(
     !is.na(m_yrs),
     compute_cmc(
-      imputed_month_capped(N, m_yrs,
+      imp_cap(N, m_yrs,
                            survey_cmc = surv_cmc,
                            after_cmc  = df_unions_final[[Ustart]]),
       m_yrs
@@ -323,7 +342,7 @@ for (u in seq_len(5)) {
   df_unions_final[[Uend]] <- ifelse(
     !is.na(e_yrs),
     compute_cmc(
-      imputed_month_capped(N, e_yrs,
+      imp_cap(N, e_yrs,
                            survey_cmc = surv_cmc,
                            after_cmc  = end_after_cmc),
       e_yrs
@@ -357,10 +376,7 @@ for (u in seq_len(5)) {
 
 df_unions_final$surveyDate_cmc <- NULL   # drop join helper before merging
 
-EDER_ENADID25 <- EDER_ENADID25 %>%
-  dplyr::left_join(df_unions_final, by = "llave_muj")
-rm(df_unions_final)
-
+df_unions_final_claude <- df_unions_final
 
 # ==== Diagnostic: union extraction (remove after validation) ====
 
@@ -445,6 +461,179 @@ diagnose_union_extraction <- function(df) {
 
 diagnose_union_extraction(EDER_ENADID25)
 
+# ==== Alternate implementation of Union history ====
+# first position in column 'vec' or value 'val'
+find_pos <- function(vec, val) {
+  pos <- which(vec %in% val)
+  if (length(pos) > 0) pos[1] else NA_integer_
+}
+
+df_unions_final <- EDER25 %>%
+  dplyr::group_by(llave_muj) %>%
+  dplyr::group_modify(~ {
+    data_woman <- .x
+    df <- NULL
+    for (u in (1:5)) {
+      col_name <- paste0("edo_civil", u)
+      pos_union <- find_pos(data_woman[[col_name]], 1)
+      pos_union_state <- find_pos(data_woman[[col_name]], 10)
+      if (is.na(pos_union) & !is.na(pos_union_state)) {
+        pos_union <- pos_union_state
+      }
+      pos_marriage <- find_pos(data_woman[[col_name]], c(2, 3, 4))
+      pos_marriage_state <- find_pos(data_woman[[col_name]], c(20, 30, 40))
+      if (is.na(pos_marriage) & !is.na(pos_marriage_state)) {
+        pos_marriage <- pos_marriage_state
+      }
+      pos_separation <- find_pos(data_woman[[col_name]], 5)
+      pos_separation_state <- find_pos(data_woman[[col_name]], 50)
+      if (is.na(pos_separation) & !is.na(pos_separation_state)) {
+        pos_separation <- pos_separation_state
+      }
+      yEnd    <- if (is.na(pos_separation)) NA_integer_ else data_woman$anio_retro[pos_separation]
+      codeSep <- if (is.na(pos_separation)) NA_integer_ else data_woman[[col_name]][pos_separation]
+      pos_divorce <- find_pos(data_woman[[col_name]], 6)
+      pos_divorce_state <- find_pos(data_woman[[col_name]], 60)
+      if (is.na(pos_divorce) & !is.na(pos_divorce_state)) {
+        pos_divorce <- pos_divorce_state
+      }
+      if (is.na(yEnd)) {
+        yEnd    <- if (is.na(pos_divorce)) NA_integer_ else data_woman$anio_retro[pos_divorce]
+        codeSep <- if (is.na(pos_divorce)) NA_integer_ else data_woman[[col_name]][pos_divorce]
+      }
+      pos_widowhood <- find_pos(data_woman[[col_name]], 7)
+      pos_widowhood_state <- find_pos(data_woman[[col_name]], 70)
+      if (is.na(pos_widowhood) & !is.na(pos_widowhood_state)) {
+        pos_widowhood <- pos_widowhood_state
+      }
+      if (is.na(yEnd)) {
+        yEnd    <- if (is.na(pos_widowhood)) NA_integer_ else data_woman$anio_retro[pos_widowhood]
+        codeSep <- if (is.na(pos_widowhood)) NA_integer_ else data_woman[[col_name]][pos_widowhood]
+      }
+      
+      usType <- paste0("union_start_type",    u)
+      usDate <- paste0("union_start_cmc",     u)
+      usDateI <- paste0("union_start_cmc_I",     u)
+      msDate <- paste0("marriage_start_cmc",  u)
+      msDateI <- paste0("marriage_start_cmc_I",  u)
+      usYear <- paste0("yStartUnion_",        u)
+      usYearC <- paste0("yStartUnionCode_",    u)
+      msYear <- paste0("yStartMarr_",         u)
+      msYearC <- paste0("yStartMarrCode_",     u)
+      mStateYear <- paste0("yStateMarr_",         u)
+      mStateYearC <- paste0("yStateMarrCode_",     u)
+      ueDate <- paste0("union_end_cmc",       u)
+      ueDateI <- paste0("union_end_cmc_I",       u)
+      ueYear <- paste0("yEndUnion_",          u)
+      ueYearC <- paste0("yEndUnionCode_",      u)
+      ueMot <- paste0("union_end_motive",    u)
+      usInf <- paste0("union_start_inferred",u)
+      
+      fields <- list()
+      fields[[usType]] <- NA_character_
+      fields[[usDate]] <- NA_integer_
+      fields[[usDateI]] <- NA_integer_
+      fields[[msDate]] <- NA_integer_
+      fields[[msDateI]] <- NA_integer_
+      fields[[usYear]] <- if (is.na(pos_union))          NA_integer_ else data_woman$anio_retro[pos_union]
+      fields[[usYearC]] <- if (is.na(pos_union))          NA_integer_ else 2L
+      fields[[msYear]] <- if (is.na(pos_marriage))       NA_integer_ else data_woman$anio_retro[pos_marriage]
+      fields[[msYearC]] <- if (is.na(pos_marriage))       NA_integer_ else data_woman[[col_name]][pos_marriage]  # was missing ]
+      fields[[mStateYear]] <- if (is.na(pos_marriage_state)) NA_integer_ else data_woman$anio_retro[pos_marriage_state]
+      fields[[mStateYearC]] <- if (is.na(pos_marriage_state)) NA_integer_ else data_woman[[col_name]][pos_marriage_state]
+      fields[[ueDate]] <- NA_integer_
+      fields[[ueDateI]] <- NA_integer_
+      fields[[ueYear]] <- yEnd
+      fields[[ueYearC]] <- codeSep
+      fields[[ueMot]] <- NA_character_
+      fields[[usInf]] <- FALSE
+      
+      df1 <- do.call(data.frame, fields)
+      
+      # Helper: EDER records years only; months are always imputed (flag 1).
+      # If the year itself is DK / out of range (> 9000), use flag 10 instead.
+      eder_flag <- function(yr) if (!is.na(yr) && yr > 9000L) 10L else 1L
+
+      if (!is.na(df1[[usYear]])) {
+        df1[[usDate]] <- compute_cmc (
+          imp_cap(1L, df1[[usYear]], survey_cmc = survey_cmc_eder25),
+          df1[[usYear]]
+        )
+        df1[[usDateI]] <- eder_flag(df1[[usYear]])
+        if (is.na(df1[[msYear]])) {
+          df1[[usType]] <- "cohabitation"
+        } else {
+          df1[[usType]] <- "cohabitation before marriage"
+          df1[[msDate]] <- compute_cmc (
+            imp_cap(1L, df1[[msYear]], survey_cmc = survey_cmc_eder25),
+            df1[[msYear]]
+          )
+          df1[[msDateI]] <- eder_flag(df1[[msYear]])
+        }
+      } else {
+        if (!is.na(df1[[msYear]])) {
+          df1[[usType]] <- "marriage"
+          df1[[msDate]] <- compute_cmc (
+            imp_cap(1L, df1[[msYear]], survey_cmc = survey_cmc_eder25),
+            df1[[msYear]]
+          )
+          df1[[msDateI]] <- eder_flag(df1[[msYear]])
+          df1[[usDate]] <- df1[[msDate]]
+          df1[[usDateI]] <- eder_flag(df1[[msYear]])
+        } else {
+          df1[[usType]] <- NA_character_
+        }
+      }
+
+      if (!is.na(df1[[ueYear]])) {
+        df1[[ueDate]] <- compute_cmc (
+          imp_cap(1L, df1[[ueYear]], survey_cmc = survey_cmc_eder25),
+          df1[[ueYear]]
+        )
+        df1[[ueDateI]] <- eder_flag(df1[[ueYear]])
+        if (df1[[ueYearC]] %in% c(5L, 50L)) {
+          df1[[ueMot]] <- "separation"
+        } else if (df1[[ueYearC]] %in% c(6L, 60L)) {
+          df1[[ueMot]] <- "separation"
+        } else if (df1[[ueYearC]] %in% c(7L, 70L)) {
+          df1[[ueMot]] <- "widowhood"
+        } else {
+          df1[[ueMot]] <- NA_character_
+        }
+      } else {
+        if (!is.na(df1[[usDate]])) {
+          df1[[ueMot]] <- "in union"
+        } else {
+          df1[[ueMot]] <- NA_character_
+        }
+      }
+      
+      if (TRUE) {
+        df1[[usYear]] <- NULL
+        df1[[usYearC]] <- NULL
+        df1[[msYear]] <- NULL
+        df1[[msYearC]] <- NULL
+        df1[[mStateYear]] <- NULL
+        df1[[mStateYearC]] <- NULL
+        df1[[ueYear]] <- NULL
+        df1[[ueYearC]] <- NULL
+        df1[[usInf]] <- NULL
+      }
+      
+      if (u==1) {
+        df <- df1
+      } else {
+        df <- cbind(df, df1)
+      }
+    }
+    df
+  }) %>%
+  dplyr::ungroup()
+
+EDER_ENADID25 <- EDER_ENADID25 %>%
+  dplyr::left_join(df_unions_final, by = "llave_muj")
+#rm(df_unions_final)
+
 
 # ==== 4. Birth history ====
 
@@ -499,7 +688,7 @@ df_summary <- EDER25[, {
       # after_cmc = prev_dob only binds when birth_yr == year of prev_dob;
       # imputed_month_capped() ignores it otherwise
       dob <- compute_cmc(
-        imputed_month_capped(1L, birth_yr,
+        imp_cap(1L, birth_yr,
                              survey_cmc = surv,
                              after_cmc  = prev_dob),
         birth_yr
@@ -526,7 +715,7 @@ df_summary <- EDER25[, {
       first_death_row <- death_idx[which.min(anio_retro[death_idx])]
       death_yr <- anio_retro[first_death_row]
       results[[paste0("dod_cmc",   i)]] <-
-        compute_cmc(imputed_month_capped(1L, death_yr, survey_cmc = surv), death_yr)
+        compute_cmc(imp_cap(1L, death_yr, survey_cmc = surv), death_yr)
       results[[paste0("dod_cmc_I", i)]] <- 1L
     } else {
       results[[paste0("dod_cmc",   i)]] <- NA_integer_
@@ -540,6 +729,46 @@ EDER_ENADID25 <- EDER_ENADID25 %>%
   dplyr::left_join(df_summary, by = "llave_muj")
 rm(df_summary)
 
+# ==== 4.2 Impute month of birth again in case it occurs in the same year than a union start or a union end ====
+impute_month_same_year <- function (df, cmc_birth_str="dob_cmc1") {
+  N <- nrow(df)
+  for (u in 1:5) {
+    Ustart <- paste0("union_start_cmc", u)
+    Uend   <- paste0("union_end_cmc",   u)
+
+    birth_year <- cmc_to_year(df[[cmc_birth_str]])
+    
+    # Impute month of birth when it occurs in the same year than a union start
+    same_year_start <- !is.na(df[[Ustart]]) & birth_year == cmc_to_year(df[[Ustart]])
+    df[[cmc_birth_str]] <- ifelse(
+      same_year_start,
+      compute_cmc(imp_cap(N, birth_year, survey_cmc = df$surveyDate_cmc, after_cmc = df[[Ustart]], after_cmc_imp = 1), birth_year),
+      df[[cmc_birth_str]]
+    )
+    
+    # Impute month of birth when it occurs in the same year than a union end
+    same_year_end <- !is.na(df[[Uend]]) & birth_year == cmc_to_year(df[[Uend]])
+    df[[cmc_birth_str]] <- ifelse(
+      same_year_end,
+      compute_cmc(imp_cap(N, birth_year, survey_cmc = df$surveyDate_cmc, after_cmc = df[[Uend]], after_cmc_imp = 1), birth_year),
+      df[[cmc_birth_str]]
+    )
+  }
+  return(df)
+}
+# first 10 births
+for (b in (1:10)) {
+  cmc_birth_str <- paste0("dob_cmc", b)
+  if (cmc_birth_str %in% names(EDER_ENADID25)) {
+    EDER_ENADID25 <- impute_month_same_year(EDER_ENADID25, cmc_birth_str)
+  }
+}
+
+chk <- EDER_ENADID25 %>%
+  dplyr::filter(!is.na(dob_cmc1), !is.na(union_start_cmc1),
+                cmc_to_year(dob_cmc1) == cmc_to_year(union_start_cmc1))
+cat("n same-year cases:", nrow(chk),
+    " | share before union start:", mean(chk$dob_cmc1 < chk$union_start_cmc1), "\n")
 
 # ==== 5. Finalise & save ====
 
@@ -549,4 +778,6 @@ if (!(exists("DEBUG25"))) {
   
   save(EDER_ENADID25, file = path_EDER_ENADID2025)
   rm(EDER25)
+  rm(df_unions_final)
+  rm(df_unions_final_claude)
 }

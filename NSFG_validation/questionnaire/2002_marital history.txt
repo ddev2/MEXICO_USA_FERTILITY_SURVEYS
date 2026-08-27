@@ -1,0 +1,3744 @@
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+                                SECTION C
+                    Marital and Relationship History
+
+VARIABLES IMPORTED FROM EARLIER SECTIONS:
+AGE_R         R=s age at interview (from A)
+AGESCRN       R=s age at screener (from A)
+MARSTAT       R=s informal marital status (from A)
+FMARIT R=s formal marital status (from A)
+MANREL Relationship of man in HH to R (husband or cohab partner) (from A)
+MANWITHR      Name fill for current husband or cohabiting partner (from A)
+HIGRADE       R=s highest grade attended (from A)
+HHKIDS18      # of NONBIOKIDS IN HH < AGE 19 & RELAR = Codes 4 to 10 (from A)
+MENARCHE      R=s age at first menstrual period (from B)
+EVERPREG      Whether R has ever been pregnant (from B)
+CMPG1BEG      CM for mo/yr when 1st pregnancy (even if current) began (from B)
+
+
+VARIABLES DEFINED (COMPUTED) WITHIN THIS SECTION:
+CHPNAME       Name fill for current husband or cohabiting partner (FC C-1)
+MARRCNTR      Marriage loop counter (FC C-2)
+COHBCNTR      Cohabiting partner loop counter (FC C-2)
+PRT12CNTR     Recent partner loop counter (FC C-2)
+MARRFILL      Marriage order fill (FC C-6b)
+HUSBFILL      Husband name fill (FC C-6b)
+CMMARRHX      CM date of marriage X (FC C-7)
+CMMARRHX_FILL Mo/Yr fill for CMMARRHX (FC C-7)
+CMMARRCH      CM date of marriage to current husband (FC C-7)
+CMHSBDOBX     CM for husband X=s date of birth (FC C-8)
+CMDOBCH       CM for current husband=s DOB (FC C-8)
+CMPMCOHX      CM date when R began living (premaritally) with husband X (FC C-9)
+CMHSBDIEX     CM date when husband X died (FC C-18)
+CMHSBDIEX_FILL       Mo/Yr fill for CMHSBDIEX (FC C-18)
+CMDIVORCX     CM date of divorce or annulment from husband X (FC C-20)
+CMDIVORCX_FILL       Mo/Yr fill for CMDIVORCX (FC C-20)
+CMSTPHSBX     CM date R stopped living with former husband X (FC C-21)
+PREVHUSB      Number of former husbands (FC C-22)
+CMSTRTCP      CM date when R began living with current cohabiting partner (FC C-26)
+CMDOBCP       CM for current cohabiting partner=s DOB (FC C-27)
+CMSTRTHP      CM date R began living with current husband or cohab partner (FC C-31)
+EVRCOHAB      Whether R has ever lived with a nonmarital partner (FC C-32)
+PREVCOHB      Number of former cohabiting partners (FC C-34)
+COHBFILL      Cohabiting partner name fill (FC C-34b)
+CMCOHSTX      CM date R began living with former cohabiting partner X (FC C-35)
+CMCOHSTX_FILL Mo/Yr fill for CMCOHSTX (FC C-35)
+CMDOBCX       CM for former cohabiting partner=s DOB (FC C-36)
+CMSTPCOHX     CM date R stopped living with former cohabiting partner X (FC C-39)
+RHADSEX       Whether R has ever had sex (heterosexual vaginal intercourse) (FC C-42)
+CMFSTSEX      CM date of first sexual intercourse (FC C-44)
+FLGSXDK1      Flag indicating special-case reporting on WNFSTSEX_M (FC C-44)
+CMFSTSEX_FILL Mo/Yr fill for CMFSTSEX (FC C-44)
+CMLSEXFP      CM date of last sex with 1st sexual partner (FC C-57)
+CMFPLAST      CM date of last or only sex with 1st sexual partner (FC C-57)
+CMSEXAFM      CM date of 1st sex after menarche (FC C-60)
+FLGSXDK2      Flag indicating special-case reporting on WNSEXAFM_M (FC C-60)
+PARTS12       Number of partners in last 12 mos (FC C-64)
+DESCRIBD      # of partners in past year that were previously described (FC C-65)
+CMFSEXX       CM date of 1st sex with partner X in last 12 mos (FC C-67)
+PCURRNTX      Whether partner X in last 12 mos is current (FC C-68b)
+CMLSEXX       CM date of last sex with partner X in last 12 mos (FC C-69)
+CMLSEXX_FILL Mo/Yr fill for CMLSEX for partner X (FC C-69)
+CMLSTSXX      CM date of last or only sex with partner X in last 12 mos (FC C-69)
+CMLSTSXX_FILL Mo/Yr fill for CMLSTSXX (FC C-69)
+CMLSTSX12     CM date of last sex (for those with PARTS12 > 0) (FC C-74)
+CMDATLST      CM date of last sex (for those with PARTS12 = 0) (FC C-76)
+              (Note: This variable was originally named CMLSTSX0 but renamed in
+              instrument.)
+LIFEPRTS      Number of partners in lifetime (FC C-77)
+
+                                                 C-1
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+CMLASTSX       CM for date of most recent sexual intercourse (FC C-77)
+CURRPRTT       Total number of current sexual partners, including a current (not
+               separated) husband or cohabiting partner in the total (FC C-77)
+CURRPRTS       Number of current nonmarital, noncoresidential partners (FC C-77)
+PRT12NAM1      Name or initials for most recent male partner in last 12 mos (FC-77)
+PRT12NAM2      Name or initials for 2nd most recent male partner in last 12 mos (FC-77)
+PRT12NAM3      Name or initials for 3rd most recent male partner in last 12 mos (FC-77)
+CMPART1Y1      CM date of last (or only) sex with PRT12NAM1 (FC-77)
+CMPART1Y2      CM date of last (or only) sex with PRT12NAM2 (FC-77)
+CMPART1Y3      CM date of last (or only) sex with PRT12NAM3 (FC-77)
+CURPART1       Name or initials of current partner 1 (for R=s 15-17 only) (FC C-77)
+CURPART2       Name or initials of current partner 2 (for R=s 15-17 only) (FC C-77)
+CURPART3       Name or initials of current partner 3 (for R=s 15-17 only) (FC C-77)
+CMCURRP1       CM date of last (or only) sex with CURPART1 (FC C-77)
+CMCURRP2       CM date of last (or only) sex with CURPART2 (FC C-77)
+CMCURRP3       CM date of last (or only) sex with CURPART3 (FC C-77)
+
+COMPUTED VARIABLES (from this section) TO BE INCLUDED ON OUTPUT DATA FILE:
+CMMARRHX
+CMMARRCH
+CMHSBDOBX
+CMDOBCH
+CMPMCOHX
+CMHSBDIEX
+CMDIVORCX
+CMSTPHSBX
+PREVHUSB
+CMSTRTCP
+CMDOBCP
+CMSTRTHP
+EVRCOHAB
+PREVCOHB
+CMCOHSTX
+CMDOBCX
+CMSTPCOHX
+RHADSEX
+CMFSTSEX
+FLGSXDK1
+CMLSEXFP
+CMFPLAST
+CMSEXAFM
+FLGSXDK2
+PARTS12
+CMFSEXX
+PCURRNTX
+CMLSEXX
+CMLSTSXX
+CMLSTSX12
+CMDATLST
+LIFEPRTS
+CMLASTSX
+CURRPRTT
+CURRPRTS
+CMPART1Y1
+CMPART1Y2
+CMPART1Y3
+CMCURRP1
+CMCURRP2
+CMCURRP3
+
+       CM VARIABLES TO CHECK AGAINST BOTH CMINTVW AND CMBIRTH:
+              CMMARRHX
+              CMMARRCH
+              CMPMCOHX
+              CMHSBDIEX
+              CMDIVORCX
+              CMSTPHSBX
+              CMSTRTCP
+              CMSTRTHP
+              CMCOHSTX
+
+                                                 C-2
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               CMSTPCOHX
+               CMFSTSEX
+               CMLSEXFP
+               CMFPLAST
+               CMSEXAFM
+               CMFSEXX
+               CMLSEXX
+               CMLSTSXX
+               CMLSTSX12
+               CMDATLST
+               CMLASTSX
+
+       CM VARIABLES TO CHECK AGAINST ONLY CMINTVW:
+              CMHSBDOBX
+              CMDOBCH
+              CMDOBCP
+              CMDOBCX
+
+
+
+-------------- SECTION C begins here ------------------
+
+FLOW CHECK C-1:       INITIALIZE CHPNAME (name fill for current husband or
+                      cohabiting partner) (value may change in Flow Checks C-5, C-
+                      5b, or C-25):
+
+                      IF AB-1 MARSTAT = 3 or 4 or 5 or 6 or DK or RF, SET CHPNAME
+                      = blank (inapp).
+                      ELSE IF MARSTAT = 1 or 2 AND MANWITHR NE blank, SET CHPNAME
+                      = MANWITHR.
+
+FLOW CHECK C-2:       IF FMARIT = 1 or 2 or 3 or 4, CONTINUE.
+                      ELSE IF FMARIT = 5 (never married) or 0 (DK or RF), GO TO
+                      FLOW CHECK C-23.
+
+                      INITIALIZE COUNTERS TO 0:
+                      MARRCNTR COUNTS LOOPS THROUGH HUSBANDS SERIES (CB).
+                      COHBCNTR COUNTS LOOPS THROUGH OTHER COHAB PARTNERS SERIES
+                      (CD).
+                      PRT12CNTR COUNTS LOOPS THROUGH RECENT PARTNERS SERIES (CI).
+
+                              SET MARRCNTR = 0
+                              SET COHBCNTR = 0
+                              SET PRT12CNTR = 0
+
+NUMBER OF MARRIAGES (CA)
+
+C_INTRO1
+CA-0. The next questions are about your marriages and other relationships.
+
+               ENTER [1] to continue
+
+TIMESMAR
+CA-1. IF FMARIT = 1 or 4 (married or separated), ASK:
+      Including your present marriage, how many times have you been married?
+
+       ELSE IF FMARIT = 2 or 3 (widowed or divorced), ASK:
+       How many times have you been married?
+
+               ENTER number
+
+[HELP AVAILABLE]
+
+
+                                                 C-3
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+               Number _____
+
+               UNDERLYING RANGE: 1 to 95
+               (But we want to allow space for only 6 husbands in looping)
+
+FLOW CHECK C-3:       IF 1 LE CA-1 TIMESMAR LE 95 OR IF TIMESMAR = DK OR RF,
+                      CONTINUE WITH FLOW CHECK C-4.
+
+FLOW CHECK C-4:       IF MARSTAT = 1 (married) AND 1 LE TIMESMAR LE 6 AND CHPNAME
+                      NE BLANK, ASK CA-2 HUSBNAMEX FOR EACH FORMER HUSBAND IF ANY
+                      (up to TIMESMAR-1) AND THEN ASK CA-2b HSBVERIF TO VERIFY
+                      NAME OF CURRENT HUSBAND.
+
+                      ELSE IF 2 LE CA-1 TIMESMAR LE 6 OR (CA-1 TIMESMAR = 1 AND
+                      AB-1 MARSTAT NE 1), ASK CA-2 HUSBNAMEX FOR EACH OF THE
+                      [TIMESMAR] FORMER (or currently separated) HUSBANDS.
+
+                      ELSE IF MARSTAT = 1 (married) AND 1 LE TIMESMAR LE 6 AND
+                      CHPNAME = BLANK, ASK CA-2 HUSBNAMEX FOR EACH FORMER HUSBAND
+                      IF ANY (up to TIMESMAR-1) AND THEN GO TO CA-2c CHVERIFY TO
+                      FIND OUT NAME OF CURRENT HUSBAND.
+
+                      ELSE IF TIMESMAR = DK OR RF, GO TO CA-2c CHVERIFY TO FIND
+                      OUT NAME OF CURRENT OR MOST RECENT HUSBAND (BASED ON MARSTAT
+                      VALUE).
+
+                      ELSE IF TIMESMAR GT 6 AND MANREL = 1, ASK HUSBNAMEX FOR HER
+                      FIRST 5 FORMER HUSBANDS AND THEN ASK CA-2c CHVERIFY OR CA-2b
+                      HSBVERIF (as appropriate based on CHPNAME value) ABOUT R=s
+                      CURRENT HUSBAND. (For currently married women with more
+                      than 6 marriages, we will only ask about her 1st 5 husbands
+                      and her current husband.)
+
+                      ELSE IF TIMESMAR GT 6 AND MANREL NE 1, ASK HUSBNAMEX FOR HER
+                      FIRST 6 FORMER HUSBANDS. (For currently unmarried women
+                      with more than 6 marriages, we will only ask about her 1st 6
+                      marriages.)
+
+HUSBNAMEX
+CA-2. IF CA-1 TIMESMAR GT 6 AND MANREL = 1 (husband), ASK:
+      In order to save time during the interview, I will ask you about your
+      first 5 marriages, and then about your current husband.
+
+       Please tell me the first names or the initials of your former husbands
+       so that I can refer to them during the interview. Let's begin with the
+       name or initials of your first husband. (PROBE: And your next husband?)
+
+       ELSE IF CA-1 TIMESMAR GT 6 AND MANREL NE 1, ASK:
+       In order to save time during the interview, I will ask you only about
+       your first 6 marriages.
+
+       Please tell me the first names or the initials of your former husbands
+       so that I can refer to them during the interview. Let's begin with the
+       name or initials of your first husband. (PROBE: And your next husband?)
+
+       ELSE IF CA-1 TIMESMAR = 1 AND MANREL NE 1 AND FMARIT NE 2 OR 3, ASK:
+       Please tell me your husband's first name or his initials so that I can
+       refer to him during the interview.
+
+
+                                                 C-4
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+       ELSE (IF TIMESMAR = 2 AND MANREL = 1) OR (IF TIMESMAR = 1 AND NO PERSON
+       IN HH HAS RELAR[X] = 1 (husband) AND FMARIT = 2 OR 3 (widowed or
+       divorced)), ASK:
+       Please tell me your former husband's first name or his initials so that
+       I can refer to him during the interview.
+
+       ELSE IF TIMESMAR = 2 AND MARSTAT NE 1 (married) ASK:
+       Please tell me the first names or the initials of your former husbands
+       so that I can refer to them during the interview. Let's begin with the
+       name or initials of your first husband. (PROBE: And your second
+       husband?)
+
+       ELSE IF 2 LT TIMESMAR LE 6, ASK:
+       Please tell me the first names or the initials of your former husbands
+       so that I can refer to them during the interview. Let's begin with the
+       name or initials of your first husband and then list the others in
+       order. (PROBE: And your next husband?)
+
+{ Allow space for entry of names or initials for up to 6 husbands
+{ Note: Married Rs with more than 6 marriages will only use 5 of these spaces.
+
+FLOW CHECK C-5:       IF CA-1 TIMESMAR GE 1 AND AB-1 MARSTAT = 1 AND CHPNAME NE
+                      blank, ASK CA-2b HSBVERIF USING CHPNAME FOR HUSBAND=S NAME
+                      FOR MARRIAGE X, WHERE X = TIMESMAR.
+
+                      ELSE IF TIMESMAR GE 1 AND MARSTAT = 1 AND CHPNAME = blank,
+                      GO TO CA-2c CHVERIFY.
+
+                      ELSE IF TIMESMAR GE 1 AND MARSTAT NE 1, GO TO FLOW CHECK C-
+                      6.
+
+{ ASKED ONLY IF MARSTAT = 1 (married) and CHPNAME NE BLANK.
+HSBVERIF
+CA-2b.      And you told me that your current husband is [CHPNAME]?
+
+                      Yes ......1 (FLOW CHECK C-6)
+                      No .......5 (FLOW CHECK C-6)
+
+{ ASKED ONLY IF (MARSTAT=1 AND CHPNAME=blank) OR
+{            IF (TIMESMAR = DK/RF and FMARIT = 1,2,3, or 4).
+CHVERIFY
+CA-2c.      IF MARSTAT = 1 AND (CHPNAME=blank OR TIMESMAR = DK/RF), ASK:
+            You may have mentioned this earlier, but what is your current
+            husband=s name or initials, so that I can refer to him during the
+            interview?
+
+               ELSE IF FMARIT = 2, 3, or 4, ASK:
+               You may have mentioned this earlier, but what is your most recent
+                husband=s name or initials, so that I can refer to him during the
+               interview?
+
+               Name ______
+
+FLOW CHECK C-5b:      IF CA-2c CHVERIFY NE BLANK OR DK OR RF AND MARSTAT=1
+                      (married), THEN SET CHPNAME = CHVERIFY.
+
+                      ELSE IF CHVERIFY = DK OR RF AND MARSTAT=1 (married), SET
+                      CHPNAME = Ayour husband@
+
+FLOW CHECK C-6:       SET MARRCNTR = 1.
+
+
+
+                                                 C-5
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+FLOW CHECK C-6b:      DEFINE MARRFILL:
+                      (Fill for marriage order)
+
+                              MARRFILL = blank if TIMESMAR = 1
+                              ELSE IF TIMESMAR GT 1,
+                                    MARRFILL    = Afirst@ if MARRCNTR = 1
+                                                = Asecond@ if MARRCNTR = 2
+                                                = Athird@ if MARRCNTR = 3
+                                                And so forth.
+
+                      DEFINE HUSBFILL:
+                      (Fill for husband=s name)
+
+                              IF X = TIMESMAR AND MARSTAT = 1, SET HUSBFILL =
+                              CHPNAME.
+                              ELSE IF HUSBNAMEX (where X = MARRCNTR) NE DK OR RF,
+                              SET HUSBFILL = HUSBNAMEX.
+                              ELSE IF HUSBNAMEX = DK OR RF (where X = MARRCNTR), SET
+                              HUSBFILL = Ayour (MARRFILL) husband)@
+
+
+HUSBANDS (CB)
+
+C_INTRO2
+CB-0. The next questions are about your (MARRFILL) marriage.
+
+               ENTER [1] to continue
+
+WHMARHX_M
+CB-1. In what month and year were you and (HUSBFILL) married?
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                   9. September   13. Winter
+       2. February            6. June                  10. October    14. Spring
+       3. March               7. July                  11. November   15. Summer
+       4. April               8. August                12. December   16. Fall
+
+WHMARHX_Y
+CB-1. (In what month and year were you and (HUSBFILL) married?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       After R has given the year, SAY: Please record husband=s initials in
+       the appropriate box on the AMarriage@ row of your calendar.
+
+               ENTER year in 4 digits ______
+
+               UNDERLYING RANGE: 1967 to 2002
+
+FLOW CHECK C-7:       COMPUTE CMMARRHX (where X = MARRCNTR):
+                      (Century month for date of marriage to husband X)
+
+                              SET CMMARRHX = null/blank.
+
+
+
+                                                 C-6
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                              IF WHMARHX_Y = RF, SET CMMARRHX = 9998 (RF).
+                              ELSE IF WHMARHX_Y = DK, SET CMMARRHX = 9999 (DK).
+
+                              ELSE IF WHMARHX_M LE 12,
+                              COMPUTE CMMARRHX = (WHMARHX_Y - 1900)*12 + WHMARHX_M
+
+                              ELSE IF 13 LE WHMARHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMMARRHX as above.
+
+                              ELSE IF WHMARHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMMARRHX as above.
+
+                      IF CMMARRHX NE BLANK, ESTABLISH CMMARRHX_FILL.
+
+
+                      COMPUTE CMMARRCH:
+                      (CM for date of marriage to current husband)
+
+                              SET CMMARRCH = blank/inapp (if no current husband)
+                              IF MARRCNTR = TIMESMAR AND AB-1 MARSTAT = 1 (married),
+
+                                     SET CMMARRCH = CMMARRHX for this husband
+
+
+                      IF (CMMARRHX = blank or DK or RF) OR (WHMARHX_M = 13 or 14
+                      or 15 or 16 or DK or RF), ASK CB-2 AGEMARHX.
+                      ELSE GO TO CB-3 HXAGEMAR.
+
+AGEMARHX
+CB-2. IF CA-1 TIMESMAR = 1, ASK:
+      How old were you when you got married?
+
+       ELSE IF TIMESMAR GT 1, ASK:
+       How old were you when you got married this (MARRFILL) time?
+
+               ENTER age in years ______
+
+               UNDERLYING RANGE:      10 to 45
+
+EDIT CHECK CB2_1: PROBE IF (CMMARRHX - CMBIRTH)/12 LT 13 OR IF CB-2 AGEMARHX <
+                  13. DISPLAY TEXT: R has reported getting married at an age
+                  younger than 13 years. Is this correct?
+
+HXAGEMAR
+CB-3. How old was (HUSBFILL) when you got married?
+
+       If R says DK, PROBE for the age difference between R and this husband
+       and have her add to or subtract from her age at the marriage. ENTER the
+       resulting value for his age in years.
+
+               ENTER age in years ________
+
+               UNDERLYING RANGE: 10 to 95
+
+DOBHUSBX_M
+CB-4. In what month and year was he born?
+
+       ENTER month
+       PROBE for season if DK month
+
+
+                                                 C-7
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+[HELP AVAILABLE]
+      1. January              5. May                   9. September   13. Winter
+      2. February             6. June                  10. October    14. Spring
+      3. March                7. July                  11. November   15. Summer
+      4. April                8. August                12. December   16. Fall
+
+DOBHUSBX_Y
+CB-4. (In what month and year was he born?)
+
+[HELP AVAILABLE]
+
+               ENTER year in 4 digits _______
+
+               UNDERLYING RANGE: 1905 to 1992
+
+FLOW CHECK C-8:       COMPUTE CMHSBDOBX (where X = MARRCNTR):
+                      (CM for husband X=s date of birth)
+
+                              SET CMHSBDOBX = null/blank.
+
+                              IF DOBHUSBX_Y = RF, SET CMHSBDOBX = 9998 (RF).
+                              ELSE IF DOBHUSBX_Y = DK, SET CMHSBDOBX = 9999 (DK).
+
+                              ELSE IF DOBHUSBX_M LE 12,
+                              COMPUTE CMHSBDOBX = (DOBHUSBX_Y - 1900)*12 +
+                              DOBHUSBX_M
+
+                              ELSE IF 13 LE DOBHUSBX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMHSBDOBX as above.
+
+                              ELSE IF DOBHUSBX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMHSBDOBX as above.
+
+                      IF MARRCNTR = TIMESMAR AND AB-1 MARSTAT = 1 (married),
+
+                              SET CMDOBCH = CMHSBDOBX for this husband
+                              (CMDOBCH = CM for current husband=s date of birth)
+
+
+EDIT CHECK CB4_1: PROBE IF (CMMARRHX - CMHSBDOBX)/12 LT 13 OR IF CB-4 HXAGEMAR
+                  < 13. DISPLAY TEXT: R has reported that this husband was
+                  younger than age 13 when they got married. Is this correct?
+
+LVTOGHX
+CB-5. Some couples live together without being married. By living together,
+      we mean having a sexual relationship while sharing the same usual
+      address. Did you and (HUSBFILL) live together before you got married?
+
+[HELP AVAILABLE]
+
+                      Yes....................1
+                      No.....................5 (Flow Check C-10)
+
+STRTOGHX_M
+CB-6. In what month and year did you and he first start living together?
+
+       ENTER month
+       PROBE for season if DK month
+
+[HELP AVAILABLE]
+
+
+                                                 C-8
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+[CALENDAR REFERENCE]
+
+       1. January             5. May                   9. September   13. Winter
+       2. February            6. June                  10. October    14. Spring
+       3. March               7. July                  11. November   15. Summer
+       4. April               8. August                12. December   16. Fall
+
+STRTOGHX_Y
+CB-6. (In what month and year did you and he first start living together?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       After R has reported year, SAY: AIf you think it might help you in
+       remembering dates of other things later, you can record the start of
+       your living together with this husband on the calendar in the AMarriage@
+       row.@
+
+               ENTER year in 4 digits _________
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-9:       COMPUTE CMPMCOHX (where X = MARRCNTR):
+                      (CM for date when they began premarital cohabitation)
+
+                              SET CMPMCOHX = null/blank.
+
+                              IF STRTOGHX_Y = RF, SET CMPMCOHX = 9998 (RF).
+                              ELSE IF STRTOGHX_Y = DK, SET CMPMCOHX = 9999 (DK).
+
+                              ELSE IF STRTOGHX_M LE 12,
+                              COMPUTE CMPMCOHX = (STRTOGHX_Y - 1900)*12 + STRTOGHX_M
+
+                              ELSE IF 13 LE STRTOGHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMPMCOHX as above.
+
+                              ELSE IF STRTOGHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMPMCOHX as above.
+
+
+EDIT CHECK CB5_1: PROBE IF CMMARRHX LE CMPMCOHX. IF CMMARRHX = CMPMCOHX,
+                  CHECK WHETHER R DID INDEED BEGIN COHABITING WITH HER HUSBAND
+                  IN THE SAME MONTH AS (BUT BEFORE) MARRIAGE.
+
+EDIT CHECK CB5_2: PROBE IF (CMPMCOHX - CMBIRTH)/12 LT 13. DISPLAY TEXT: R has
+                  reported that she began living together with this husband
+                  when she was younger than 13 years. Is this correct?
+
+ENGAGHX
+CB-7. At the time you began living together, were you and he engaged to be
+      married or have definite plans to get married?
+
+               Yes .........1
+               No ..........5
+
+FLOW CHECK C-10:      IF MARRCNTR = 1 OR (MARRCNTR = TIMESMAR AND MARSTAT = 1 or 5
+                      (married or separated)), ASK CB-8 HISPHX.
+                      ELSE, GO TO FLOW CHECK C-12.
+
+{ Hisp & Race asked only for 1st or current/separated husbands
+
+                                                 C-9
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+HISPHX
+CB-8. IF (MARRCNTR = 1 AND TIMESMAR GT 1) OR (MARRCNTR = 1 AND TIMESMAR = 1
+       AND FMARIT = 2 or 3), ASK:
+       Was (HUSBFILL) Hispanic or Latino, or of Spanish origin?
+
+       ELSE IF (MARRCNTR = TIMESMAR AND MARSTAT = 1 or 5), ASK:
+       Is (HUSBFILL) Hispanic or Latino, or of Spanish origin?
+
+                      Yes.....................1
+                      No......................5
+
+RACEHX
+CB-9. Which of the groups on Card 2 describes (HUSBFILL)'s racial background?
+       Please select one or more groups.
+
+               ENTER all that apply
+
+               NOTE: If R reports a mixture of several races (biracial, mixed,
+               mulatto, etc.), ENTER all groups that are part of the mixture.
+
+[SHOW CARD 2]
+[HELP AVAILABLE]
+
+               American Indian or Alaska Native ...............1
+               Asian ..........................................2
+               Native Hawaiian or Other Pacific Islander ......3
+               Black or African American ......................4
+               White ..........................................5
+
+               DK OR RF CANNOT BE ENTERED WITH CODES 1 - 5
+
+FLOW CHECK C-11:      IF MORE THAN ONE RACE IS CODED FOR CB-9 RACEHX, ASK CB-10
+                      BSTRACHX. ELSE, GO TO FLOW CHECK C-12.
+
+BSTRACHX
+CB-10.         Which of these groups, that is (RESPONSES FROM CB-9 RACEHX), would
+               you say best describes his racial background?
+
+[HELP AVAILABLE
+{ Display only those categories reported in CB-9 RACEHX
+
+FLOW CHECK C-12:      IF MARRCNTR = TIMESMAR AND MARSTAT = 1 or 5 (married or
+                      separated), ASK CB-11 CHEDMARN.
+                      ELSE GO TO CB-12 MARBEFHX.
+
+{ Asked only for current or separated husbands
+CHEDMARN
+CB-11.      IF MARSTAT = 1 (married), ASK:
+            Please look at Card 11. What is the highest level of education
+            (CHPNAME) has completed?
+
+               ELSE IF MARSTAT = 5 (separated), ASK:
+               Please look at Card 11. What is the highest level of education
+               your husband has completed?
+
+[SHOW CARD 11]
+
+               Less than high school ...........................1
+               High school graduate or GED .....................2
+               Some college but no degree ......................3
+               2-year college degree (e.g., Associate=s degree).4
+               4-year college graduate (e.g., BA, BS) ..........5
+
+                                                 C-10
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               Graduate or professional school .................6
+
+MARBEFHX
+CB-12.         At the time you and he were married, had (HUSBFILL) been married
+               before?
+
+[HELP AVAILABLE]
+
+                      Yes ................1
+                      No .................5
+
+KIDSHX
+CB-13.         When you and he got married, did he have any children, either
+               biological or adopted, from any previous relationships?
+
+                      Yes ................1
+                      No .................5 (FLOW CHECK C-16)
+
+NUMKDSHX
+CB-14.         How many children did he have?
+
+                      ENTER number _____
+
+                      UNDERLYING RANGE:          1 to 95
+
+KIDLIVHX
+CB-15.         IF CB-14 NUMKDSHX = 1, ASK:
+               Did this child ever live with you and (HUSBFILL)?
+
+               ELSE IF CB-14 NUMKDSHX > 1, ASK:
+               Did any of his children from previous relationships ever live with
+               you and (HUSBFILL)?
+
+                      Yes ..............1
+                      No ...............5
+
+FLOW CHECK C-13:      IF MARRCNTR = TIMESMAR AND MARSTAT = 1 (married) AND CB-14
+                      NUMKDSHX = 1, ASK CB-16a CHKID18A.
+
+                      ELSE IF MARRCNTR = TIMESMAR AND MARSTAT = 1 (married) AND
+                      CB-14 NUMKDSHX > 1, GO TO CB-16b CHKID18B.
+
+                      ELSE, GO TO FLOW CHECK C-22.
+
+CHKID18A
+CB-16a.        Is this child aged 18 years or younger now?
+
+                      Yes ........1 (FLOW CHECK C-14)
+                      No .........5 (FLOW CHECK C-14)
+
+CHKID18B
+CB-16b.        How many, if any, of these [NUMKDSHX] children are aged 18 years
+               or younger now?
+
+                      ENTER number _________
+
+                      UNDERLYING RANGE: 0 to 95
+
+EDIT CHECK CB16b_1:           PROBE IF CB-16b CHKID18B GT CB-14 NUMKDSHX. DISPLAY
+                              TEXT: R has reported a larger number of children 18
+                              and under than the total number of children she said
+
+
+                                                 C-11
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                              this husband had when they got married. Has something
+                              been entered incorrectly?
+
+FLOW CHECK C-14:      IF (CB-16a CHKID18A = 5, DK, OR RF) OR (CB-16b CHKID18B = 0,
+                      DK, OR RF), GO TO FLOW CHECK C-22.
+                      (USER NOTE: This flow check was specified incorrectly.
+                      Instead of routing to Flow Check C-22, it should have routed
+                      to Flow Check C-16. See User’s Guide section on “Data
+                      Quality” for further information.)
+
+WHRCHKDS
+CB-17.         IF CB-16a CHKID18A = 1, ASK:
+               Where does this child live now? In this household with you and
+               (CHPNAME), with his or her mother, with grandparents or other
+               relatives, or somewhere else?
+
+               ELSE IF CB-16b CHKID18B = 1, ASK:
+               Where does this child aged 18 or younger live now? In this
+               household with you and (CHPNAME), with his or her mother, with
+               grandparents or other relatives, or somewhere else?
+
+               ELSE IF CB-16b CHKID18B > 1, ASK:
+               Where do these (CHKID18B) children aged 18 or younger live now?
+               In this household with you and (CHPNAME), with their mother, with
+               grandparents or other relatives, or somewhere else?
+
+[HELP AVAILABLE]
+
+               ENTER all that apply
+
+                      In this household.....................1
+                      With their mother.....................2
+                      With grandparents or other relatives..3
+                      Somewhere else........................4
+
+EDIT CHECK CB17_1:            PROBE IF HHKIDS18 = 0 BUT R HAS REPORTED THAT ANY OF
+                              HER HUSBAND=S CHILDREN LIVE ONLY AIN THIS HOUSEHOLD@
+                              (CB-17 WHRCHKDS = ONLY 1). DISPLAY TEXT: R has
+                              reported that her husband=s child(ren) lives with
+                              them, but earlier did not report any children 18 or
+                              under in the household. Has something been entered
+                              incorrectly?
+
+FLOW CHECK C-15:      IF CB-17 WHRCHKDS INCLUDES CODES 2 or 3 or 4, ASK CB-18
+                      SUPPORCH. ELSE GO TO FLOW CHECK C-22.
+
+SUPPORCH
+CB-18.         IF CB-16a CHKID18A = 1 OR CB-16b CHKID18B = 1, ASK:
+               Does (CHPNAME) regularly contribute to the financial support of
+               this child aged 18 or under?
+
+               ELSE IF CB-16b CHKID18B > 1, ASK:
+               Does (CHPNAME) regularly contribute to the financial support of
+               these children aged 18 and under?
+
+               READ if necessary: Regular child support is financial support
+               provided at specified intervals, such as every week, every other
+               week, or every month, rather than sporadically.
+
+                      Yes....................1
+                      No.....................5
+
+
+                                                 C-12
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+FLOW CHECK C-16:      IF MARRCNTR < TIMESMAR OR (MARRCNTR = TIMESMAR AND AB-1
+                      MARSTAT NE 1 OR 5), ASK CB-19 MARENDHX.
+
+                      ELSE IF MARRCNTR = TIMESMAR AND MARSTAT = 5 (separated), GO
+                      TO CB-22 WNSTPHX.
+
+                      ELSE IF MARRCNTR = TIMESMAR AND MARSTAT = 1 (married), GO TO
+                      FLOW CHECK C-22.
+
+MARENDHX
+CB-19.         How did your (MARRFILL) marriage end?
+
+               READ categories if necessary to prompt R.
+
+[HELP AVAILABLE]
+
+                      Death of husband ................1
+                      Divorce .........................2
+                      Annulment .......................3
+
+FLOW CHECK C-17:      IF CB-19 MARENDHX = 1, ASK CB-20 WNDIEHX.
+                      ELSE IF MARENDHX = 2 or 3, ASK CB-21 DIVDATHX.
+                      ELSE IF MARENDHX = DK OR RF, GO TO CB-22 WNSTPHX.
+
+WNDIEHX_M
+CB-20.         In what month and year did (HUSBFILL) die?
+
+               ENTER month
+               PROBE for season if DK month
+
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+WNDIEHX_Y
+CB-20.         (In what month and year did (HUSBFILL) die?)
+
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY: Please record something in the
+               appropriate box in the AMarriage@ row of your calendar to indicate
+               when this occurred.
+
+               ENTER year in 4 digits ______
+
+               UNDERLYING RANGE: 1967 to 2002
+
+FLOW CHECK C-18:      COMPUTE CMHSBDIEX (where X=MARRCNTR):
+                      (CM for date of husband X=s death)
+
+                              SET CMHSBDIEX = null/blank.
+
+                              IF WNDIEHX_Y = RF, SET CMHSBDIEX = 9998 (RF).
+                              ELSE IF WNDIEHX_Y = DK, SET CMHSBDIEX = 9999 (DK).
+
+                              ELSE IF WNDIEHX_M LE 12,
+                              COMPUTE CMHSBDIEX = (WNDIEHX_Y - 1900)*12 + WNDIEHX_M
+
+                                                 C-13
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+                              ELSE IF 13 LE WNDIEHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMHSBDIEX as above.
+
+                              ELSE IF WNDIEHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMHSBDIEX as above.
+
+                      IF CMHSBDIEHX NE BLANK, ESTABLISH CMHSBDIEHX_FILL.
+
+EDIT CHECK CB20_1:            PROBE IF CMHSBDIEX LT CMMARRHX. DISPLAY TEXT: R has
+                              reported that her husband died earlier than their
+                              marriage. Has one of the dates been entered
+                              incorrectly?
+
+EDIT CHECK CB20_2:            PROBE IF CMHSBDIEX LT CMDOBHSBX. DISPLAY TEXT: R has
+                              reported that her husband died earlier than his date
+                              of birth. Has one of the dates been entered
+                              incorrectly?
+
+FLOW CHECK C-19:      IF CB-19 MARENDHX=1, GO TO FLOW CHECK C-22.
+
+DIVDATHX_M
+CB-21.         IF CB-19 MARENDHX = 2, ASK:
+               In what month and year did your divorce become final?
+
+               ELSE IF CB-19 MARENDHX = 3, ASK:
+               In what month and year did your annulment take place?
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+DIVDATHX_Y
+CB-21.         IF CB-19 MARENDHX = 2, DISPLAY:
+               (In what month and year did your divorce become final?)
+
+               ELSE IF CB-19 MARENDHX = 3, DISPLAY:
+               (In what month and year did your annulment take place?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY: Please record something in the
+               appropriate box in the AMarriage@ row of your calendar to indicate
+               when this occurred.
+
+               ENTER year in 4 digits ______
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-20:      COMPUTE CMDIVORCX (where X=MARRCNTR):
+                      (CM for date of divorce or annulment from husband X)
+
+                              SET CMDIVORCX = null/blank.
+
+                                                 C-14
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+                              IF DIVDATHX_Y = RF, SET CMDIVORCX = 9998 (RF).
+                              ELSE IF DIVDATHX_Y = DK, SET CMDIVORCX = 9999 (DK).
+
+                              ELSE IF DIVDATHX_M LE 12,
+                              COMPUTE CMDIVORCX = (DIVDATHX_Y - 1900)*12 +
+                              DIVDATHX_M
+                              ELSE IF 13 LE DIVDATHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMDIVORCX as above.
+
+                              ELSE IF DIVDATHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMDIVORCX as above.
+
+
+EDIT CHECK CB21_1:            PROBE IF CMDIVORCX LT CMMARRHX. DISPLAY TEXT: R has
+                              reported that the divorce occurred earlier than their
+                              marriage. Has one of the dates been entered
+                              incorrectly?
+
+EDIT CHECK CB21_2:            PROBE IF CMDIVORCX LT CMDOBHSBX. DISPLAY TEXT: R has
+                              reported that the divorce occurred earlier than her
+                              husband=s date of birth. Has one of the dates been
+                              entered incorrectly?
+
+WNSTPHX_M
+CB-22.         IF MARRCNTR = TIMESMAR AND MARSTAT = 5 (separated), ASK:
+               In what month and year did you and (HUSBNAMEX/your husband) stop
+               living together? (IF NECESSARY, SAY: When did you stop living
+               together most recently?)
+
+               ELSE ASK:
+               In what month and year did you and (HUSBFILL) stop living together
+               for the last time?
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+WNSTPHX_Y
+CB-22.         IF MARRCNTR = TIMESMAR AND MARSTAT = 5 (separated), DISPLAY:
+               (In what month and year did you and (HUSBNAMEX/your husband) stop
+               living together?)
+
+               ELSE DISPLAY:
+               (In what month and year did you and (HUSBFILL) stop living
+               together for the last time?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has reported year, SAY: AIf you think it might help you in
+               remembering dates of other things later, you can record the end
+               of your living together with this husband on the calendar in the
+               AMarriage@ row.@
+
+                                                 C-15
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+               ENTER year in 4 digits ________
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-21:      COMPUTE CMSTPHSBX (where X=MARRCNTR):
+                      (CM for date R last lived with husband X)
+                            SET CMSTPHSBX = null/blank.
+
+                              IF WNSTPHX_Y = RF, SET CMSTPHSBX = 9998 (RF).
+                              ELSE IF WNSTPHX_Y = DK, SET CMSTPHSBX = 9999 (DK).
+
+                              ELSE IF WNSTPHX_M LE 12,
+                              COMPUTE CMSTPHSBX = (WNSTPHX_Y - 1900)*12 + WNSTPHX_M
+
+                              ELSE IF 13 LE WNSTPHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMSTPHSBX as above.
+
+                              ELSE IF WNSTPHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMSTPHSBX as above.
+
+
+EDIT CHECK CB22_1:            PROBE IF CMSTPHSBX LT CMMARRHX. DISPLAY TEXT: R has
+                              reported that she stopped living with her husband
+                              earlier than their marriage. Has one of the dates
+                              been entered incorrectly?
+
+EDIT CHECK CB22_2:            PROBE IF CMSTPHSBX LT CMDOBHSBX. DISPLAY TEXT: R has
+                              reported that she stopped living with her husband
+                              before his date of birth. Has one of the dates been
+                              entered incorrectly?
+
+EDIT CHECK CB22_3:            PROBE IF CMSTPHSBX GT CMDIVORCX. DISPLAY TEXT: R has
+                              reported that she stopped living with this former
+                              husband after their divorce. Is this correct?
+
+
+FLOW CHECK C-22:      IF MARRCNTR = TIMESMAR, THEN DO:
+
+                              COMPUTE PREVHUSB:
+                              =     NUMBER OF PREVIOUS (NONCURRENT) HUSBANDS
+                                    (separated husbands should be counted here)
+
+                                     (Count all husbands with MARENDHX NE BLANK, AND
+                                     ADD 1 if FMARIT = 4.)
+
+                              =      0 if FMARIT = 5 or 0(never married).
+
+                              THEN GO TO FLOW CHECK C-23.
+
+                      ELSE IF MARRCNTR LT TIMESMAR, ADVANCE MARRCNTR BY 1 AND
+                      RETURN TO FLOW CHECK C-6b TO ASK ABOUT NEXT HUSBAND.
+
+FLOW CHECK C-23:      IF MANREL = 2 (male cohab partner) OR AB-1 MARSTAT = 2
+                      (cohabiting), CONTINUE WITH FLOW CHECK C-24.
+
+                      ELSE IF MANREL = 1 (husband) or blank AND MARSTAT NE 2, GO
+                      TO FLOW CHECK C-31.
+
+
+                                                 C-16
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                      ELSE IF FMARIT = 5 or 0 (never married), GO TO C-INTRO4.
+
+
+CURRENT COHABITING PARTNER (CC)
+
+FLOW CHECK C-24:      IF CHPNAME = BLANK AND AB-1 MARSTAT = 2 (cohabiting), ASK
+                      CC-0 CPNAME.
+                      ELSE IF CHPNAME NE BLANK AND AB-1 MARSTAT = 2 (cohabiting),
+                      GO TO C_INTRO3 CC-1.
+
+CPNAME
+CC-0. Earlier, you told me that you are living with a male partner. Please
+       tell me his first name or initials, so that I can refer to him in the
+       interview.
+
+               Name or initials ________
+
+FLOW CHECK C-25:      IF NAME OR INITIALS GIVEN IN CC-0 CPNAME, SET CHPNAME =
+                      CPNAME. ELSE IF CPNAME = DK OR RF, SET CHPNAME = “your
+                      partner.”
+
+                      GO TO CC-2 WNSTRTCP.
+
+C_INTRO3
+CC-1. Earlier, you told me you and (CHPNAME) are living together.            The next
+      questions are about your relationship with him.
+
+               ENTER [1] to continue
+
+WNSTRTCP_M
+CC-2. In what month and year did you and (CHPNAME) begin living together?
+
+               ENTER month
+               PROBE for season if DK month
+
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+WNSTRTCP_Y
+CC-2. (In what month and year did you and (CHPNAME) begin living together?)
+
+[CALENDAR REFERENCE]
+
+       After R has given the year, SAY: Please record your partner=s initials
+       in the appropriate box on the ACohabitation@ row of your calendar.
+
+               ENTER year in 4 digits ________
+
+               UNDERLYING RANGE: 1967 to 2002
+
+FLOW CHECK C-26:      COMPUTE CMSTRTCP:
+                      (CM for date when R began living with current cohab partner)
+
+                              SET CMSTRTCP = null/blank.
+
+                              IF WNSTRTCP_Y = RF, SET CMSTRTCP = 9998 (RF).
+                              ELSE IF WNSTRTCP_Y = DK, SET CMSTRTCP = 9999 (DK).
+
+                                                 C-17
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+                              ELSE IF WNSTRTCP_M LE 12,
+                              COMPUTE CMSTRTCP = (WNSTRTCP_Y - 1900)*12 + WNSTRTCP_M
+
+                              ELSE IF 13 LE WNSTRTCP_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMSTRTCP as above.
+
+                              ELSE IF WNSTRTCP_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMSTRTCP as above.
+
+                      IF (CMSTRTCP = blank or DK or RF) OR (WNSTRTCP_M = 13 or 14
+                      or 15 or 16 or DK or RF), ASK CC-3 CPHERAGE.
+                      ELSE GO TO CC-4 CPHISAGE.
+
+CPHERAGE
+CC-3. How old were you when you began living with (CHPNAME)?
+
+               ENTER age in years ___________
+
+               UNDERLYING RANGE:      10 to 45
+
+EDIT CHECK CC3_1: PROBE IF (CMSTRTCP - CMBIRTH)/12 LT 13 OR IF CC-3 CPHERAGE <
+                  13. DISPLAY TEXT: R has reported that she started living
+                  with this partner at an age younger than 13 years. Is this
+                  correct?
+
+CPHISAGE
+CC-4. How old was (CHPNAME) when you began living together?
+
+       If R says DK, PROBE for the age difference between R and this husband
+       and have her add to or subtract from her age at the marriage. ENTER the
+       resulting value for age in years.
+
+               ENTER age in years ______
+
+               UNDERLYING RANGE:      10 to 95
+
+WNCPBRN_M
+CC-5. In what month and year was (CHPNAME) born?
+
+               ENTER month
+               PROBE for season if DK month
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+WNCPBRN_Y
+CC-5. (In what month and year was (CHPNAME) born?)
+
+               ENTER year in 4 digits _____
+
+               UNDERLYING RANGE:      1905 to 1992
+
+FLOW CHECK C-27:      COMPUTE CMDOBCP:
+                      (CM for current cohab partner=s date of birth)
+
+                              SET CMDOBCP = null/blank.
+
+
+
+                                                 C-18
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                              IF WNCPBRN_Y = RF, SET CMDOBCP = 9998 (RF).
+                              ELSE IF WNCPBRN_Y = DK, SET CMDOBCP = 9999 (DK).
+
+                              ELSE IF WNCPBRN_M LE 12,
+                              COMPUTE CMDOBCP = (WNCPBRN_Y - 1900)*12 + WNCPBRN_M
+
+                              ELSE IF 13 LE WNCPBRN_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMDOBCP as above.
+
+                              ELSE IF WNCPBRN_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMDOBCP as above.
+
+
+EDIT CHECK CC5_1: PROBE IF (CMSTRTCP - CMDOBCP)/12 LT 13 OR IF CC-4 CPHISAGE <
+                  13. DISPLAY TEXT: R has reported that this partner was
+                  younger than age 13 when they began living together. Is
+                  this correct?
+
+CPENGAG1
+CC-6. At the time you began living together, were you and he engaged to be
+      married or have definite plans to get married?
+
+                      Yes .....1
+                      No ......5
+
+WILLMARR
+CC-7. Please look at Card 21.         What is the chance that you and [CHPNAME] will
+      marry each other?
+
+[SHOW CARD 21]
+
+               No chance ....................1
+               A little chance ..............2
+               50-50 chance .................3
+               A pretty good chance .........4
+               An almost certain chance .....5
+
+CPHISP
+CC-8. Is (CHPNAME) Hispanic or Latino, or of Spanish origin?
+
+                      YES.....................1
+                      NO......................5
+
+CPRACE
+CC-9. Which of the groups on Card 2 describes (CHPNAME)'s racial background?
+       Please select one or more groups.
+
+               ENTER all that apply
+
+               NOTE: If R reports a mixture of several races (biracial, mixed,
+               mulatto, etc.), ENTER all groups that are part of the mixture.
+
+[SHOW CARD 2]
+[HELP AVAILABLE]
+
+               American Indian or Alaska Native ...............1
+               Asian ..........................................2
+               Native Hawaiian or Other Pacific Islander ......3
+               Black or African American ......................4
+               White ..........................................5
+
+
+                                                 C-19
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               DK OR RF CANNOT BE ENTERED WITH CODES 1 - 5
+
+FLOW CHECK C-28:      IF MORE THAN ONE RACE CODED FOR CPRACE, ASK CC-10 CPBESTR.
+                      ELSE, GO TO CC-11 CPEDUC.
+
+CPBESTR
+CC-10.         Which of these groups, that is (RESPONSES FROM CC-9 CPRACE), would
+               you say best describes (CHPNAME)'s racial background?
+
+[HELP AVAILABLE]
+{ Display only those categories reported in CC-9 CPRACE
+
+CPEDUC
+CC-11.         Please look at Card 11. What is the highest level of education
+               (CHPNAME) has completed?
+
+[SHOW CARD 11]
+
+               Less than high school ...........................1
+               High school graduate or GED .....................2
+               Some college but no degree ......................3
+               2-year college degree (e.g., Associate=s degree).4
+               4-year college graduate (e.g., BA, BS) ..........5
+               Graduate or professional school .................6
+
+CPMARBEF
+CC-12.         Has (CHPNAME) ever been married?
+
+[HELP AVAILABLE]
+
+                      YES..................1
+                      NO...................5
+
+CPKIDS
+CC-13.         When you and (CHPNAME) first began living together, did he have
+               any children, either biological or adopted, from any previous
+               relationships?
+
+                      Yes......1
+                      No.......5 (FLOW CHECK C-31)
+
+CPNUMKDS
+CC-14.         How many children did he have?
+
+                      ENTER number _____
+
+                      UNDERLYING RANGE: 1 to 95
+
+CPKIDLIV
+CC-15.         IF CC-14 CPNUMKDS = 1, ASK:
+               Did this child ever live with you and (CHPNAME)?
+
+               ELSE IF CC-14 CPNUMKDS > 1, ASK:
+               Did any of his children from previous relationships ever live with
+               you and (CHPNAME)?
+
+                      Yes ..............1
+                      No ...............5
+
+FLOW CHECK C-28b: IF CC-14 CPNUMKDS = 1, ASK CC-16a CPKID18A.
+                  ELSE IF CC-14 CPNUMKDS > 1, GO TO CC-16b CPKID18B.
+
+
+                                                 C-20
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+CPKID18A
+CC-16a.        Is this child aged 18 years or younger now?
+
+                      Yes ........1 (FLOW CHECK C-29)
+                      No .........5 (FLOW CHECK C-29)
+
+CPKID18B
+CC-16b.        How many, if any, of these [CPNUMKDS] children, are aged 18 years
+               or younger now?
+
+                      ENTER number _________
+
+                      UNDERLYING RANGE:          0 to 95
+
+EDIT CHECK CC16b_1:           PROBE IF CC-16b CPKID18B GT CC-14 CPNUMKDS. DISPLAY
+                              TEXT: R has reported a larger number of children 18
+                              and under than the total number of children she said
+                              this partner had when they began living together. Has
+                              something been entered incorrectly?
+
+
+FLOW CHECK C-29:      IF (CC-16a CPKID18A = 5, DK, OR RF) OR (CC-16b CPKID18B = 0,
+                      DK, OR RF), GO TO FLOW CHECK C-31.
+
+WHRCPKDS
+CC-17.         IF CC-16a CPKID18A = 1, ASK:
+               Where does this child live now? In this household with you and
+               (CHPNAME), with his or her mother, with grandparents or other
+               relatives, or somewhere else?
+
+               ELSE IF CC-16b CPKID18B = 1, ASK:
+               Where does this child aged 18 or younger live now? In this
+               household with you and (CHPNAME), with his or her mother, with
+               grandparents or other relatives, or somewhere else?
+
+               ELSE IF CC-16b CPKID18B > 1, ASK:
+               Where do these (CPKID18B) children aged 18 or younger live now?
+               In this household with you and (CHPNAME), with their mother, with
+               grandparents or other relatives, or somewhere else?
+
+[HELP AVAILABLE]
+
+               ENTER all that apply
+
+                      In this household.....................1
+                      With their mother.....................2
+                      With grandparents or other relatives..3
+                      Somewhere else........................4
+
+EDIT CHECK CC17_1:            PROBE IF HHKIDS18 = 0 BUT R HAS REPORTED THAT ANY OF
+                              HER PARTNER=S CHILDREN LIVE ONLY AIN THIS HOUSEHOLD@
+                              (CC-17 WHRCPKDS = ONLY 1). DISPLAY TEXT: R has
+                              reported that her partner=s child(ren) lives with
+                              them, but earlier did not report any children 18 or
+                              under in the household. Has something been entered
+                              incorrectly?
+
+FLOW CHECK C-30:      IF CC-17 WHRCPKDS INCLUDES CODES 2 or 3 or 4, ASK CC-18
+                      SUPPORCP. ELSE GO TO FLOW CHECK C-31.
+
+SUPPORCP
+
+                                                 C-21
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+CC-18.         IF CC-16a CPKID18A = 1 OR CC-16b CPKID18B = 1, ASK:
+               Does (CHPNAME) regularly contribute to the financial support of
+               this child?
+
+               ELSE IF CC-16b CPKID18B > 1, ASK:
+               Does (CHPNAME) regularly contribute to the financial support of
+               these children?
+               READ if necessary: Regular child support is financial support
+               provided at specified intervals, such as every week, every other
+               week, or every month, rather than sporadically.
+
+                      Yes....................1
+                      No.....................5
+
+FLOW CHECK C-31:      COMPUTE CMSTRTHP:
+                      (CM for date when R began living with current husband or
+                      cohabiting partner)
+
+                              IF AB-1 MARSTAT = 3 or 4 or 5 or 6 or DK or RF (or if
+                              the necessary CM variables are null/blank), SET
+                              CMSTRTHP = null/blank.
+                              ELSE IF MARSTAT = 1 (married) THEN:
+                                    CMSTRTHP = EARLIER VALUE OF CMMARRCH and
+                                                CMPMCOHX for current husband
+                              ELSE IF MARSTAT = 2 (cohabiting) THEN:
+                                    CMSTRTHP = CMSTRTCP.
+
+                      IF FMARIT = 5 or 0 (never married) AND MARSTAT NE 2,
+                      CONTINUE WITH C_INTRO4 CD-0.
+                      ELSE IF (FMARIT = 1 or 2 or 3 or 4) OR MARSTAT = 2, GO TO
+                      CD-1 LIVEOTH.
+
+
+FORMER (non-current) COHABITING PARTNERS (CD)
+
+C_INTRO4
+CD-0. Some couples live together without being married. By living together,
+      we mean having a sexual relationship while sharing the same usual
+      address.
+
+               ENTER [1] to continue
+
+LIVEOTH
+CD-1. IF (CHPNAME = BLANK OR ONE OR MORE HUSBNAMEX = DK OR RF), ASK:
+      Not counting anyone we've already talked about, have you ever lived
+      together with any other man?
+
+         ELSE IF CHPNAME NE BLANK AND NO DK OR RF VALUES ON HUSBNAMEX), ASK:
+         Besides (CHPNAME AND (fill in all husbands named in HUSBNAMEX)), have
+         you ever lived together with any other man?
+
+         ELSE IF CHPNAME = BLANK AND FMARIT = 5 or 0 (never married), ASK:
+         Have you ever lived together with a man?
+
+               NOTE: Do not count "dating" or "sleeping over" as living together.
+                Living together means having a sexual relationship while sharing
+               the same usual address.
+
+[HELP AVAILABLE]
+
+                      Yes................1
+
+                                                 C-22
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                      No.................5
+
+FLOW CHECK C-32:      COMPUTE EVRCOHAB:
+                      (Whether R has ever lived with a man outside of marriage)
+
+                              EVRCOHAB = 1 (YES)             IF CD-1 LIVEOTH = 1 (yes)
+                                                        OR   IF MANREL = 2
+                                                        OR   IF AB-1 MARSTAT = 2
+                                                        OR   IF CB-5 LIVTOGHX = 1 (yes) for
+                                                             any husband
+
+                              EVRCOHAB = 5 (NO) OTHERWISE.
+
+                      IF LIVEOTH = 1 (yes), ASK CD-2 HMOTHMEN.
+                      ELSE IF LIVEOTH NE 1, GO TO FLOW CHECK C-34.
+
+HMOTHMEN
+CD-2. IF MANREL = 1 or 2 OR FMARIT = 1 or 2 or 3 or 4, ASK:
+      With how many other men have you ever lived?
+
+       ELSE IF MANREL = BLANK AND FMARIT = 5 or 0, ASK:
+       With how many men have you ever lived?
+
+               NOTE: Do not count husbands R lived with prior to marriage.           Do
+               not count R's current cohabiting partner.
+
+               ENTER number __________
+
+                      UNDERLYING RANGE:          1 to 95 (allow space for 8 in looping)
+
+FLOW CHECK C-33:      IF CD-2 HMOTHMEN = DK OR RF, GO TO FLOW CHECK C-34.
+
+OTHMANX
+CD-3. IF (MANREL = 1 or 2 OR FMARIT = 1 or 2 or 3 or 4) AND CD-2 HMOTHMEN = 1,
+      ASK:
+      Please tell me the first name or the initials of the other man you lived
+      with so that I can refer to him during the interview.
+
+       ELSE IF (MANREL = BLANK AND FMARIT = 5 or 0) AND CD-2 HMOTHMEN = 1, ASK:
+       Please tell me the first name or the initials of the man you lived with
+       so that I can refer to him during the interview.
+
+       ELSE IF (MANREL = 1 or 2 OR FMARIT = 1 or 2 or 3 or 4) AND (2 LE CD-2
+       HMOTHMEN LE 8), ASK:
+       Starting with the first one, please tell me the first names or the
+       initials of the other men you lived with so that I can refer to them
+       during the interview.
+
+       ELSE IF (MANREL = BLANK AND FMARIT = 5 or 0) AND (2 LE CD-2 HMOTHMEN LE
+       8), ASK:
+       Starting with the first one, please tell me the first names or the
+       initials of the men you lived with so that I can refer to them during
+       the interview.
+
+       ELSE IF (MANREL = 1 or 2 OR FMARIT = 1 or 2 or 3 or 4) AND CD-2 HMOTHMEN
+       GT 8, ASK:
+       In order to save time during the interview, I will only ask you about
+       the first 8 men with whom you lived. Starting with the first one,
+       please tell me the first names or the initials of the other men you
+       lived with so that I can refer to them during the interview.
+
+
+
+                                                 C-23
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+       ELSE IF (MANREL = BLANK AND FMARIT = 5 or 0) AND CD-2 HMOTHMEN GT 8,
+       ASK:
+       In order to save time during the interview, I will only ask you about
+       the first 8 men with whom you lived. Starting with the first one,
+       please tell me the first names or the initials of the men you lived with
+       so that I can refer to them during the interview.
+
+{ Space for names/initials
+EDIT CHECK CD3_1: (very soft edit) PROBE IF NAME/INITIALS REPORTED IN CD-3
+                  OTHMANX IS SAME AS NAME OF A HUSBAND OR CURRENT COHABITING
+                  PARTNER (in CA-2 HUSBNAMEX OR CHPNAME). DISPLAY TEXT: Just
+                  to make sure I haven=t entered something incorrectly, is
+                  this man someone different from the man named (HUSBNAMEX or
+                  CHPNAME) we have already talked about?
+
+FLOW CHECK C-34:      DEFINE PREVCOHB:
+                      (Number of former cohabiting partners)
+
+                      PREVCOHB = 0      IF EVRCOHAB = NO
+                                  OR    IF CD-2 HMOTHMEN = DK OR RF
+                                  OR    IF CD-1 LIVEOTH = NO, DK, OR RF
+                      PREVCOHB = HMOTHMEN
+
+
+                      IF PREVCOHB = 0, GO TO FLOW CHECK C-41.
+                      ELSE, CONTINUE WITH FLOW CHECK C-34b.
+
+FLOW CHECK C-34b: DETERMINE WHICH FORMER COHABITING PARTNER TO DISCUSS.
+
+                      INCREASE COHBCNTR BY 1.
+
+                      IF HMOTHMEN = 1, SET NTH = blank
+                      ELSE IF HMOTHMEN GT 1,
+                            USE A1st@ for nth if COHBCNTR = 1
+                            USE A2nd@ for nth if COHBCNTR = 2, and so forth.
+
+                      DEFINE COHBFILL:
+                      (Name fill for each former cohabiting partner)
+
+                              IF OTHMANX NE DK OR RF, SET COHBFILL = OTHMANX (where
+                              X = COHBCNTR).
+                              ELSE IF OTHMANX = DK OR RF, SET COHBFILL = Ayour (nth)
+                              partner@
+
+                      ASK CD-4 TO CD-14 FOR EACH FORMER COHABITING PARTNER (up to
+                      a max of 8).
+
+STRTOTHX_M
+CD-4. In what month and year did you and (COHBFILL) begin living together?
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+                                                 C-24
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+STRTOTHX_Y
+CD-4. (In what month and year did you and (COHBFILL) begin living together?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       After R has given the year, SAY: Please record this partner=s initials
+       in the appropriate box on the ACohabitation@ row of your calendar.
+
+               ENTER year in 4 digits ______
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-35:      COMPUTE CMCOHSTX:
+                      (CM for date R began living with former cohabiting partner
+                      X)
+
+                              SET CMCOHSTX = null/blank.
+
+                              IF STRTOTHX_Y = RF, SET CMCOHSTX = 9998 (RF).
+                              ELSE IF STRTOTHX_Y = DK, SET CMCOHSTX = 9999 (DK).
+
+                              ELSE IF STRTOTHX_M LE 12,
+                              COMPUTE CMCOHSTX = (STRTOTHX_Y - 1900)*12 + STRTOTHX_M
+
+                              ELSE IF 13 LE STRTOTHX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMCOHSTX as above.
+
+                              ELSE IF STRTOTHX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMCOHSTX as above.
+
+
+                      IF CMCOHSTX NE BLANK, ESTABLISH CMCOHSTX_FILL.
+
+                      IF (CMCOHSTX = blank or DK or RF) OR (STRTOTHX_M = 13 or 14
+                      or 15 or 16 or DK or RF), ASK CD-5 HERAGECX.
+                      ELSE GO TO EDIT CHECK CD5_1.
+
+
+HERAGECX
+CD-5. How old were you when you began living with (COHBFILL)?
+
+               ENTER age in years ___________
+
+               UNDERLYING RANGE:      10 to 45
+
+EDIT CHECK CD5_1: PROBE IF (CMCOHSTX - CMBIRTH)/12 LT 13 OR IF CD-5 CXHERAGE <
+                  13. DISPLAY TEXT: R has reported that she started living
+                  with this partner at an age younger than 13 years. Is this
+                  correct?
+
+HISAGECX
+CD-6. How old was he when you began living together?
+
+       If R says DK, PROBE for the age difference between R and this partner
+       and have her add to or subtract from her age at the start of the
+       cohabitation. ENTER this resulting value for age in years.
+
+               ENTER age in years ________
+
+                                                 C-25
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+               UNDERLYING RANGE:      10 to 95
+
+WNBRNCX_M
+CD-7. In what month and year was he born?
+
+             ENTER month
+             PROBE for season if DK month
+       1. January        5. May                         9. September   13. Winter
+       2. February       6. June                        10. October    14. Spring
+       3. March          7. July                        11. November   15. Summer
+       4. April          8. August                      12. December   16. Fall
+
+WNBRNCX_Y
+CD-7. (In what month and year was he born?)
+
+               ENTER year in 4 digits ____
+
+               UNDERLYING RANGE:      1905 to 1992
+
+FLOW CHECK C-36:      COMPUTE CMDOBCX:
+                      (CM for this former cohabiting partner=s date of birth)
+
+                              SET CMDOBCX = null/blank.
+
+                              IF WNBRNCX_Y = RF, SET CMDOBCX = 9998 (RF).
+                              ELSE IF WNBRNCX_Y = DK, SET CMDOBCX = 9999 (DK).
+
+                              ELSE IF WNBRNCX_M LE 12,
+                              COMPUTE CMDOBCX = (WNBRNCX_Y - 1900)*12 + WNBRNCX_M
+
+                              ELSE IF 13 LE WNBRNCX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMDOBCX as above.
+
+                              ELSE IF WNBRNCX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMDOBCX as above.
+
+
+EDIT CHECK CD7_1: PROBE IF (CMCOHSTX - CMDOBCX)/12 LT 13 OR IF CD-6 CXHISAGE <
+                  13. DISPLAY TEXT: R has reported that this partner was
+                  younger than age 13 when they began living together. Is
+                  this correct?
+
+ENGAG1CX
+CD-8. At the time you began living together, were you and he engaged to be
+      married or have definite plans to get married?
+
+                      Yes .....1
+                      No ......5
+
+FLOW CHECK C-37:      IF COHBCNTR = 1, ASK CD-9 HISPCX.
+                      ELSE GO TO CD-12 MAREVCX.
+
+{ Ask only for 1st former CP
+HISPCX
+CD-9. Was (COHBFILL) Hispanic or Latino, or of Spanish origin?
+
+               Yes ....................1
+               No .....................5
+
+
+
+                                                 C-26
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+{ Ask only for 1st former CP
+RACECX
+CD-10.      Which of the groups on Card 2 describes (COHBFILL)=s racial
+            background? Please select one or more groups.
+
+               ENTER all that apply
+
+               NOTE: If R reports a mixture of several races (biracial, mixed,
+               mulatto, etc.), ENTER all groups that are part of the mixture.
+
+[SHOW CARD 2]
+[HELP AVAILABLE]
+
+               American Indian or Alaska Native ...............1
+               Asian ..........................................2
+               Native Hawaiian or Other Pacific Islander ......3
+               Black or African American ......................4
+               White ..........................................5
+
+               DK OR RF CANNOT BE ENTERED WITH CODES 1 - 5
+
+FLOW CHECK C-38:       IF MORE THAN ONE RACE CODED FOR RACECX, ASK CD-11 BSTRACCX.
+                        ELSE, GO TO CD-12 MAREVCX.
+
+{ Ask only for 1st former CP if more than 1 race reported
+BSTRACCX
+CD-11.      Which of these groups, that is (RESPONSES FROM CD-10 RACECX),
+            would you say best describes his racial background?
+
+[HELP AVAILABLE]
+{ Display only those categories reported in CD-10 RACECX
+
+MAREVCX
+CD-12.         When you began living together, had (COHBFILL) ever been married?
+
+[HELP AVAILABLE]
+
+                       Yes..................1
+                       No...................5
+
+CXKIDS
+CD-13.         When you and he began living together, did he have any children,
+               either biological or adopted, from any previous relationships?
+
+                       Yes......1
+                       No.......5
+
+STPTOGCX_M
+CD-14.         In what month and year did you and (COHBFILL) stop living together
+               for the last time?
+
+               ENTER month
+               PROBE for season if DK month
+
+[CALENDAR REFERENCE]
+
+         1. January           5. May                    9. September   13. Winter
+         2. February          6. June                   10. October    14. Spring
+         3. March             7. July                   11. November   15. Summer
+         4. April             8. August                 12. December   16. Fall
+
+STPTOGCX_Y
+
+                                                 C-27
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+CD-14.         (In what month and year did you and (COHBFILL) stop living
+               together for the last time?)
+
+               After R has given the year, SAY: Please record something in the
+               appropriate box in the ACohabitation@ row of your calendar to
+               indicate when this occurred.
+
+[CALENDAR REFERENCE]
+
+               ENTER year in 4 digits _______
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-39:      COMPUTE CMSTPCOHX:
+                      (CM for date when R stopped cohabiting with this partner X)
+
+                              SET CMSTPCOHX = null/blank.
+
+                              IF STPTOGCX_Y = RF, SET CMSTPCOHX = 9998 (RF).
+                              ELSE IF STPTOGCX_Y = DK, SET CMSTPCOHX = 9999 (DK).
+
+                              ELSE IF STPTOGCX_M LE 12,
+                              COMPUTE CMSTPCOHX = (STPTOGCX_Y - 1900)*12 +
+                              STPTOGCX_M
+
+                              ELSE IF 13 LE STPTOGCX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMSTPCOHX as above.
+
+                              ELSE IF STPTOGCX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMSTPCOHX as above.
+
+EDIT CHECK CD14_1:            PROBE IF CMSTPCOHX < CMCOHSTX. DISPLAY TEXT: R has
+                              reported that she stopped living with the partner
+                              before she began living with him. Has one of the
+                              dates been entered incorrectly?
+
+EDIT CHECK CD14_2:            THE DATES R LIVED WITH NON-CURRENT, NON-MARITAL
+                              PARTNERS SHOULD NOT OVERLAP WITH MARRIAGES EXCEPT
+                              DURING PERIOD OF SEPARATION. COMPARE CMCOHSTX AND
+                              CMSTPCOHX WITH CMMARRHX AND CMSTPHSBX FOR ALL
+                              HUSBANDS. PROBE IF OVERLAP OCCURS.
+
+EDIT CHECK CD14_3:            THE DATES R LIVED WITH NON-CURRENT, NON-MARITAL
+                              PARTNERS CANNOT OVERLAP WITH PREMARITAL COHABITATIONS
+                              WITH HUSBANDS. COMPARE CMCOHSTX AND CMSTPCOHX WITH
+                              CMPMCOHX FOR ALL HUSBANDS. PROBE IF OVERLAP OCCURS.
+
+EDIT CHECK CD14_4:            THE DATES R LIVED WITH NON-CURRENT, NON-MARITAL
+                              PARTNERS CANNOT OVERLAP WITH HER CURRENT COHABITATION
+                              WITH A PARTNER. COMPARE CMCOHSTX AND CMSTPCOHX WITH
+                              CMSTRTCP. PROBE IF OVERLAP OCCURS.
+
+EDIT CHECK CD14_5:            COHABITATION DATES WITH DIFFERENT PARTNERS CANNOT
+                              OVERLAP EACH OTHER. COMPARE CMCOHSTX AND CMSTPCOHX FOR
+                              EACH "X" PARTNER REPORTED. PROBE IF OVERLAP OCCURS.
+
+
+FLOW CHECK C-40:      IF COHBCNTR LT HMOTHMEN LT 8, RETURN TO FLOW CHECK C-34b TO
+                      ASK ABOUT NEXT FORMER COHABITING PARTNER.
+
+
+                                                 C-28
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+                      ELSE IF COHBCNTR = HMOTHMEN OR IF COHBCNTR = 8, CONTINUE
+                      WITH FLOW CHECK C-41.
+
+
+EVER HAD INTERCOURSE (CE)
+
+FLOW CHECK C-41:      IF FMARIT = 5 or 0 (never married) AND EVRCOHAB = 5 (no) AND
+                                                                EVERPREG = 5 (no),
+                                                                ASK CE-1 EVERSEX.
+                      ELSE IF (FMARIT = 1, 2, 3, or 4) OR (CA-1 TIMESMAR GE 1) OR
+                      EVRCOHAB = 1 (yes) OR EVERPREG = 1 (yes), GO TO CE-3
+                      WNFSTSEX.
+
+EVERSEX
+CE-1. At any time in your life, have you ever had sexual intercourse with a
+      man, that is, made love, had sex, or gone all the way?
+
+               NOTE: Do not count oral sex, anal sex, heavy petting, or other
+               forms of sexual activity that do not involve vaginal penetration.
+                Do not count sex with a female partner.
+
+                      Yes ........................1
+                      No .........................5
+
+FLOW CHECK C-42:      COMPUTE RHADSEX:
+                      (Whether R has ever had vaginal intercourse with a male)
+
+                              RHADSEX = 1 (yes) IF           CE-1 EVERSEX = YES
+                                                OR           FMARIT = 1, 2, 3, or 4
+                                                OR           CA-1 TIMESMAR GE 1
+                                                OR           EVRCOHAB = YES
+                                                OR           EVERPREG = YES
+
+                              RHADSEX = 5 (no)          IF   CE=1 EVERSEX = NO, DK, OR RF.
+
+
+                      IF RHADSEX = NO, ASK CE-2 YNOSEX.
+                      ELSE IF RHADSEX = YES, GO TO FLOW CHECK C-43.
+
+YNOSEX
+CE-2. As you know, some people have had sexual intercourse by your age and
+       others have not. Please look at Card 22? which lists some reasons that
+       people give for not having sexual intercourse.
+
+       What would you say is the most important reason why you have not had
+       sexual intercourse up to now?
+
+[SHOW CARD 22]
+
+               Against religion or morals............................1
+               Don=t want to get pregnant............................2
+               Don=t want to get a sexually transmitted disease......3
+               Haven=t found the right person yet....................4
+               In a relationship, but waiting for the right time.....5
+               Other ................................................6
+
+FLOW CHECK C-43:      IF RHADSEX = YES, ASK CE-3 WNFSTSEX.
+                      ELSE IF RHADSEX = NO, GO TO FLOW CHECK C-48.
+
+
+
+                                                 C-29
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+WNFSTSEX_M
+CE-3. Please look at the calendar and think back to the very first time in
+      your life that you ever had sexual intercourse with a man. In what
+      month and year was that?
+
+
+               ENTER 96 if R insists that she has never had sexual intercourse.
+
+               NOTE: This is one of the most important questions in the survey!
+               It marks the beginning of R's exposure to the risk of pregnancy.
+
+               If R refuses, stress the importance of the questions and the
+               confidential nature of her response.
+
+               If R does not know the date, probe extensively using the calendar
+               and other reference dates.
+
+               Sexual intercourse here refers to a sexual encounter between a man
+               and a woman, in which the penis enters the vagina.
+
+               NOTE: Do not count oral sex, anal sex, heavy petting, or other
+               forms of sexual activity that do not involve vaginal penetration.
+                Do not count sex with a female partner.
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+{ YEAR IS ASKED ONLY IF WNFSTSEX_M NE 96
+WNFSTSEX_Y
+CE-3. IF WNFSTSEX_M NE 96, DISPLAY:
+      (Please look at the calendar and think back to the very first time in
+      your life that you ever had sexual intercourse with a man. In what
+      month and year was that?)
+
+               NOTE: This is one of the most important questions in the survey!
+               It marks the beginning of R's exposure to the risk of pregnancy.
+               If R refuses, stress the importance of the questions and the
+               confidential nature of her response. If R does not know the date,
+               probe extensively using the calendar and other reference dates.
+
+               NOTE: Do not count oral sex, anal sex, heavy petting, or other
+               forms of sexual activity that do not involve vaginal penetration.
+                Do not count sex with a female partner.
+
+{ AFTER R HAS GIVEN THE YEAR, INTERVIEWER SHOULD SAY:
+            Please record this event in the appropriate box in the AFirst
+            Partner@ row of your calendar. You might use FSEX or some other
+            notation that you will recognize later.
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               ENTER year in 4 digits _______
+
+
+                                                 C-30
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               UNDERLYING RANGE:      1957 to 2002
+
+FLOW CHECK C-44:      COMPUTE CMFSTSEX:
+                      (CM for date of first vaginal intercourse with a male)
+
+                              SET CMFSTSEX = null/blank.
+
+                              IF WNFSTSEX_Y = RF, SET CMFSTSEX = 9998 (RF).
+                              ELSE IF WNFSTSEX_Y = DK, SET CMFSTSEX = 9999 (DK).
+
+                              ELSE IF WNFSTSEX_M LE 12,
+                              COMPUTE CMFSTSEX = (WNFSTSEX_Y - 1900)*12 + WNFSTSEX_M
+
+                              ELSE IF 13 LE WNFSTSEX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMFSTSEX as above.
+
+                              IF WNFSTSEX_M = 96, SET CMFSTSEX = 9996 (R has never
+                              had sex) AND RESET RHADSEX = NO.
+
+                              ELSE IF WNFSTSEX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMFSTSEX as above.
+
+                      IF CMFSTSEX NE BLANK AND CMFSTSEX LT 9996, ESTABLISH
+                      CMFSTSEX_FILL.
+
+                      COMPUTE FLGSXDK1:
+                      (Flag indicating reporting of season or DK/RF on CE-3
+                      WNFSTSEX_M)
+
+                              IF 13 LE WNFSTSEX_M LE 16, SET FLGSXDK1 = 1.
+                              ELSE IF WNFSTSEX_M = DK/RF, SET FLGSXDK1 = 2.
+                              ELSE IF WNFSTSEX_M = 96, SET FLGSXDK1 = 3.
+                              ELSE SET FLGSXDK1 = 0.
+
+                      IF CMFSTSEX NE BLANK AND (CMFSTSEX < 9996 OR CMFSTSEX = DK
+                      OR RF), ASK CE-4 AGEFSTSX.
+                      ELSE IF CMFSTSEX = 9996, GO TO FLOW CHECK C-48.
+
+EDIT CHECK CE3_1: PROBE IF CMFSTSEX > CMPG1BEG + 2 (date when 1st pregnancy
+                  began + 2 months leeway). DISPLAY TEXT: R has reported
+                  first having sexual intercourse more than 2 months after the
+                  computer has calculated that her 1st pregnancy began. Is
+                  this correct?
+
+AGEFSTSX
+CE-4. That very first time that you had sexual intercourse with a man, how old
+      were you?
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               IF NECESSARY: Suggest to R that she look at her calendar to
+               verify her age at first sex (for example, if it occurred in the
+               same month as her birthday).
+
+               ENTER age in years _____
+
+               UNDERLYING RANGE: 0 to 45
+
+
+
+                                                 C-31
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+EDIT CHECK CE4_1: PROBE IF INT(CMFSTSEX - CMBIRTH)/12) IS INCONSISTENT WITH
+                  CE-4 AGEFSTSX. DISPLAY TEXT: R has reported an age at first
+                  sex that appears inconsistent with the mo/yr when she first
+                  had sex. Has something been entered incorrectly?
+
+FLOW CHECK C-45:      IF CE-4 AGEFSTSX = DK OR RF, ASK CE-5 C_SEX18.
+                      ELSE GO TO FLOW CHECK C-46.
+
+C_SEX18
+CE-5. Were you less than 18 years old or were you 18 years or older?
+
+                      Less than 18 years...........1
+                      18 years or older............2
+
+FLOW CHECK C-45b: IF CE-5 C_SEX18 = 1 OR DK, ASK CE-6 C_SEX15.
+                  ELSE IF C_SEX18 = 2, GO TO CE-7 C_SEX20.
+                  ELSE IF C_SEX18 = RF, GO TO FLOW CHECK C-46.
+
+C_SEX15
+CE-6. Were you less than 15 years old or were you 15 or older?
+
+                      Less than 15 years...........1
+                      15 years or older............2
+
+FLOW CHECK C-45c: IF CE-6 C_SEX15 = 1, 2, DK, or RF, GO TO FLOW CHECK C-46.
+
+C_SEX20
+CE-7. Were you less than 20 years old or were you 20 or older?
+
+                      Less than 20 years...........1
+                      20 years or older............2
+
+FLOW CHECK C-46:      IF CE-4 AGEFSTSX GT 17 OR (CE-4 AGEFSTSX = DK OR RF AND CE-5
+                      C_SEX18 = 2), GO TO FLOW CHECK C-47.
+
+GRFSTSX
+CE-8. What grade or year of school were you in that first time you had
+      intercourse with a male?
+
+[HELP AVAILABLE]
+
+               ENTER 96 if R was not in school when she first had intercourse
+
+               1st grade .......................................1
+               2nd grade .......................................2
+               3rd grade .......................................3
+               4th grade .......................................4
+               5th grade .......................................5
+               6th grade .......................................6
+               7th grade .......................................7
+               8th grade .......................................8
+               9th grade .......................................9
+               10th grade ......................................10
+               11th grade ......................................11
+               12th grade ......................................12
+               1st year of college .............................13
+               2nd year of college .............................14
+               3rd year of college .............................15
+               4th year of college .............................16
+
+               UNDERLYING RANGE: 1 to 16, 96
+
+                                                 C-32
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+FLOW CHECK C-47:      IF FMARIT = 0 OR 5 (never married) AND EVRCOHAB = NO, ASK
+                      CE-9 SXMTONCE.
+
+                      ELSE IF FMARIT = 1, 2, 3, or 4 OR EVRCOHAB = YES, GO TO FLOW
+                      CHECK C-48.
+
+SXMTONCE
+CE-9. Have you had sexual intercourse more than once?
+
+               Yes .........................1
+               No ..........................5
+
+
+Sex Communication (CF)
+
+FLOW CHECK C-48:      IF AGESCRN > 19, GO TO FLOW CHECK C-51.
+
+TALKPAR
+CF-1. IF AGE_R GE 18, SAY:
+      The next questions are about how you learned about sex and birth
+      control. Before you were 18 years old, did you ever talk with a parent
+      or guardian about any of the topics shown on Card 23?
+
+       ELSE IF AGE_R LT 18, SAY:
+       The next questions are about how you learned about sex and birth
+       control. Have you ever talked with a parent or guardian about any of
+       the topics shown on Card 23?
+
+[SHOW CARD 23]
+
+               ENTER all that apply.
+
+               How to say no to sex ............1
+               Methods of birth control ........2
+               Where to get birth control ......3
+               Sexually transmitted diseases ...4
+               How to use a condom .............5
+               None of the above ...............6
+
+               RANGE CHECK: 6,DK,RF CANNOT BE COMBINED WITH ANY OTHER RESPONSE
+
+SEDNO
+CF-2. IF AGE_R GE 18, ASK:
+      Now I=m interested in knowing about formal sex education you may have
+      had. Before you were 18, did you ever have any formal instruction at
+      school, church, a community center or some other place ...
+
+       About how to say no to sex?
+
+       ELSE IF AGE_R LT 18, ASK:
+       Now I=m interested in knowing about formal sex education you may have
+       had. Have you ever had any formal instruction at school, church, a
+       community center or some other place ...
+
+       About how to say no to sex?
+
+               Yes............1
+               No.............5 (CF-5 SEDBC)
+
+SEDNOG
+CF-3. What grade were you in when you first received instruction on how to say
+
+                                                 C-33
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+       no to sex?
+
+               ENTER 96 if R was not in school when she received the instruction
+
+               1st grade .......................................1
+               2nd grade .......................................2
+               3rd grade .......................................3
+               4th grade .......................................4
+               5th grade .......................................5
+               6th grade .......................................6
+               7th grade .......................................7
+               8th grade .......................................8
+               9th grade .......................................9
+               10th grade ......................................10
+               11th grade ......................................11
+               12th grade ......................................12
+               1st year of college .............................13
+               2nd year of college .............................14
+               3rd year of college .............................15
+               4th year of college .............................16
+               Not in school when received instruction .........96
+
+
+               UNDERLYING RANGE 1-16,96
+
+EDIT CHECK CF2_1: PROBE IF CF-2 SEDNOG GT AF-3 HIGRADE. DISPLAY TEXT: R has
+                  reported receiving this instruction in a grade higher than
+                  her highest grade attended. Is this correct?
+
+FLOW CHECK C-49:      IF RHADSEX=NO, GO TO FLOW CHECK CF-5 SEDBC.
+
+                      ELSE IF RHADSEX = YES THEN DO:
+                            IF CE-8 GRFSTSX NE 96 OR DK OR RF AND GRFSTSX = CF-3
+                            SEDNOG, ASK CF-4 SEDNOSX.
+
+                              ELSE IF GRFSTSX = DK OR RF OR SEDNOG = DK OR RF, ASK
+                              CF-4 SEDNOSX.
+
+                              ELSE IF GRFSTSX NE SEDNOG, GO TO CF-5 SEDBC.
+                              END.
+
+SEDNOSX
+CF-4. Did you receive instruction about how to say no to sex before or after
+      the first time you had sex?
+
+               Before..........1
+               After...........2
+
+SEDBC
+CF-5. IF AGE_R GE 18, ASK:
+      Before you were 18, did you ever have any formal instruction at school,
+      church, a community center or some other place ...
+
+       About methods of birth control?
+
+       ELSE IF AGE_R LT 18, ASK:
+       Have you ever had any formal instruction at school, church, a community
+       center or some other place ...
+
+       About methods of birth control?
+
+
+
+                                                 C-34
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               Yes............1
+               No.............5 (CF-8 PLEDGE)
+
+SEDBCG
+CF-6. What grade were you in when you first received instruction on methods of
+       birth control?
+
+               ENTER 96 if R was not in school when she received the instruction
+
+               1st grade .......................................1
+               2nd grade .......................................2
+               3rd grade .......................................3
+               4th grade .......................................4
+               5th grade .......................................5
+               6th grade .......................................6
+               7th grade .......................................7
+               8th grade .......................................8
+               9th grade .......................................9
+               10th grade ......................................10
+               11th grade ......................................11
+               12th grade ......................................12
+               1st year of college .............................13
+               2nd year of college .............................14
+               3rd year of college .............................15
+               4th year of college .............................16
+               Not in school when received instruction .........96
+
+               UNDERLYING RANGE 1-16,96
+
+EDIT CHECK CF6_1: PROBE IF CF-6 SEDBCG GT AF-3 HIGRADE. DISPLAY TEXT: R has
+                  reported receiving this instruction in a grade higher than
+                  her highest grade attended. Is this correct?
+
+FLOW CHECK C-50:      IF RHADSEX=NO, GO TO CF-8 PLEDGE.
+
+                      ELSE IF RHADSEX = YES THEN DO:
+                            IF CE-8 GRFSTSX NE 96 OR DK OR RF AND GRFSTSX = CF-6
+                            SEDBCG, ASK CF-7 SEDBCSX.
+
+                              ELSE IF GRFSTSX = DK OR RF OR SEDBCG = DK OR RF, ASK
+                              CF-7 SEDBCSX.
+
+                              ELSE IF GRFSTSX NE SEDBCG, GO TO CF-8 PLEDGE.
+                              END.
+
+SEDBCSX
+CF-7. Did you receive instruction about methods of birth control before or
+      after the first time you had sex?
+
+               Before..........1
+               After...........2
+
+PLEDGE
+CF-8. IF FMARIT = 1 or 2 or 3 or 4, ASK:
+       Did you ever take a public or written pledge to remain a virgin until
+       marriage?
+
+       ELSE IF FMARIT = 0 OR 5 (never married), ASK:
+       Have you ever taken a public or written pledge to remain a virgin until
+       marriage?
+
+
+
+                                                 C-35
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               Yes ............1
+               No .............5
+
+FLOW CHECK C-51:      IF RHADSEX = NO, GO TO FLOW CHECK C-77.
+
+
+FIRST INTERCOURSE PARTNER (CG)
+
+FRSTPART
+CG-1. Please tell me the first name or the initials of your first male sexual
+      partner so that I can refer to him during the interview.
+[HELP AVAILABLE]
+
+               Name or initials      __________________
+
+FLOW CHECK C-52:      IF FMARIT = 1 or 2 or 3 or 4 (ever married) OR EVRCOHAB =
+                      YES, ASK CG-2 SAMEMAN.
+
+                      ELSE IF FMARIT = O OR 5 OR EVRCOHAB = NO, GO TO FLOW CHECK
+                      C-53.
+
+SAMEMAN
+CG-2. CREATE SUMMARY SCREEN TO DISPLAY NAMES OR INITIALS OF ALL REPORTED
+      HUSBANDS AND PARTNERS, ALONG WITH START & END DATES OF
+      MARRIAGE/COHABITATION. For example:
+
+       Name           Start                             End
+       HUSBNAME1      (CMMARRH1_FILL)                   (CMDIVORC1_FILL)
+       HUSBNAME2      (CMMARRH2_FILL)                   (CMHSBDIE2_FILL)
+       OTHMAN1        (CMCOHST1_FILL)                   (CMSTPCOH1_FILL)
+       CHPNAME        (CMMARRCH_FILL)                   still married
+
+               (Note to programmers: Husbands with whom she lived premaritally
+               should only be listed under Ahusbands.@)
+
+       IF NAME OR INITIALS GIVEN IN FRSTPART, ASK:
+       Please look at this screen. Is (FRSTPART) someone we talked about
+       earlier? That is, was he someone you=ve been married to or lived with?
+
+       IF FRSTPART = DK OR RF, ASK:
+       Please look at this screen. Is your first partner someone we talked
+       about earlier? That is, was he someone you=ve been married to or lived
+       with?
+
+                      YES................1
+                      NO.................5 (FLOW CHECK C-53)
+
+EDIT CHECK CG2_1: PROBE IF CG-2 SAMEMAN = NO AND FRSTPART IS IDENTICAL TO A
+                  NAME OR INITIALS FROM THE SUMMARY SCREEN. DISPLAY TEXT: R
+                  has stated that none of the men just listed was her first
+                  partner, but a man listed on the screen has the same name or
+                  initials as her first partner. If her 1st partner was a
+                  different man, please give him a different name or initials
+                  to distinguish him from the other man.
+
+WHOFSTPR
+CG-3. Which of these men listed on the screen was your first sexual partner?
+      Was he ...
+
+               [Programmers: PLEASE DISPLAY SAME LIST OF MEN AS SHOWN ON SUMMARY
+               SCREEN, BUT INCLUDE CODE NUMBERS TO ENABLE SELECTION OF ONE MAN AS
+
+                                                 C-36
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               HER FIRST PARTNER.]
+
+FLOW CHECK C-53:      IF AGE_R GE 18, ASK CG-4 FPAGE.
+                      ELSE IF AGE_R LT 18, GO TO CG-5 KNOWFP.
+
+FPAGE
+CG-4. IF NAME OR INITIALS GIVEN IN FRSTPART, ASK:
+      How old was (FRSTPART) when you had sexual intercourse with him that
+      first time?
+
+       ELSE IF FRSTPART = DK OR RF, ASK:
+       How old was your first partner when you had sexual intercourse with him
+       that first time?
+
+               ENTER age in years
+
+[HELP AVAILABLE]
+
+               Age in years __________
+
+               UNDERLYING RANGE:      5 to 95
+
+FLOW CHECK C-54:      IF CG-4 FPAGE = DK OR RF, ASK CG-4b FPRELAGE.
+                      ELSE IF FPAGE LE 95, GO TO CG-5 KNOWFP.
+
+FPRELAGE
+CG-4b.         Was he older than you, younger than you, or the same age?
+
+               Older ............1
+               Younger ..........2
+               Same age .........3
+
+FLOW CHECK C-55:      IF CG-4b FPRELAGE = 1 OR 2, ASK CG-4c FPRELYRS.
+                      ELSE IF FPRELAGE = 3 OR DK OR RF, GO TO CG-5 KNOWFP.
+
+FPRELYRS
+CG-4c.         By how many years?
+
+               1-2 years.............1
+               3-5 years.............2
+               6-10 years............3
+               More than 10 years....4
+
+KNOWFP
+CG-5. IF NAME OR INITIALS ARE GIVEN IN FRSTPART, ASK:
+       Please look at Card 24. At the time you first had sexual intercourse
+       with (FRSTPART), how would you describe your relationship with him?
+
+       ELSE IF FRSTPART = DK OR RF, ASK:
+       Please look at Card 24. At the time you first had sexual intercourse
+       with your first partner, how would you describe your relationship with
+       him?
+
+[SHOW CARD 24]
+[HELP AVAILABLE]
+
+               Married to him ...............................................1
+               Engaged to him ...............................................2
+               Living together in a sexual relationship, but not engaged ....3
+               Going with him or going steady ...............................4
+               Going out with him once in a while ...........................5
+               Just friends .................................................6
+
+                                                 C-37
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               Had just met him .............................................7
+               Something else ...............................................8
+
+FLOW CHECK C-56:      ASK CG-6 STILFPSX IF:
+                      B CG-2 SAMEMAN = YES AND WHOFSTPR = (A FORMER HUSBAND OR
+                      COHABITING PARTNER) AND MARSTAT NE 1 or 2
+                      OR
+                      B IF CG-2 SAMEMAN NE YES AND MARSTAT NE 1 or 2
+
+                      ELSE GO TO CG-7 LSTSEXFP IF:
+                      B CG-2 SAMEMAN = YES AND WHOFSTPR = (A FORMER HUSBAND OR
+                      COHABITING PARTNER) AND MARSTAT = 1 or 2
+                      OR
+                      B CG-2 SAMEMAN = YES AND WHOFSTPR = (CURRENT HUSBAND OR
+                      COHABITING PARTNER)
+                      OR
+                      B CG-2 SAMEMAN NE YES AND MARSTAT = 1 or 2
+
+STILFPSX
+CG-6. Do you consider him to be a current sexual partner?
+
+[HELP AVAILABLE]
+
+                      Yes .......................1
+                      No ........................5
+
+LSTSEXFP_M
+CG-7. IF NAME OR INITIALS ARE GIVEN IN FRSTPART, ASK:
+      When was the last time you had sexual intercourse with (FRSTPART), that
+      is, in what month and year?
+
+       ELSE IF FRSTPART = DK OR RF, ASK:
+       When was the last time you had sexual intercourse with your first
+       partner, that is, in what month and year?
+
+               ENTER 96 if R only had sex once with this partner
+
+               ENTER month
+               PROBE for season if DK month
+
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September    13. Winter
+       2. February            6. June                   10. October     14. Spring
+       3. March               7. July                   11. November    15. Summer
+       4. April               8. August                 12. December    16. Fall
+
+{ ASKED ONLY IF LSTSEXFP_M NE 96
+LSTSEXFP_Y
+CG-7. IF NAME OR INITIALS ARE GIVEN IN FRSTPART AND LSTSEXFP_M NE 96, DISPLAY:
+      (When was the last time you had sexual intercourse with (FRSTPART), that
+      is, in what month and year?)
+
+       ELSE IF FRSTPART = DK OR RF AND LSTSEXFP_M NE 96, DISPLAY:
+       (When was the last time you had sexual intercourse with your first
+       partner, that is, in what month and year?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY:            Please record this event in the
+
+                                                 C-38
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               appropriate box in the AFirst Partner@ row of your calendar. You
+               might use LSEX or some other notation that you will recognize
+               later.
+
+               ENTER year in 4 digits _________
+
+               UNDERLYING RANGE: 1957 to 2002
+
+FLOW CHECK C-57:      COMPUTE CMLSEXFP:
+                      (CM for date of last sex with first sexual partner)
+                            SET CMLSEXFP = null/blank.
+
+                              IF LSTSEXFP_Y = RF, SET CMLSEXFP = 9998 (RF).
+                              ELSE IF LSTSEXFP_Y = DK, SET CMLSEXFP = 9999 (DK).
+
+                              ELSE IF LSTSEXFP_M LE 12,
+                              COMPUTE CMLSEXFP = (LSTSEXFP_Y - 1900)*12 + LSTSEXFP_M
+
+                              ELSE IF 13 LE LSTSEXFP_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMLSEXFP as above.
+
+                              ELSE IF LSTSEXFP_M = 96, SET CMLSEXFP = 9996 (only had
+                              sex once with this partner).
+
+                              ELSE IF LSTSEXFP_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMLSEXFP as above.
+
+                      COMPUTE CMFPLAST:
+                      (CM for date of last or only sex with first sexual partner)
+
+                      IF CMLSEXFP = 9996, THEN SET CMFPLAST = CMFSTSEX.
+                      ELSE SET CMFPLAST = CMLSEXFP.
+
+                      ESTABLISH CMLSEXFP_FILL AS INDICATED IN FLOW CHECK B-42.
+                            (Recall that IF CMLSEXFP = 9996, fill=@Not
+                            Applicable@)
+
+
+EDIT CHECK CG7_1: PROBE IF CMLSEXFP < CMFSTSEX. DISPLAY TEXT: R has reported
+                  that she last had sex with this partner before she first had
+                  sex with this partner. Has one of the dates been entered
+                  incorrectly?
+
+FLOW CHECK C-58:      IF BA-1 MENARCHE = 96 OR CE-5 AGEFSTSX > BA-1 MENARCHE, GO
+                      TO CH-1 LIFEPRT.
+
+                      ELSE IF (AGEFSTSX = DK OR RF AND CMFSTSEX = DK OR RF), GO TO
+                      CG-9 SEXAFMEN.
+
+                      ELSE IF AGEFSTSX LE MENARCHE, CONTINUE WITH C_INTRO6 CG-7b.
+
+C_INTRO6
+CG-7b.         IF CE-5 AGEFSTSX = BA-1 MENARCHE, SAY:
+               You told me that you were [AGEFSTSX] years old the first time you
+               had sexual intercourse, the same age you were when you had your
+               first menstrual period. It is important for this study to know
+               whether your first sexual intercourse was before or after your
+               first menstrual period so we know something about your risk of
+               pregnancy.
+
+
+                                                 C-39
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               ELSE IF CE-5 AGEFSTSX < BA-1 MENARCHE, SAY:
+               You told me that you were [AGEFSTSX] years old the first time you
+               had sexual intercourse, and that you were [MENARCHE] years old
+               when you had your first menstrual period. It is important for
+               this study to know when you first had sexual intercourse after
+               your first menstrual period so we know something about your risk
+               of pregnancy.
+
+               ENTER [1] to continue
+
+FLOW CHECK C-58b: IF CE-5 AGEFSTSX = BA-1 MENARCHE, ASK CG-8 WHICH1ST.
+                  ELSE GO TO FLOW CHECK C-59.
+
+WHICH1ST
+CG-8. Which came first, your first sexual intercourse or your first menstrual
+      period?
+
+[HELP AVAILABLE]
+
+               Sexual intercourse .............1 (FLOW CHECK C-59)
+               Menstrual period ...............2 (CH-1 LIFEPRT)
+
+FLOW CHECK C-59:      IF CHPNAME = BLANK AND EVERPREG = NO AND EVRCOHAB = NO, ASK
+                      CG-9 SEXAFMEN. ELSE, GO TO CG-10 WNSEXAFM.
+
+SEXAFMEN
+CG-9. Since your first menstrual period, have you had sexual intercourse?
+
+               NOTE: If R refuses to answer, emphasize importance of the
+               information and that it is completely confidential. Only then
+               should you accept a refusal. Do not count oral sex, anal sex,
+               heavy petting, or other forms of sexual activity that do not
+               involve vaginal penetration. Do not count sex with a female
+               partner.
+
+[HELP AVAILABLE]
+
+                      Yes ....................1
+                      No .....................5 (CH-1 LIFEPRT)
+
+WNSEXAFM_M
+CG-10.         Thinking back, after your first menstrual period, in what month
+               and year did you have sexual intercourse for the first time?
+
+               ENTER 96 if R insists that she has not had sexual intercourse
+               since her first menstrual period.
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+{ ASKED ONLY IF WNSEXAFM_M NE 96
+WNSEXAFM_Y
+CG-10.      IF WNSEXAFM_M NE 96, DISPLAY:
+            (Thinking back, after your first menstrual period, in what month
+
+                                                 C-40
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               and year did you have sexual intercourse for the first time? )
+
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY: Please record this event in the
+               appropriate box in the AFirst Partner@ row of your calendar. You
+               can use any abbreviation or notation that you will recognize
+               later.
+
+               ENTER year in 4 digits ________
+
+               UNDERLYING RANGE:      1962 to 2002
+
+FLOW CHECK C-60:      COMPUTE CMSEXAFM:
+                      (CM for date of 1st sexual intercourse after menarche)
+
+                              SET CMSEXAFM = null/blank.
+
+                              IF WNSEXAFM_Y = RF, SET CMSEXAFM = 9998 (RF).
+                              ELSE IF WNSEXAFM_Y = DK, SET CMSEXAFM = 9999 (DK).
+
+                              ELSE IF WNSEXAFM_M LE 12,
+                              COMPUTE CMSEXAFM = (WNSEXAFM_Y - 1900)*12 + WNSEXAFM_M
+
+                              ELSE IF 13 LE WNSEXAFM_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMSEXAFM as above.
+
+                              IF WNSEXAFM_M = 96, SET CMSEXAFM = 9996 (R has never
+                              had sex).
+
+                              ELSE IF WNSEXAFM_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMSEXAFM as above.
+
+                      IF CMSEXAFM NE BLANK AND CMSEXAFM LT 9996, ESTABLISH
+                      CMSEXAFM_FILL.
+
+                      COMPUTE FLGSXDK2:
+                      (Flag indicating reporting of season or DK/RF on CG-10
+                      WNSEXAFM_M)
+
+                              IF 13 LE WNSEXAFM_M LE 16, SET FLGSXDK2 = 1.
+                              ELSE IF WNSEXAFM_M = DK/RF, SET FLGSXDK2 = 2.
+                              ELSE IF WNSEXAFM_M = 96, SET FLGSXDK2 = 3.
+                              ELSE SET FLGSXDK2 = 0.
+
+                      IF CMSEXAFM NE BLANK AND (CMSEXAFM < 9996 OR CMSEXAFM = DK
+                      OR RF), ASK CG-11 AGESXAFM.
+                      ELSE IF CMSEXAFM = 9996, GO TO CH-1 LIFEPRT.
+
+
+EDIT CHECK CG10_1:            PROBE IF CMSEXAFM > CMPG1BEG + 2 (date when 1st
+                              pregnancy began + 2 months leeway). DISPLAY TEXT: R
+                              has reported first having sexual intercourse (after
+                              menarche) more than 2 months after the computer has
+                              calculated that her 1st pregnancy began. Is this
+                              correct?
+
+AGESXAFM
+CG-11.         Thinking back after your first menstrual period, how old were you
+
+                                                 C-41
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               when you had sexual intercourse for the first time?
+
+[HELP AVAILABLE]
+
+                      ENTER age in years _______
+
+                      UNDERLYING RANGE:          5 to 45
+
+FLOW CHECK C-60b: IF CG-11 AGESXAFM = DK, ASK CG-12 AFMEN18.
+                  ELSE IF AGESXAFM LE 45 OR AGESXAFM = RF, GO TO CH-1 LIFEPRT.
+AFMEN18
+CG-12.      Were you less than 18 years old or were you 18 years or older?
+
+                      Less than 18 years...........1
+                      18 years or older............2
+
+FLOW CHECK C-61:      IF CG-12 AFMEN18 = 1 OR DK, ASK CG-13 AFMEN15.
+                      ELSE IF AFMEN18 = 2, ASK CG-14 AFMEN20.
+                      ELSE IF AFMEN18 = RF, GO TO CH-1 LIFEPRT.
+
+AFMEN15
+CG-13.         Were you less than 15 years old or were you 15 or older?
+
+                      Less than 15 years...........1
+                      15 years or older............2
+
+FLOW CHECK C-62:      IF CG-13 AFMEN15 = 1, 2, DK, OR RF, GO TO CH-1 LIFEPRT.
+
+AFMEN20
+CG-14.         Were you less than 20 years old or were you 20 or older?
+
+                      Less than 20 years...........1
+                      20 years or older............2
+
+EDIT CHECK CG14_1:            PROBE IF INT(CMSEXAFM - CMBIRTH)/12) IS INCONSISTENT
+                              WITH CG-11 AGESXAFM. DISPLAY TEXT: R has reported an
+                              age at first sex after menarche that appears
+                              inconsistent with the mo/yr when she first had sex
+                              after menarche. Has something been entered
+                              incorrectly?
+
+EDIT CHECK CG14_2:            PROBE IF CG-11 AGESXAFM < BA-1 MENARCHE. DISPLAY
+                              TEXT: R has reported that she first had sex after
+                              menarche at an age younger than her age at first
+                              period. Has something been entered incorrectly?
+
+
+NUMBERS OF SEXUAL PARTNERS (CH)
+
+LIFEPRT
+CH-1. Counting all your male sexual partners, even those you had intercourse
+      with only once, how many men have you had sexual intercourse with in
+      your life?
+
+[HELP AVAILABLE]
+
+       If R is unable or unwilling to give an exact number, SAY: AIf you would
+       prefer, you can give me a range.@ ENTER DK or RF as appropriate, and
+       enter range in the next two fields.
+
+               ENTER number of partners __________
+
+                                                 C-42
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+               UNDERLYING RANGE 1 to 995
+
+FLOW CHECK C-62b: IF CH-1 LIFEPRT = DK OR RF, ASK CH-1b LIFEPRT_LO.
+                  ELSE IF LIFEPRT LE 995, GO TO CH-2 MON12PRT.
+
+LIFEPRT_LO
+CH-1b.         (ENTER LOWER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS IN
+               LIFETIME.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 1 to 995
+
+LIFEPRT_HI
+CH-1c.         (ENTER UPPER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS IN
+               LIFETIME.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 2 to 995
+
+MON12PRT
+CH-2. During the last 12 months, that is, since (CMLSTYR_FILL), how many men,
+      if any, have you had sexual intercourse with? Please count every male
+      sexual partner, even those you had sex with only once.
+
+[HELP AVAILABLE]
+
+       If R is unable or unwilling to give an exact number, SAY: AIf you would
+       prefer, you can give me a range.@ ENTER DK or RF as appropriate, and
+       enter range in the next two fields.
+
+               ENTER number of partners __________
+
+               UNDERLYING RANGE 0 to 995
+
+FLOW CHECK C-62c: IF CH-2 MON12PRT = DK OR RF, ASK CH-2b MON12PRT_LO.
+                  ELSE IF MON12PRT LE 995, GO TO FLOW CHECK C-63.
+
+MON12PRT_LO
+CH-2b.      (ENTER LOWER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS IN LAST 12
+            MONTHS.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 1 to 995
+
+MON12PRT_HI
+CH-2c.      (ENTER UPPER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS IN LAST 12
+            MONTHS.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 2 to 995
+
+EDIT CHECK CH2_1: PROBE IF CH-2 MON12PRT > CH-1 LIFEPRT. DISPLAY TEXT: R has
+                  reported more partners in the last 12 months than she
+                  reported for her lifetime. Has something been entered
+                  incorrectly?
+
+
+
+                                                 C-43
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+FLOW CHECK C-63:      IF FMARIT = 1 or 2 or 3 or 4, ASK CH-3 PTSB4MAR.
+                      ELSE IF FMARIT = 5 (NEVER MARRIED), GO TO FLOW CHECK C-64.
+
+PTSB4MAR
+CH-3. IF CA-1 TIMESMAR = 1 AND FMARIT = 3 (divorced), ASK:
+      Including your former husband, how many male sexual partners did you
+      have before you got married?
+
+       ELSE IF TIMESMAR = 1 AND FMARIT = 1, 2, or 4 (married, widowed, or
+       separated), ASK:
+       Including your husband, how many male sexual partners did you have
+       before you got married?
+
+       ELSE IF TIMESMAR > 1, ASK:
+       Including your first husband, how many male sexual partners did you have
+       before you got married the first time?
+
+[HELP AVAILABLE]
+
+       If R is unable or unwilling to give an exact number, SAY: AIf you would
+       prefer, you can give me a range.@ ENTER DK or RF as appropriate, and
+       enter range in the next two fields.
+
+               ENTER number of partners __________
+
+               UNDERLYING RANGE: 0 to 95
+
+
+FLOW CHECK C-63b: IF CH-3 PTSB4MAR = DK OR RF, ASK CH-3b PTSB4MAR_LO.
+                  ELSE IF PTSB4MAR LE 95, GO TO FLOW CHECK C-64.
+
+PTSB4MAR_LO
+CH-3b.      (ENTER LOWER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS BEFORE
+            MARRIAGE.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 1 to 95
+
+PTSB4MAR_HI
+CH-3c.      (ENTER UPPER BOUND OF RANGE FOR NUMBER OF MALE PARTNERS BEFORE
+            MARRIAGE.)
+
+               ENTER number ____________
+
+               UNDERLYING RANGE: 2 to 95
+
+EDIT CHECK CH3_1: PROBE IF CH-3 PTSB4MAR > CH-1 LIFEPRT. DISPLAY TEXT: R has
+                  reported more partners before marriage than she reported for
+                  her lifetime. Has something been entered incorrectly?
+
+
+RECENT SEXUAL PARTNERS IN LAST 12 MONTHS (CI)
+
+FLOW CHECK C-64:      COMPUTE PARTS12:
+                      (Number of partners in last 12 mos)
+
+                              IF CH-2 MON12PRT LE 995 OR MON12PRT = RF,
+                                    SET PARTS12 = MON12PRT.
+                              ELSE IF MON12PRT = DK,
+                                    SET PARTS12 = MON12PRT_LO.
+
+                                                 C-44
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+
+                      IF CH-1 LIFEPRT = 1 AND CG-2 SAMEMAN = YES (R was ever
+                      married to or ever lived with this 1 partner), GO TO FLOW
+                      CHECK C-77.
+
+                      ELSE IF LIFEPRT NE 1 OR (IF CH-1 LIFEPRT = 1 AND CG-2
+                      SAMEMAN NE YES), THEN DO:
+
+                              DETERMINE WHOM R HAS HAD SEX WITH SINCE CMLSTYR:
+                                    IF PARTS12 = 0, DK, OR RF, GO TO FLOW CHECK C-
+                                    75.
+
+                                     ELSE IF PARTS12 = 1 AND (CHPNAME NE blank AND
+                                     AB-1 MARSTAT = 1 or 2), GO TO CI-1 WHOSNC1Y.
+
+                                     ELSE IF PARTS12 = 1 AND (CHPNAME = blank AND AB-
+                                     1 MARSTAT NE 1 or 2), GO TO CI-2 PRT1YNMX.
+
+                                     ELSE IF PARTS12 GE 2, GO TO CI-2 PRT1YNMX.
+
+WHOSNC1Y
+CI-1. You mentioned that you have had one sexual partner since (CMLSTYR_FILL).
+       Is that (CHPNAME)?
+
+                      YES................1 (FLOW CHECK C-65)
+                      NO.................5 (CI-2 PRT1YNMX)
+
+EDIT CHECK CI1_1: PROBE IF CI-1 WHOSNC1Y = NO AND CMFSTSEX GE CMLSTYR.
+                  DISPLAY TEXT: R has answered WHOSNC1Y as NO, but her 1st
+                  sexual intercourse was within the last 12 months. Is this
+                  correct?
+
+EDIT CHECK CI1_2: PROBE IF CI-1 WHOSNC1Y = NO AND MARSTAT = 1 or 2. DISPLAY
+                  TEXT: R has answered WHOSNC1Y as NO, but she is currently
+                  married or cohabiting. Is this correct?
+
+PRT1YNMX
+CI-2. IF CI-1 WHOSNC1Y = BLANK (not asked because PARTS12 NE 1), ASK:
+      Please tell me the names or initials of your (PARTS12) male sexual
+      partners since (CMLSTYR_FILL) so that I can refer to them in the next
+      few questions.
+
+       ELSE IF CI-1 WHOSNC1Y = 5 (NO), ASK:
+       Please tell me the name or initials of your 1 male sexual partner since
+       (CMLSTYR_FILL) so that I can refer to him in the next few questions.
+
+               If R refuses or does not know a name, SAY: AI=m going to be asking
+               a few questions about that partner. In order to refer to him, I=m
+               going to call him MAN1.@
+
+[HELP AVAILABLE]
+
+
+               ENTER name/initials ________
+
+{ Allow space for names/initials up to a total of PARTS12
+
+FLOW CHECK C-64b: CI-1 IF WHOSNC1Y = 5 or DK or RF, GO TO FLOW CHECK C-65.
+
+
+                                                 C-45
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+TALKALL
+CI-3. IF PARTS12 = 1, ASK:
+      Have we already talked about (PRT1YNM1)? That is, is he your first
+      partner, (or have you been married to or lived with him)?
+
+       ELSE IF PARTS12 = 2, ASK:
+       Have we already talked about either of these men? That is, is one of
+       them your first partner, (or have you been married to or lived with
+       either of them)?
+
+       ELSE IF PARTS12 > 2, ASK:
+       Have we already talked about any of these (PARTS12) men? That is, is
+       one of them your first partner, (or have you been married to or lived
+       with any of them)?
+
+                      Yes ...................1
+                      No ....................5 (Flow Check C-65)
+
+EDIT CHECK CI3_1: PROBE IF CI-3 TALKALL = NO AND CMFSTSEX GE CMLSTYR. DISPLAY
+                  TEXT: R has answered TALKALL as NO, but her 1st sexual
+                  intercourse was within the last 12 months. Is this correct?
+
+EDIT CHECK CI3_2: PROBE IF CI-3 TALKALL = NO AND MARSTAT = 1 or 2. DISPLAY
+                  TEXT: R has answered TALKALL as NO, but she is currently
+                  married or cohabiting. Is this correct?
+
+WHICH1Y
+CI-4. CREATE SUMMARY SCREEN TO DISPLAY NAMES OR INITIALS OF ALL REPORTED
+      HUSBANDS AND PARTNERS, INCLUDING FIRST SEXUAL PARTNER, JUST AS WAS DONE
+      IN CG-2 SAMEMAN. For example:
+
+       Name           Start                             End
+       FRSTPART       (CMFSTSEX_FILL)                   (CMFPLAST_FILL)
+       HUSBNAME1      (CMMARRH1_FILL)                   (CMDIVORC1_FILL)
+       HUSBNAME2      (CMMARRH2_FILL)                   (CMHSBDIE2_FILL)
+       OTHMAN1        (CMCOHST1_FILL)                   (CMSTPCOH1_FILL)
+       CHPNAME        (CMMARRCH_FILL)                   still married
+
+               (Note to programmers: Husbands with whom she lived premaritally
+               should only be listed under Ahusbands.@)
+
+       Which of the men that we have already talked about have you had sexual
+       intercourse with since (CMLSTYR_FILL)?
+
+{ CODE NUMBERS MUST BE ATTACHED TO EACH MAN ON SUMMARY SCREEN.
+
+               ENTER all that apply
+
+FLOW CHECK C-65:      DETERMINE WHICH PARTNERS (IF ANY) SINCE CMLSTYR NEED TO GO
+                      THROUGH REMAINDER OF THIS SERIES.
+
+                      DEFINE DESCRIBD:
+                      (Number of partners previously described)
+
+                              (Partner is previously described if he is R=s 1st
+                              sexual partner, OR if R ever married him or cohabited
+                              with him. If he is R=s 1st sexual partner, none of the
+                              CI series will be asked for him. If he is a husband
+                              or cohabiting partner (former or current), he will be
+                              routed as appropriate through the remainder of the CI
+                              series.)
+
+                                                 C-46
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+
+
+                      IF DESCRIBD = PARTS12 = 1 AND THIS PARTNER IS R=S FIRST
+                      SEXUAL PARTNER, GO TO FLOW CHECK C-70.
+
+                      ELSE CONTINUE WITH FLOW CHECK C-66.
+
+FLOW CHECK C-66:      INCREASE PRT12CNTR BY 1.
+
+                      IF PARTNER BEING DISCUSSED IS R'S FIRST SEXUAL PARTNER, GO
+                      TO FLOW CHECK C-70.
+                      ELSE, ASK CI-5 P1YRAGE THROUGH CI-15 P1YRN (as appropriate)
+                      FOR ALL OTHER PARTNERS IN LAST 12 MOS.
+
+P1YRAGE
+CI-5. Thinking now of (PRT1YNMX), how old were you when you first had sexual
+      intercourse with him?
+
+[HELP AVAILABLE]
+
+                      ENTER age in years _________
+
+                      UNDERLYING RANGE:          5 to 45
+
+FLOW CHECK C-66b: IF AGE_R GE 18, ASK CI-6 P1YHSAGE.
+                  ELSE IF AGE_R LT 18, GO TO CI-7 P1YRF.
+
+P1YHSAGE
+CI-6. And how old was he when you first had sexual intercourse with him?
+
+[HELP AVAILABLE]
+
+                      ENTER age in years ________
+
+                      UNDERLYING RANGE: 5 to 95
+
+P1YRF
+CI-7. Please look at Card 24. At the time you first had sexual intercourse
+      with (PRT1YNMX), how would you describe your relationship with him?
+
+[SHOW CARD 24]
+
+               Married to him ...............................................1
+               Engaged to him ...............................................2
+               Living together in a sexual relationship, but not engaged ....3
+               Going with him or going steady ...............................4
+               Going out with him once in a while ...........................5
+               Just friends .................................................6
+               Had just met him .............................................7
+               Something else ...............................................8
+
+P1YFSEX_M
+CI-8. In what month and year did you have sexual intercourse with him for the
+      first time?
+
+               NOTE: If R refuses to answer, emphasize importance of the
+               information and that it is completely confidential. Only then
+               should you accept a refusal. Do not count oral sex, anal sex,
+               heavy petting, or other forms of sexual activity that do not
+               involve vaginal penetration. Do not count sex with a female
+               partner.
+
+
+                                                 C-47
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+P1YFSEX_Y
+CI-8. (In what month and year did you have sexual intercourse with him for the
+      first time?)
+
+               NOTE: If R refuses to answer, emphasize importance of the
+               information and that it is completely confidential. Only then
+               should you accept a refusal. Do not count oral sex, anal sex,
+               heavy petting, or other forms of sexual activity that do not
+               involve vaginal penetration. Do not count sex with a female
+               partner.
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY: Please record this partner=s
+               initials in the appropriate box on one of the AOther Partner@ rows
+               of your calendar.
+
+               ENTER year in 4 digits ________
+
+               UNDERLYING RANGE: 1967 to 2002
+
+FLOW CHECK C-67:      COMPUTE CMFSEXX:
+                      (CM for date of 1st sex with partner X in last 12 mos)
+
+                              SET CMFSEXX = null/blank.
+
+                              IF P1YFSEX_Y = RF, SET CMFSEXX = 9998 (RF).
+                              ELSE IF P1YFSEX_Y = DK, SET CMFSEXX = 9999 (DK).
+
+                              ELSE IF P1YFSEX_M LE 12,
+                              COMPUTE CMFSEXX = (P1YFSEX_Y - 1900)*12 + P1YFSEX_M
+
+                              ELSE IF 13 LE P1YFSEX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMFSEXX as above.
+
+                              ELSE IF P1YFSEX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMFSEXX as above.
+
+
+                      IF CMFSEXX NE BLANK AND CMFSEXX LT 9996, ESTABLISH
+                      CMFSEXX_FILL.
+
+
+EDIT CHECK CI8_1: PROBE IF CMFSEXX LT CMFSTSEX. DISPLAY TEXT: R has reported
+                  first having sexual intercourse with this partner before she
+                  ever had sexual intercourse in her life. Has something been
+                  entered incorrectly?
+
+
+
+                                                 C-48
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+FLOW CHECK C-68:      ASK CI-9 P1YCURRP:
+
+                      B       IF R IS SEPARATED FROM CURRENT HUSBAND (AB-1 MARSTAT =
+                              5), AND PARTNER BEING DISCUSSED IS NOT R'S CURRENT
+                              HUSBAND
+                      OR
+                      B       IF R IS NOT CURRENTLY MARRIED TO OR COHABITING WITH
+                              THIS PARTNER.
+
+                      ELSE GO TO FLOW CHECK C-68b:
+                      B     IF CI-1 WHOSNC1Y = YES
+                      OR
+                      B     IF R IS CURRENTLY MARRIED OR COHABITING (AB-1 MARSTAT
+                            = 1 or 2) AND PARTNER BEING DESCRIBED IS CURRENT
+                            HUSBAND OR COHABITING PARTNER.
+
+P1YCURRP
+CI-9. Do you consider (PRT1YNMX) to be a current sexual partner?
+
+[HELP AVAILABLE]
+
+                      Yes ................1
+                      No .................5
+
+FLOW CHECK C-68b: COMPUTE PCURRNTX:
+                  (Whether partner X is last 12 mos is Acurrent@)
+
+                      IF CI-9 P1YCURRP = 1 THEN PCURRNTX = 1 (current).
+                      ELSE IF P1YCURRP = blank (not asked), THEN PCURRNTX = 1.
+                      ELSE IF P1YCURRP = 5, DK, OR RF, THEN PCURRNTX = 5 (not
+                      current).
+
+P1YLSEX_M
+CI-10.         In what month and year did you last have sexual intercourse with
+               him?
+
+               ENTER 96 if R only had sex once with this partner
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September    13. Winter
+       2. February            6. June                   10. October     14. Spring
+       3. March               7. July                   11. November    15. Summer
+       4. April               8. August                 12. December    16. Fall
+
+                      UNDERLYING RANGE: 1-16, 96
+
+{ ASKED ONLY IF P1YLSEX_M NE 96
+P1YLSEX_Y
+CI-10.      IF P1YLSEX_M NE 96, DISPLAY:
+            (In what month and year did you last have sexual intercourse with
+            him?)
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY:            Please record this event in the
+
+                                                 C-49
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               appropriate box on one of the AOther Partner@ rows of your
+               calendar. You can use any abbreviation or notation that you will
+               recognize later.
+
+               ENTER year in 4 digits _______
+
+               UNDERLYING RANGE:      1967 to 2002
+
+FLOW CHECK C-69:      COMPUTE CMLSEXX:
+                      (CM for date of last sex with partner X in last 12 mos)
+                            SET CMLSEXX = null/blank.
+
+                              IF P1YLSEX_Y = RF, SET CMLSEXX = 9998 (RF).
+                              ELSE IF P1YLSEX_Y = DK, SET CMLSEXX = 9999 (DK).
+
+                              ELSE IF P1YLSEX_M LE 12,
+                              COMPUTE CMLSEXX = (P1YLSEX_Y - 1900)*12 + P1YLSEX_M
+
+                              ELSE IF 13 LE P1YLSEX_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMLSEXX as above.
+
+                              ELSE IF P1YLSEX_M = 96, SET CMLSEXX = 9996 (only had
+                              sex once with this partner).
+
+                              ELSE IF P1YLSEX_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMLSEXX as above.
+
+                      ESTABLISH CMLSEXX_FILL AS INDICATED IN FLOW CHECK B-42.
+                            (Recall that IF CMLSEXX = 9996, fill=@Not Applicable@)
+
+
+                      COMPUTE CMLSTSXX:
+                      (CM for date of last or only sex with partner X in last 12
+                      mos)
+
+                              IF CMLSEXX = 9996, THEN SET CMLSTSXX = CMFSEXX.
+                              ELSE SET CMLSTSXX = CMLSEXX.
+
+                      IF CMLSTSXX NE BLANK AND CMLSTSXX LT 9996, ESTABLISH MO/YR
+                      FILL FOR CMLSTSXX.
+
+
+EDIT CHECK CI10_1:            PROBE IF CMLSEXX LT CMFSEXX. DISPLAY TEXT: R has
+                              reported that date of last sex with this partner was
+                              earlier than date of first sex with this partner. Has
+                              one of the dates been entered incorrectly?
+
+EDIT CHECK CI10_2:            PROBE IF CMLSEXX < CMLSTYR OR IF CMLSTSXX < CMLSTYR.
+                              DISPLAY TEXT: R has reported that her last (or only)
+                              sex with this partner was longer ago than 12 months.
+                              In this series of questions, we are only asking about
+                              partners she had sex with during the last 12 mos. Has
+                              something been entered incorrectly?
+
+FLOW CHECK C-70:      IF PARTNER BEING DESCRIBED IS CURRENT AND IS NOT R=S CURRENT
+                      HUSBAND OR COHABITING PARTNER (CI-9 P1YCURRP = YES OR CG-6
+                      STILFPSX), ASK CI-11 P1YEDUC.
+                      ELSE GO TO FLOW CHECK C-73.
+
+
+                                                 C-50
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+P1YEDUC
+CI-11.         Please look at Card 11.           What is the highest level of education he
+               has completed?
+
+[SHOW CARD 11]
+
+               Less than high school ...........................1
+               High school graduate or GED .....................2
+               Some college but no degree ......................3
+               2-year college degree (e.g., Associate=s degree).4
+               4-year college graduate (e.g., BA, BS) ..........5
+               Graduate or professional school .................6
+
+P1YHISP
+CI-12. Is (PRT1YNMX) Hispanic or Latino, or of Spanish origin?
+
+                      YES.....................1
+                      NO......................5
+
+P1YRACE
+CI-13.         Which of the groups on Card 2 describes (PRT1YNMX)'s racial
+               background? Please select one or more groups.
+
+               ENTER all that apply
+
+               NOTE: If R reports a mixture of several races (biracial, mixed,
+               mulatto, etc.), ENTER all groups that are part of the mixture.
+
+[SHOW CARD 2]
+[HELP AVAILABLE]
+
+               American Indian or Alaska Native ...............1
+               Asian ..........................................2
+               Native Hawaiian or Other Pacific Islander ......3
+               Black or African American ......................4
+               White ..........................................5
+
+               DK OR RF CANNOT BE ENTERED WITH CODES 1 - 5
+
+FLOW CHECK C-71:      IF MORE THAN ONE RACE CODED IN CI-13 P1YRACE, ASK CI-14
+                      P1YRACEB. ELSE, GO TO FLOW CHECK C-72.
+
+P1YRACEB
+CI-14.         Which of these groups, that is (RESPONSES FROM P1YRACE), would you
+               say best describes his racial background?
+
+[HELP AVAILABLE]
+{ Display only those categories reported in CI-13 P1YRACE
+
+FLOW CHECK C-72:      IF THIS PARTNER IS EXPLICITLY REPORTED AS ACURRENT@ (CI-9
+                      P1YCURRP = YES), AND RELATIONSHIP HAS LASTED LONGER THAN 1
+                      MONTH (CMLSEXX - CMFSEXX GE 1), THEN ASK CI-15 P1YRN.
+                      ELSE GO TO FLOW CHECK C-73.
+
+P1YRN
+CI-15.         Please look at Card 24. How would you describe your current
+               relationship with (PRT1YNMX)?
+
+[SHOW CARD 24]
+
+               Married to him ...............................................1
+               Engaged to him ...............................................2
+
+                                                 C-51
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               Living together in a sexual relationship, but not engaged ....3
+               Going with him or going steady ...............................4
+               Going out with him once in a while ...........................5
+               Just friends .................................................6
+               Had just met him .............................................7
+               Something else ...............................................8
+
+FLOW CHECK C-73:      IF PRT12CNTR LT PARTS12, RETURN TO FLOW CHECK C-65 AND
+                      REPEAT P1YRAGE THROUGH P1YRN AS NEEDED FOR NEXT PARTNER IN
+                      LAST 12 MOS.
+
+                      ELSE IF PRT12CNTR = PARTS12, GO TO FLOW CHECK C-74.
+
+FLOW CHECK C-74:      EXAMINE DATES OF LAST SEX WITH EACH PARTNER SINCE CMLSTYR TO
+                      DETERMINE R=S LAST MO/YR OF SEXUAL INTERCOURSE. CONSIDER
+                      ALL VALUES OF CMLSTSXX AND CMFPLAST AS APPLICABLE. DO NOT
+                      ASSESS AS A DUPLICATE DATE IF THE CMLSTSXX OR CMFPLAST VALUE
+                      IS BASED ON MONTH = DK, RF, OR SEASON.
+
+                      COMPUTE CMLSTSX12:
+
+                              CMLSTSX12 = MAX VALUE AMONG CMLSTSXX OR CMFPLAST
+                                          VALUES
+
+                              IF CMLSTSX12 IS SHARED BY 2 OR MORE PARTNERS, DO NOT
+                              COUNT AS A DUPLICATE VALUE UNLESS ALL MONTH VALUES
+                              WERE REPORTED AS 1-12.
+
+                      IF R=S LAST SEX DATE IS REPORTED FOR 2 OR MORE PARTNERS
+                      (CMLSTSX12 = CMLSTSXX OR CMFPLAST FOR MORE THAN 1 PARTNER
+                      AND MONTH FOR ALL THE PARTNERS WAS REPORTED AS 1-12), ASK
+                      CI-16 LASTSEX TO ESTABLISH WHEN AND WITH WHOM R LAST HAD
+                      SEX.
+
+                      IF NO AMBIGUITY IN DATES OF LAST SEX (RLASTSEX = CMFPLAST OR
+                      CMLSTSXX FOR ONLY 1 PARTNER), GO TO FLOW CHECK C-77.
+
+LASTSEX
+CI-16.         Before we move on to the next section of the interview, let me
+               make sure I have everything correct so far. You reported that you
+               last had sex with (list names from PRT1YNMX) in (CMLSTSX12_FILL).
+                Is that correct?
+
+                      Yes ....1
+                      No .....5      (should back up to CI-10 P1YLSEX OR CG-7
+                                     LSTSEXFP to make any necessary correction)
+
+LASTSEXW
+CI-17.         Please think about the very last time you had sexual intercourse
+               in (CMLSTSXX_FILL). With which of these men (repeat names from
+               PRT1YNMX) was that last sexual intercourse?
+
+                      PRT1YNMX .....1
+                      PRT1YNMX .....2
+                      Etc.
+
+FLOW CHECK C-75:      IF PARTS12 = 0, DK, OR RF, ASK CI-18 DATELAST.
+                      ELSE IF PARTS12 = blank or RHADSEX = NO, GO TO FLOW CHECK C-
+                      77.
+
+
+                                                 C-52
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+DATELAST_M
+CI-18.         In what month and year did you last have sexual intercourse with a
+               male?
+
+               ENTER month
+               PROBE for season if DK month
+
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+       1. January             5. May                    9. September   13. Winter
+       2. February            6. June                   10. October    14. Spring
+       3. March               7. July                   11. November   15. Summer
+       4. April               8. August                 12. December   16. Fall
+
+DATELAST_Y
+CI-18.      (In what month and year did you last have sexual intercourse with
+            a male?)
+[HELP AVAILABLE]
+[CALENDAR REFERENCE]
+
+               After R has given the year, SAY: Please record this event in the
+               appropriate box on one of the ARelationships@ or APartners@ rows of
+               your calendar. You can use any abbreviation or notation that you
+               will recognize later.
+
+               ENTER year in 4 digits ________
+
+               UNDERLYING RANGE:      1967 to 2001
+
+FLOW CHECK C-76:      COMPUTE CMDATLST:
+                      (CM for date of last sex, for those who have reported no
+                      male partners in last 12 mos, but they have had sex)
+
+                              SET CMDATLST = null/blank.
+
+                              IF DATELAST_Y = RF, SET CMDATLST = 9998 (RF).
+                              ELSE IF DATELAST_Y = DK, SET CMDATLST = 9999 (DK).
+
+                              ELSE IF DATELAST_M LE 12,
+                              COMPUTE CMDATLST = (DATELAST_Y - 1900)*12 + DATELAST_M
+
+                              ELSE IF 13 LE DATELAST_M LE 16, USE MONTH APPROPRIATE
+                              TO SEASON & COMPUTE CMDATLST as above.
+
+                              ELSE IF DATELAST_M = DK OR RF, ASSIGN MONTH = 6 (June)
+                              & COMPUTE CMDATLST as above.
+
+EDIT CHECK CI18_1:            PROBE IF CMDATLST GE CMLSTYR. DISPLAY TEXT: R has
+                              reported that her last sexual intercourse was within
+                              the last 12 months, but earlier she reported no sexual
+                              partners in the last 12 months. Has something been
+                              entered incorrectly?
+
+WHOLAST
+CI-19.         Who was this last sexual partner?
+
+               NOTE: These response choices are meant to be mutually exclusive.
+               Code Aformer cohabiting partner@ only if R never married him.
+               Code Afirst sexual partner@ only if R was never married to him and
+
+
+                                                 C-53
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+               never cohabited with him.
+
+                      A former husband ...................1
+                      A former cohabiting partner ........2
+                      Your first sexual partner ..........3
+                      Some other man .....................4
+
+FLOW CHECK C-77:      DEFINE COMPUTED VARIABLES:
+
+                      LIFEPRTS is defined for all Rs:
+
+                      COMPUTE LIFEPRTS -                # of male sexual partners in
+                                                        lifetime
+
+                              IF RHADSEX = NO OR CH-1 LIFEPRT = RF,
+                                    SET LIFEPRTS = 0.
+                              ELSE IF CH-1 LIFEPRT LE 995,
+                                    SET LIFEPRTS = CH-1 LIFEPRT.
+                              ELSE IF CH-1 LIFEPRT = DK,
+                                    SET LIFEPRTS = CH-1b LIFEPRT_LO.
+
+               IF RHADSEX = NO, ALL OF THE REMAINING COMPUTED VARIABLES DEFINED
+               BELOW ARE BLANK/INAPP, EXCEPT FOR CURRPRTT AND CURRPRTS.
+
+                      IF RHADSEX = NO, THEN DO:
+
+                              SET CURRPRTT = 0
+                              SET CURRPRTS = 0
+                              GO TO FLOW CHECK D-1.
+                              END.
+
+                      ELSE IF RHADSEX = YES, THEN DO:
+
+                      COMPUTE CMLASTSX =                CM date of last sex for all Rs who
+                                                        have had sex
+
+                              CMLASTSX =     Latest value among all non-blank values of
+                                             CMLSTSX12, CMDATLST, and CMFPLAST.
+
+                      COMPUTE CURRPRTT =                Total number of current sexual
+                                                        partners, including a current (not
+                                                        separated) husband or cohabiting
+                                                        partner in the total
+
+                                     =       Sum across all partners with P1YCURRP =
+                                             YES, and add 1 if R is currently married
+                                             (not separated) or cohabiting. Also add 1
+                                             if CG-6 STILFPSX = YES.
+
+                      COMPUTE CURRPRTS =                Total number of current sexual
+                                                        partners, NOT including husbands or
+                                                        cohabiting partners (for use
+                                                        primarily in Audio CASI for a series
+                                                        asked only of minors)
+
+                                     Sum across all partners with P1YCURRP = YES.
+                                     Add 1 if CG-6 STILFPSX = YES and R has never
+                                     married or cohabited with this man.
+
+
+                                                 C-54
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                      COMPUTE PRT12NAM1, PRT12NAM2, PRT12NAM3:
+                            (Name or initials of 3 most recent partners in last 12
+                            months for use in Section E)
+                      COMPUTE CMPART1Y1, CMPART1Y2, CMPART1Y3:
+                            (CM date of last or only sex with each of these 3 most
+                            recent partners in last 12 mos)
+
+                              IF PARTS12 = 0, THEN DO:
+                                    SET PRT12NAM1, PRT12NAM2, & PRT12NAM3 TO BLANK.
+                                    SET CMPART1Y1, CMPART1Y2, & CMPART1Y3 TO BLANK.
+                                    END.
+
+                              ELSE IF PARTS12 GT 0, THEN DO:
+
+                                     SORT ALL PARTNERS REPORTED IN LAST 12 MOS BY
+                                     THEIR CM DATES OF LAST SEX (STARTING WITH MOST
+                                     RECENT).
+                                     B     BASE SORTING ON CMLSTSXX VALUES.
+                                     B     IF CI-17 LASTSEXW WAS ASKED, USE RESPONSE
+                                           TO ORDER THE PARTNERS.
+                                     B     IF CMFPLAST (CM date of last or only sex
+                                           with 1st sexual partner) GE CMLSTYR,
+                                           INCLUDE 1st sexual partner as one of the
+                                           partners to be ordered chronologically.
+
+                                     SET PRT12NAM1 = PARTNER NAME OR INITIALS WITH
+                                     THE MOST RECENT DATE (among PRT1YNMX, FRSTPART,
+                                      OR PARTNER REPORTED IN CI-17 LASTSEXW). SET
+                                     CMPART1Y1 = corresponding value from CMLSTSXX or
+                                     CMFPLAST.
+
+                                     SET PRT12NAM2 = NEXT MOST RECENT PARTNER (if
+                                     applicable). SET CMPART1Y2 = corresponding
+                                     value from CMLSTSXX or CMFPLAST.
+
+                                     SET PRT12NAM3 = NEXT MOST RECENT PARTNER (if
+                                     applicable). SET CMPART1Y3 = corresponding
+                                     value from CMLSTSXX or CMFPLAST.
+
+                                     END.
+
+
+                      COMPUTE CURPART1, CURPART2, CURPART3:
+                            (Name or initials of up to 3 current sexual partners,
+                            who are not husbands or cohabiting partners, among
+                            respondents aged 15-17 -- for use in ACASI)
+                      COMPUTE CMCURRP1, CMCURRP2, CMCURRP3:
+                            (CM date of last or only sex with each of these 3
+                            current partners)
+
+                              IF CURRPRTS = 0 OR AGE_R GE 18, THEN DO:
+                                    SET CURPART1, CURPART2, & CURPART3 TO BLANK.
+                                    SET CMCURRP1, CMCURRP2, & CMCURRP3 TO BLANK.
+                                    END.
+
+                              ELSE IF CURRPRTS > 0 AND AGE_R LT 18, THEN DO:
+
+                                     SORT ALL PARTNERS WITH PCURRNTX = YES BY THEIR
+
+                                                 C-55
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+                                     CMLSTSXX VALUES (STARTING WITH MOST RECENT). If
+                                      CG-6 STILFPSX = YES and R has never married or
+                                     cohabited with her first sexual partner, INCLUDE
+                                     first sexual partner as one of the partners to
+                                     be ordered chronologically (based on CMFPLAST).
+
+                                     IF PARTNER IS NOT A HUSBAND OR COHABITING
+                                     PARTNER, SET CURPART1 = PRT1YNMX for this
+                                     partner. SET CMCURRP1 = corresponding value
+                                     from CMLSTSXX or CMFPLAST.
+
+                                     REPEAT FOR UP TO 3 SUCH PARTNERS (UNTIL CURPART3
+                                     & CMCURRP3 HAVE BEEN SET OR DETERMINED AS
+                                     INAPPLICABLE).
+
+                                     END.
+
+
+-------------------------
+
+VARIABLES (asked or defined in this section) TO BE PASSED FORWARD:
+CA-1 TIMESMAR Number of marriages (among those who ever married)
+CG-1 FRSTPART String for name of 1st sexual partner
+CH-3 MON12PRT Number of male partners in last 12 months
+CI-1 WHOSNC1Y Was the one partner in last 12 mos CHPNAME (asked if LIFEPRTS=1)
+CI-2 PRT1YNMX Names of all partners in last 12 mos
+
+CHPNAME
+CMMARRHX
+CMMARRHX_FILL
+CMMARRCH
+CMHSBDOBX
+CMDOBCH
+CMPMCOHX
+CMHSBDIEX
+CMHSBDIEX_FILL
+CMDIVORCX
+CMDIVORCX_FILL
+CMSTPHSBX
+PREVHUSB
+CMSTRTCP
+CMDOBCP
+CMSTRTHP
+EVRCOHAB
+PREVCOHB
+CMCOHSTX
+CMCOHSTX_FILL
+CMDOBCX
+CMSTPCOHX
+RHADSEX
+CMFSTSEX
+FLGSXDK1
+CMFSTSEX_FILL
+CMLSEXFP
+CMFPLAST
+CMSEXAFM
+FLGSXDK2
+PARTS12
+CMFSEXX
+PCURRNTX
+CMLSEXX
+CMLSEXX_FILL
+CMLSTSXX
+CMLSTSXX_FILL
+CMLSTSX12
+CMDATLST
+
+                                                 C-56
+NSFG Cycle 6 Main Study (FEMALE questionnaire)
+Section C (fn=CfemC6CRQ.doc)
+
+LIFEPRTS
+CMLASTSX
+CURRPRTT
+CURRPRTS
+PRT12NAM1
+PRT12NAM2
+PRT12NAM3
+CMPART1Y1
+CMPART1Y2
+CMPART1Y3
+CURPART1
+CURPART2
+CURPART3
+CMCURRP1
+CMCURRP2
+CMCURRP3
+
+
+
+
+                                                 C-57
+

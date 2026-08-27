@@ -1,12 +1,26 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
 source ("enadid_lib.R")
+source ("NSFG_harmonize_types.R")
 source ("NSFG_lib.R")
+source ("NSFG_impute_dissolution.R")
+source ("NSFG_impute_dissolution_model.R")
 source (path.expand("~/Dropbox/RStudioData/TransitionsPPR/KaplanMeierLib.R"))
 # Read US NSFG surveys
 # Some have sps import files
 # Some not
 library(tidyverse)
 library (haven)
+
+# ==== Month-imputation mode (per-reader switch) ====
+# Controls how a MISSING month is imputed for year-only event dates. The most
+# recent NSFG public-use files (2015-17 onward) give year only, so every month
+# is imputed; older files impute only the rare (<10%) out-of-range month.
+#   FALSE = legacy: uniform random month, no constraint (current behaviour).
+#   TRUE  = constrained: month capped to the survey date so a year-only event
+#           cannot land after the interview. Passed to raw_union_history().
+# No event-ordering/probabilistic layer is wired for NSFG, so TRUE adds only
+# the survey-date cap. Flip to compare old vs new imputation.
+capMonth <- TRUE
 
 #### SUMMARY ####
 # 1973: complete UH (up to 6), no CohabBefMar ever married women or single with coresiding children
@@ -242,6 +256,8 @@ getDatos_1973 <- function (childSex=TRUE) {
   } else {
     stop ("discrepancy between nBioKids and birth_count")
   }
+
+  datos <- compute_lastYear(datos)
   
   return (datos)
 }
@@ -520,6 +536,9 @@ getDatos_1982 <- function () {
   datos$lastYear <- NA
   datos$indiv_dob_cmc <- adjust_cmc (as.integer(substring(datos$raw,12,15))) # OK
   datos$indiv_age_survey <- floor((datos$surveyDate_cmc - datos$indiv_dob_cmc) / 12)
+  datos$union_status <- as.integer(substring(datos$raw,1006,1006)) #OK
+  datos$union_status <- factor(datos$union_status, levels=c(1,2,3,4,5,6),
+                               labels=c("married","cohabiting","widowed","divorced","separated","single"))
   datos$yBirth <- 1900 + floor ((datos$indiv_dob_cmc-1) / 12)
   datos$indiv_weight <- as.integer(substring(datos$raw,976,982)) # OK
   datos$pregnant <- as.integer(substring(datos$raw,63,63)) # OK
@@ -1691,7 +1710,56 @@ imputed_date_2002_after <- function (cmc) {
 # complete up to 10 unions
 # info on cohabitation before marriage
 # complete date (cmc)
-getDatos_2002 <- function () {
+
+# Per-husband "did this husband have children from a prior relationship?" flags.
+# Works for all NSFG cycles from 2002 onward.
+# df          : raw survey dataframe (must contain FMARITAL and TIMESMAR)
+# kidshx_names: character vector where kidshx_names[i] is the KIDSHX column for
+#               the i-th husband (e.g. c("KIDSHX","KIDSHX2") or
+#               c("KIDSHX_1","KIDSHX_2"))
+# Returns a data.frame with one factor column per husband,
+#   husb_priorKids_1 .. husb_priorKids_K  (K = length(kidshx_names)).
+# Universe follows the NSFG codebook: KIDSHX_i is asked of every ever-married
+# woman (FMARITAL %in% 1:4) with at least i marriages (TIMESMAR >= i); NA
+# otherwise. NOTE: in 2002 the marriage-end module (MARENDHX + stop-living /
+# death dates) was skipped whenever KIDSHX_i == "yes", so husb_priorKids_i ==
+# "yes" marks the i-th marriage whose union_end is missing-by-skip -- the
+# target for dissolution-date imputation.
+nsfg_husb_priorKids <- function(df, kidshx_names) {
+  n  <- nrow(df)
+  nm <- names(df)
+  # Marriage-count and marital-status variables are renamed in 2022-23:
+  #   count : TIMESMAR (<=2019)  / FMARNO (2022-23)
+  #   status: FMARITAL (<=2019)  / FMARIT (2022-23)
+  cnt_var <- if ("TIMESMAR" %in% nm) "TIMESMAR" else if ("FMARNO" %in% nm) "FMARNO" else NA_character_
+  mar_var <- if ("FMARITAL" %in% nm) "FMARITAL" else if ("FMARIT"  %in% nm) "FMARIT"  else NA_character_
+  if (is.na(cnt_var) || is.na(mar_var)) {
+    warning("nsfg_husb_priorKids(): missing marriage-count (TIMESMAR/FMARNO) ",
+            "or marital-status (FMARITAL/FMARIT) column; all flags returned NA")
+    timesmar     <- rep(NA_real_, n)
+    ever_married <- rep(FALSE, n)
+  } else {
+    timesmar     <- df[[cnt_var]]
+    ever_married <- !is.na(df[[mar_var]]) & df[[mar_var]] %in% 1:4
+  }
+  out        <- vector("list", length(kidshx_names))
+  names(out) <- paste0("husb_priorKids_", seq_along(kidshx_names))
+  for (i in seq_along(kidshx_names)) {
+    nm  <- kidshx_names[i]
+    val <- rep(NA_real_, n)
+    if (nm %in% names(df)) {
+      idx      <- ever_married & !is.na(timesmar) & timesmar >= i
+      val[idx] <- df[[nm]][idx]
+    }
+    out[[i]] <- factor(
+      val, levels = c(1, 5, 8, 9),
+      labels = c("yes", "no", "refused", "don't know")
+    )
+  }
+  as.data.frame(out, stringsAsFactors = FALSE, check.names = FALSE)
+}
+
+getDatos_2002 <- function (correctDissolution=TRUE) {
   path_2002 <- path.expand("~/Library/CloudStorage/GoogleDrive-ddevolder@ced.uab.es/My Drive/Documents/Travail/Demographic Surveys/USA/NSFG/2002/")
 
   wd <- getwd()
@@ -1732,9 +1800,9 @@ getDatos_2002 <- function () {
   
   ##### Union history #####
   # compute number of unions (sum of marriage and cohabitations)
-  datos$union_status <- df_NSFG_2002$MARSTAT
-  datos$union_status <- factor (datos$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos$union_status <- factor(df_NSFG_2002$RMARITAL,
+                               levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                               labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos$currMarr_cmc <- adjust_cmc_2002_after (df_NSFG_2002$CMMARRCH)
   datos$currCohab_cmc <- adjust_cmc_2002_after (df_NSFG_2002$CMSTRTCP)
@@ -1745,10 +1813,9 @@ getDatos_2002 <- function () {
   datos$nCohab <- ifelse(!is.na(datos$currCohab_cmc), df_NSFG_2002$PREVCOHB + 1, df_NSFG_2002$PREVCOHB)
   datos$nUnion <- datos$nMarriage_decl + datos$nCohab
   
-  datos_UH <- datos[, c("CaseID", "nUnion")]
-  
-  # df_UH1 <- complete_union_history (datos_UH, df_NSFG_2002, 5) this one has only cmc, not month and year
-  df_UH2 <- raw_union_history (df_NSFG_2002) # use cmc or month and year or year to compute cmc
+  #datos_UH <- datos[, c("CaseID", "nUnion")]
+  #df_UH1 <- complete_union_history (datos_UH, df_NSFG_2002, 5) this one has only cmc, not month and year
+  df_UH2 <- raw_union_history (df_NSFG_2002, survey_cmc = datos$surveyDate_cmc, capped = capMonth) # use cmc or month and year or year to compute cmc
   
   datos <- datos %>%
     left_join(df_UH2, by = "CaseID")%>%
@@ -1763,7 +1830,45 @@ getDatos_2002 <- function () {
   datos$nMarriage_decl <- NULL
   datos$nCohab <- NULL
   datos <- rename(datos, nUnion = total_unions)
-  
+
+  # ---- 2002 dissolution data gaps ----------------------------------------
+  #
+  # Two questionnaire skips leave marriage-end dates missing in 2002, both
+  # confirmed against the raw file (2026-06):
+  #
+  # 1. Currently SEPARATED respondents (RMARITAL = 5): the marriage-end module
+  #    is skipped ENTIRELY -- both MARENDHX and cmstphsbx are missing (229/229
+  #    first-marriage separated women have BOTH NA). With no stop-living date,
+  #    union_end_cmc stays NA and union_end_motive stays "in union", so these
+  #    women look STILL MARRIED and their (recent) separation is invisible --
+  #    biasing separation rates low near the survey. They are NOT caught by the
+  #    refused/DK fix below (they never get a "separation" motive); they are
+  #    tagged by sep_recent (built below) and are imputation targets, with the
+  #    separation date bounded [marriage_start, survey].
+  #
+  # 2. Past marriages where the husband had prior children (KIDSHX = 1): CB-19
+  #    (MARENDHX) and cmstphsbx are skipped for that marriage even when it is in
+  #    the past (confirmed: remarried women with KIDSHX="yes" have MARENDHX=NA,
+  #    119/119), leaving union_end_cmc = NA for marriages that DID end. When the
+  #    woman later entered another union, cleanENADID fills union_end_cmc1 =
+  #    union_start_cmc2 - 1 (the main driver of the elevated NSFG 2002 CORRECTION
+  #    count). The real date is unrecoverable; the husb_priorKids_i flags (built
+  #    below) identify the affected marriages.
+
+  # Per-husband prior-children flags (husb_priorKids_1..5). Drives the 2002
+  # dissolution-skip handling: husb_priorKids_i == "yes" => marriage i's
+  # union_end was skipped in the questionnaire and is the imputation target.
+  # Universe: all ever-married women (FMARITAL 1-4); NA for never-married.
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2002,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4", "KIDSHX5")
+  ))
+
+  # Issue-1 flag: currently separated (RMARITAL = 5). The marriage-end module
+  # was skipped for these women (confirmed all-NA above), so the separation is
+  # real but its date is missing -> imputation target (bounded by the survey).
+  datos$sep_recent <- !is.na(df_NSFG_2002$RMARITAL) & df_NSFG_2002$RMARITAL == 5
+
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2002$PARITY
   ###### count of live births #####
@@ -1790,7 +1895,7 @@ getDatos_2002 <- function () {
   if (("BABYSEX" %in% names (df_NSFG_2002_preg))) df_NSFG_2002_preg <- rename (df_NSFG_2002_preg, BABYSEX1=BABYSEX)
   if (("NBRNALIV" %in% names (df_NSFG_2002_preg))) df_NSFG_2002_preg <- rename (df_NSFG_2002_preg, BORNALIV=NBRNALIV)
   df_NSFG_2002_preg <- subset(df_NSFG_2002_preg, BORNALIV != 9)
-  children <- live_birth_history (df_NSFG_2002_preg) 
+  children <- live_birth_history (df_NSFG_2002_preg, capped = capMonth) 
 
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -1845,7 +1950,7 @@ getDatos_2006_10 <- function () {
   datos$indiv_age_survey <- df_NSFG_2006_10$AGE_R
   # we no longer have the cmc data of birht in the public file!!
   datos$yBirth <- 1900 + floor((datos$indiv_dob_cmc - 1) / 12)
-  datos$indiv_weight <- df_NSFG_2006_10$FINALWGT30
+  datos$indiv_weight <- df_NSFG_2006_10$WGTQ1Q16
   datos$pregnant <- df_NSFG_2006_10$PREGNOWQ
   datos$pregnant <- factor (datos$pregnant, levels=c(1,5,8,9), labels=c("yes","no","refused","unknown"))
   datos$want_another <- df_NSFG_2006_10$RWANT
@@ -1859,9 +1964,9 @@ getDatos_2006_10 <- function () {
   
   ##### Union history #####
   # compute number of unions (sum of marriage and cohabitations)
-  datos$union_status <- df_NSFG_2006_10$MARSTAT
-  datos$union_status <- factor (datos$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos$union_status <- factor(df_NSFG_2006_10$RMARITAL,
+                               levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                               labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos$currMarr_cmc <- df_NSFG_2006_10$CMMARRCH
   datos$yCurrCohab <- df_NSFG_2006_10$WNSTRTCP_Y
@@ -1872,10 +1977,9 @@ getDatos_2006_10 <- function () {
   datos$nCohab <- ifelse(!is.na(datos$yCurrCohab), df_NSFG_2006_10$PREVCOHB + 1, df_NSFG_2006_10$PREVCOHB)
   datos$nUnion <- datos$nMarriage_decl + datos$nCohab
   
-  datos_UH <- datos[, c("CaseID", "nUnion")]
-  
+  #datos_UH <- datos[, c("CaseID", "nUnion")]
   #df_UH1 <- complete_union_history (datos_UH, df_NSFG_2006_10, 5)
-  df_UH2 <- raw_union_history (df_NSFG_2006_10)
+  df_UH2 <- raw_union_history (df_NSFG_2006_10, survey_cmc = datos$surveyDate_cmc, capped = capMonth)
   
   datos <- datos %>%
     left_join(df_UH2, by = "CaseID") %>%
@@ -1890,7 +1994,12 @@ getDatos_2006_10 <- function () {
   datos$nMarriage_decl <- NULL
   datos$nCohab <- NULL
   datos <- rename(datos, nUnion = total_unions)
-  
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2006_10,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4", "KIDSHX5", "KIDSHX6")
+  ))
+
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2006_10$PARITY
   ###### count of live births #####
@@ -1909,7 +2018,7 @@ getDatos_2006_10 <- function () {
   datos$total_live_births <- NULL
   
   ###### Pregnancies ######
-  children <- live_birth_history (df_NSFG_2006_10_preg) 
+  children <- live_birth_history (df_NSFG_2006_10_preg, capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -1974,9 +2083,9 @@ getDatos_2011_13 <- function () {
   
   ##### Union history #####
   # compute number of unions (sum of marriage and cohabitations)
-  datos$union_status <- df_NSFG_2011_13$MARSTAT
-  datos$union_status <- factor (datos$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos$union_status <- factor(df_NSFG_2011_13$RMARITAL,
+                               levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                               labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos$currMarr_cmc <- df_NSFG_2011_13$CMMARRCH
   datos$yCurrCohab <- df_NSFG_2011_13$WNSTRTCP_Y
@@ -1987,10 +2096,9 @@ getDatos_2011_13 <- function () {
   datos$nCohab <- ifelse(!is.na(datos$yCurrCohab), df_NSFG_2011_13$PREVCOHB + 1, df_NSFG_2011_13$PREVCOHB)
   datos$nUnion <- datos$nMarriage_decl + datos$nCohab
   
-  datos_UH <- datos[, c("CaseID", "nUnion")]
-  
+  #datos_UH <- datos[, c("CaseID", "nUnion")]
   #df_UH1 <- complete_union_history (datos_UH, df_NSFG_2011_13, 5)
-  df_UH2 <- raw_union_history (df_NSFG_2011_13)
+  df_UH2 <- raw_union_history (df_NSFG_2011_13, survey_cmc = datos$surveyDate_cmc, capped = capMonth)
   
   datos <- datos %>%
     left_join(df_UH2, by = "CaseID")%>%
@@ -2005,6 +2113,11 @@ getDatos_2011_13 <- function () {
   datos$nMarriage_decl <- NULL
   datos$nCohab <- NULL
   datos <- rename(datos, nUnion = total_unions)
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2011_13,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4", "KIDSHX5")
+  ))
 
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2011_13$PARITY
@@ -2024,7 +2137,7 @@ getDatos_2011_13 <- function () {
   datos$total_live_births <- NULL
   
   ###### Pregnancies ######
-  children <- live_birth_history (df_NSFG_2011_13_preg) 
+  children <- live_birth_history (df_NSFG_2011_13_preg, capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -2087,9 +2200,9 @@ getDatos_2013_15 <- function () {
   
   ##### Union history #####
   # compute number of unions (sum of marriage and cohabitations)
-  datos$union_status <- df_NSFG_2013_15$MARSTAT
-  datos$union_status <- factor (datos$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos$union_status <- factor(df_NSFG_2013_15$RMARITAL,
+                               levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                               labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos$currMarr_cmc <- df_NSFG_2013_15$CMMARRCH
   datos$yCurrCohab <- df_NSFG_2013_15$WNSTRTCP_Y
@@ -2100,10 +2213,9 @@ getDatos_2013_15 <- function () {
   datos$nCohab <- ifelse(!is.na(datos$yCurrCohab), df_NSFG_2013_15$PREVCOHB + 1, df_NSFG_2013_15$PREVCOHB)
   datos$nUnion <- datos$nMarriage_decl + datos$nCohab
   
-  datos_UH <- datos[, c("CaseID", "nUnion")]
-  
+  #datos_UH <- datos[, c("CaseID", "nUnion")]
   #df_UH <- complete_union_history (datos_UH, df_NSFG_2013_15, 5)
-  df_rawUH <- raw_union_history (df_NSFG_2013_15)
+  df_rawUH <- raw_union_history (df_NSFG_2013_15, survey_cmc = datos$surveyDate_cmc, capped = capMonth)
   
   datos <- datos %>%
     left_join(df_rawUH, by = "CaseID") %>%
@@ -2118,7 +2230,12 @@ getDatos_2013_15 <- function () {
   datos$nMarriage_decl <- NULL
   datos$nCohab <- NULL
   datos <- rename(datos, nUnion=total_unions)
-  
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2013_15,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4", "KIDSHX5")
+  ))
+
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2013_15$PARITY
   ###### count of live births #####
@@ -2137,7 +2254,7 @@ getDatos_2013_15 <- function () {
   datos$total_live_births <- NULL
   
   ###### Pregnancies ######
-  children <- live_birth_history (df_NSFG_2013_15_preg) 
+  children <- live_birth_history (df_NSFG_2013_15_preg, capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -2199,9 +2316,9 @@ getDatos_2015_17 <- function () {
   
   ##### Union history #####
   # compute number of unions (sum of marriage and cohabitations)
-  datos$union_status <- df_NSFG_2015_17$MARSTAT
-  datos$union_status <- factor (datos$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                   labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos$union_status <- factor(df_NSFG_2015_17$RMARITAL,
+                               levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                               labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos$currMarr_cmc <- df_NSFG_2015_17$CMMARRCH
   datos$yCurrCohab <- df_NSFG_2015_17$WNSTRTCP_Y
@@ -2212,10 +2329,9 @@ getDatos_2015_17 <- function () {
   datos$nCohab <- ifelse(!is.na(datos$yCurrCohab), df_NSFG_2015_17$PREVCOHB + 1, df_NSFG_2015_17$PREVCOHB)
   datos$nUnion <- datos$nMarriage_decl + datos$nCohab
   
-  datos_UH <- datos[, c("CaseID", "nUnion")]
-
+  #datos_UH <- datos[, c("CaseID", "nUnion")]
   #df_UH <- complete_union_history (datos_UH, df_NSFG_2015_17)
-  df_rawUH <- raw_union_history (df_NSFG_2015_17)
+  df_rawUH <- raw_union_history (df_NSFG_2015_17, survey_cmc = datos$surveyDate_cmc, capped = capMonth)
   
   datos <- datos %>%
     left_join(df_rawUH, by = "CaseID") %>%
@@ -2230,6 +2346,11 @@ getDatos_2015_17 <- function () {
   datos$nMarriage_decl <- NULL
   datos$nCohab <- NULL
   datos <- rename(datos, nUnion=total_unions)
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2015_17,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4", "KIDSHX5", "KIDSHX6")
+  ))
 
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2015_17$PARITY
@@ -2249,7 +2370,7 @@ getDatos_2015_17 <- function () {
   datos$total_live_births <- NULL
   
   ###### Pregnancies ######
-  children <- live_birth_history (df_NSFG_2015_17_preg) 
+  children <- live_birth_history (df_NSFG_2015_17_preg, capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -2312,9 +2433,9 @@ getDatos_2017_19 <- function () {
   ##### Union history #####
   datos_UH <- datos[,c("CaseID","ever_contraception")]
   # compute number of unions (sum of marriage and cohabitations)
-  datos_UH$union_status <- df_NSFG_2017_19$MARSTAT
-  datos_UH$union_status <- factor (datos_UH$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                   labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos_UH$union_status <- factor(df_NSFG_2017_19$RMARITAL,
+                                  levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                                  labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos_UH$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos_UH$currMarr_cmc <- df_NSFG_2017_19$CMMARRCH
   datos_UH$yCurrCohab <- df_NSFG_2017_19$WNSTRTCP_Y
@@ -2332,7 +2453,12 @@ getDatos_2017_19 <- function () {
   # join datos and datos_BH
   datos <- datos %>%
     left_join(datos_UH, by = "CaseID")
-  
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2017_19,
+    kidshx_names = c("KIDSHX", "KIDSHX2", "KIDSHX3", "KIDSHX4")
+  ))
+
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2017_19$PARITY
   ###### count of live births #####
@@ -2352,7 +2478,7 @@ getDatos_2017_19 <- function () {
   
   ###### Pregnancies ######
   df_NSFG_2017_19_preg$BORNALIV <- df_NSFG_2017_19_preg$NBRNLV_S
-  children <- live_birth_history (subset(df_NSFG_2017_19_preg, OUTCOME==1)) 
+  children <- live_birth_history (subset(df_NSFG_2017_19_preg, OUTCOME==1), capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -2554,9 +2680,9 @@ getDatos_2022_23 <- function () {
   ##### Union history #####
   datos_UH <- datos[,c("CaseID","ever_contraception")]
   # compute number of unions (sum of marriage and cohabitations)
-  datos_UH$union_status <- df_NSFG_2022_23$MARSTAT
-  datos_UH$union_status <- factor (datos_UH$union_status, levels=c(1,2,3,4,8,9), #4: single does not exist,but we introduce it there as we will use it later
-                                   labels=c("married","cohabiting","other","single","refused","unknown"))
+  datos_UH$union_status <- factor(df_NSFG_2022_23$RMARITAL,
+                                  levels = c(1, 2, 3, 4, 5, 6, 8, 9),
+                                  labels = c("married", "cohabiting", "widowed", "divorced", "separated", "single", "refused", "unknown"))
   datos_UH$ever_contraception <-NULL # we had it only to have a dataframe at the start...
   datos_UH$currMarr_cmc <- df_NSFG_2022_23$CMMARRCH
   datos_UH$yCurrCohab <- df_NSFG_2022_23$WNSTRTCP_Y
@@ -2568,7 +2694,7 @@ getDatos_2022_23 <- function () {
   
   useCompleteUH_algorithm = TRUE
   if (isTRUE (useCompleteUH_algorithm)) {
-    datos_UH1 <- raw_union_history(df=df_NSFG_2022_23, names2022_23=TRUE, datos=datos_UH)
+    datos_UH1 <- raw_union_history(df=df_NSFG_2022_23, names2022_23=TRUE, datos=datos_UH, survey_cmc = datos$surveyDate_cmc, capped = capMonth)
   } else {
     datos_UH1 <- firstMarriage_or_firstCohabitation (datos_UH, df_NSFG_2022_23)
    }
@@ -2581,7 +2707,12 @@ getDatos_2022_23 <- function () {
   #clean
   datos$nUnion <- datos$total_unions
   datos$total_unions <- NULL
-  
+
+  datos <- dplyr::bind_cols(datos, nsfg_husb_priorKids(
+    df_NSFG_2022_23,
+    kidshx_names = c("KIDSHX_1", "KIDSHX_2", "KIDSHX_3", "KIDSHX_4", "KIDSHX_5")
+  ))
+
   ##### Birth History #####
   datos$nBioKids <- df_NSFG_2022_23$PARITY
   # check the parity and the number of live births is equal
@@ -2600,7 +2731,7 @@ getDatos_2022_23 <- function () {
   datos <- rename (datos, nBioKids=total_live_births)
   
   ###### Pregnancies ######
-  children <- live_birth_history (df_NSFG_2022_23_preg) 
+  children <- live_birth_history (df_NSFG_2022_23_preg, capped = capMonth) 
   
   ###### final women dataframe with live births ######
   datos <- datos %>%
@@ -2618,22 +2749,216 @@ NSFG_ENADID_2022_23 <-  reorder_birthHistory(NSFG_ENADID_2022_23)
 pathNSFG_ENADID_2022_23 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID_2022_23.Rdat"))
 save(NSFG_ENADID_2022_23, file = pathNSFG_ENADID_2022_23)
 
-res <- check_bind_conflicts (NSFG_ENADID_1973, NSFG_ENADID_1976, NSFG_ENADID_1982, NSFG_ENADID_1988, NSFG_ENADID_1995,
-                             NSFG_ENADID_2002, NSFG_ENADID_2006_10, NSFG_ENADID_2011_13,
-                             NSFG_ENADID_2013_15, NSFG_ENADID_2015_17, NSFG_ENADID_2017_19, NSFG_ENADID_2022_23)
+surveys_list <- list(
+  NSFG_ENADID_1973, NSFG_ENADID_1976, NSFG_ENADID_1982, NSFG_ENADID_1988,
+  NSFG_ENADID_1995, NSFG_ENADID_2002, NSFG_ENADID_2006_10,
+  NSFG_ENADID_2011_13, NSFG_ENADID_2013_15, NSFG_ENADID_2015_17,
+  NSFG_ENADID_2017_19, NSFG_ENADID_2022_23
+)
 
-NSFG_ENADID <- dplyr::bind_rows (NSFG_ENADID_1973, NSFG_ENADID_1976, NSFG_ENADID_1982, NSFG_ENADID_1988, NSFG_ENADID_1995,
-                                 NSFG_ENADID_2002, NSFG_ENADID_2006_10, NSFG_ENADID_2011_13,
-                                 NSFG_ENADID_2013_15, NSFG_ENADID_2015_17, NSFG_ENADID_2017_19, NSFG_ENADID_2022_23)
+#### harmonize fields ####
+surveys_list <- lapply(surveys_list, harmonize_survey_types)
 
+#This one was to unify with the MEXICO which has "don't know" (2 cases) when NSFG has "unknown" "refused" "don't remember" (0 case)
+#NSFG_ENADID <- harm_union_type (NSFG_ENADID, 10)
+
+res <- do.call(check_bind_conflicts, surveys_list)
+NSFG_ENADID <- dplyr::bind_rows(surveys_list)
+
+checkImputedMonth (NSFG_ENADID)
+
+#### reweight the surveys ####
+# We use two kinds of weights:
+# 1. *weight* is the original weight of each individual in the survey DIVIDED by the mean value of the weights in the survey,
+# so that the mean of indiv_weight is 1 for each survey. This way, we keep the relative weights of individuals within each survey
+# We use indiv_weight when computing variance and confidence intervals of indicators, as it reflects the sampling design of the survey.
+# 2. *popWeigth* is the multiplier that we apply to each individual weight,
+# so that the sum of the reweighted weights (weight * popWeigth) for each survey matches
+# the population counts by age in the year of the survey.
+# This way, we ensure that the total weighted count of individuals in each age group matches the population counts.
+# We use popWeigth for computing the point estimates of indicators, as a pooling mechanism: it ensures that smaller surveys effectively balance larger ones
+
+# 1. Calculate *weight* by dividing the original weight (variable indiv_weight) by the mean weight of the survey
+NSFG_ENADID <- reweight (NSFG_ENADID)
+
+# 2. Calculate *popWeigth* by multiplying *weight* by the division of the population counts by age in the year of the survey by the sum of *weight* for each age group in the survey
+PopAgeUSA <- function () {
+  return (
+    structure(list(
+      Age = 14:54,
+      NSFG1973 = c(2120455, 2122105, 2106999, 
+                   2090124, 2059452.5, 2015098, 1967575, 1911203, 1858779.5, 1833648, 
+                   1833982, 1857469, 1820539, 1620074, 1484594.5, 1516379.5, 1518572, 
+                   1428170, 1322869.5, 1273046.5, 1243285, 1211726, 1185179.5, 1182733.5, 
+                   1184383.5, 1162237.5, 1158203, 1179306.5, 1196631.5, 1209044.5, 
+                   1217076.5, 1240899, 1251665, 1264562, 1284753, 1279636, 1276590, 
+                   1275743, 1247082.5, 1211688.5, 1192191),
+      NSFG1976 = c(2102110.5, 
+                   2132402.5, 2134751.5, 2146494.5, 2149496, 2135743.5, 2119697.5, 
+                   2089488, 2045186, 1997971, 1941940.5, 1889899, 1863984.5, 1862508, 
+                   1883660.5, 1844396, 1641676, 1503583.5, 1531976, 1531057, 1438250, 
+                   1331134.5, 1279754.5, 1248436, 1215103.5, 1187108, 1183372.5, 
+                   1184014.5, 1161069.5, 1156169, 1176127.5, 1192448.5, 1204451.5, 
+                   1212447, 1235852.5, 1246130, 1258145.5, 1277100, 1270495, 1265447.5, 
+                   1262465),
+      NSFG1982 = c(1743300.5, 1792339, 1869101, 1973909.5, 
+                   2054481, 2097560.5, 2151502, 2182179.5, 2184098.5, 2195227.5, 
+                   2198131.5, 2184321.5, 2167883, 2136876, 2090894.5, 2040967.5, 
+                   1981891.5, 1925705.5, 1895773, 1889657, 1905779.5, 1861431.5, 
+                   1654853.5, 1513534, 1538305.5, 1534188.5, 1439025.5, 1329534, 
+                   1276636, 1243918, 1209317, 1180089, 1174269, 1173721.5, 1150709, 
+                   1145065.5, 1163749.5, 1178591, 1188893, 1194185, 1213622),
+      NSFG1988 = c(1579281, 
+                   1612838, 1720427, 1839481.5, 1855823, 1813130.5, 1812801, 1861101.5, 
+                   1934998, 2035985.5, 2112339.5, 2151662.5, 2202219, 2229629, 2228890, 
+                   2237356.5, 2237150, 2219363, 2199039, 2163617.5, 2113483, 2059207, 
+                   1995541.5, 1935183, 1900387.5, 1889808.5, 1901658.5, 1853545.5, 
+                   1645262, 1502094, 1524155, 1518043.5, 1421762.5, 1312484.5, 1259029.5, 
+                   1225795, 1190661.5, 1160169, 1152912, 1149952, 1124375),
+      NSFG1995 = c(1850788, 
+                   1835843.5, 1794011.5, 1767710.5, 1736442, 1704145.5, 1710769.5, 
+                   1718852, 1749239.5, 1851315.5, 1963673.5, 1973464, 1924232, 1916843.5, 
+                   1957801, 2025105.5, 2119801.5, 2189621, 2222580, 2266511.5, 2286615, 
+                   2277857, 2278070, 2268565.5, 2241555, 2212174.5, 2169018.5, 2112887, 
+                   2053094.5, 1984986.5, 1920370, 1881165.5, 1867289, 1876325, 1826234, 
+                   1618260, 1474975, 1494597, 1486084, 1390243, 1281317),
+      NSFG2002 = c(2020307, 
+                   2070647.5, 2124634, 2172683, 2172633.5, 2135632.5, 2105993, 2085678, 
+                   2087763.5, 2086202.5, 2078094, 2092617, 2098579.5, 2091265, 2072464.5, 
+                   2024275, 1989719, 1948580.5, 1905897.5, 1901725.5, 1898925, 1918175, 
+                   2007906.5, 2107779.5, 2105936.5, 2045638, 2026745.5, 2055968.5, 
+                   2111340, 2192573.5, 2248739, 2268583, 2299627, 2308328.5, 2290429, 
+                   2281806.5, 2264060, 2229883, 2194189.5, 2145209.5, 2083546), 
+      NSFG2006_10 = c(2049500.5, 2029417, 2022979.5, 2028301, 2050944, 
+                      2085638, 2132040.5, 2184138.5, 2239150.5, 2287124, 2285972.5, 
+                      2247326.5, 2215953.5, 2193568, 2193173, 2188341, 2176144.5, 
+                      2185589.5, 2186155, 2173630.5, 2149844, 2097009, 2057754, 
+                      2011728, 1963847, 1954253.5, 1946223, 1960401, 2044784, 2139215.5, 
+                      2132506.5, 2068141.5, 2045507.5, 2070760, 2121855, 2198552, 
+                      2250418.5, 2266403, 2292990.5, 2297131, 2274592),
+      NSFG2011_13 = c(2068926.5, 
+                      2092201, 2086630, 2067202.5, 2061329.5, 2067208.5, 2090256.5, 
+                      2125143, 2171555.5, 2223582.5, 2278598.5, 2326350.5, 2324548, 
+                      2284918, 2252270, 2228333, 2226186, 2219484.5, 2205392, 2213038.5, 
+                      2211670.5, 2197116, 2171301.5, 2116408.5, 2075197, 2027627, 
+                      1978557.5, 1967498, 1957401, 1969457, 2051963.5, 2144618.5, 
+                      2136683, 2071325, 2047518.5, 2071375.5, 2120661, 2195274.5, 
+                      2244935, 2258719, 2282926),
+      NSFG2013_15 = c(2111446, 2104195, 
+                      2108006, 2131998.5, 2127053.5, 2108210.5, 2102775, 2108886, 
+                      2131961, 2166761, 2213113.5, 2264909, 2319223.5, 2365822.5, 
+                      2362545, 2321219, 2286814, 2260980, 2256788, 2248190, 2232104, 
+                      2237542.5, 2234050.5, 2217293.5, 2189420, 2132889, 2090270.5, 
+                      2041316.5, 1990412, 1977313, 1965611.5, 1976266.5, 2057156, 
+                      2148021, 2138935, 2072862.5, 2047711, 2069735.5, 2116977, 
+                      2189188, 2236209),
+      NSFG2015_17 = c(2208333, 2216412, 2183850.5, 
+                      2156823, 2153262.5, 2146420.5, 2150565.5, 2174793, 2169968.5, 
+                      2151115.5, 2145526.5, 2151416.5, 2174098.5, 2208335, 2253672.5, 
+                      2303967.5, 2356381, 2400792.5, 2395188, 2351573.5, 2314827, 
+                      2286821.5, 2280358, 2269279.5, 2250714, 2253531.5, 2247544.5, 
+                      2228617, 2198609.5, 2140170.5, 2095592.5, 2044455.5, 1991673, 
+                      1976504.5, 1962822.5, 1971290, 2049211.5, 2136816, 2125059.5, 
+                      2056906, 2029010),
+      NSFG2017_19 = c(2171850.5, 2216541, 2224421, 
+                      2191677, 2164483, 2160765, 2153870, 2158004.5, 2182131.5, 
+                      2177118.5, 2158156.5, 2152546, 2158421.5, 2181127, 2215432, 
+                      2260842.5, 2311146, 2363524.5, 2407774.5, 2401834.5, 2358024.5, 
+                      2321157.5, 2293024, 2286405.5, 2275071, 2256292, 2258935.5, 
+                      2252780.5, 2233628, 2203202, 2144396, 2099365.5, 2047733, 
+                      1994622, 1978998, 1964899.5, 1973138.5, 2050619.5, 2137275, 
+                      2124591, 2055785.5),
+      NSFG2022_23 = c(2208333, 2216412, 2183850.5, 
+                      2156823, 2153262.5, 2146420.5, 2150565.5, 2174793, 2169968.5, 
+                      2151115.5, 2145526.5, 2151416.5, 2174098.5, 2208335, 2253672.5, 
+                      2303967.5, 2356381, 2400792.5, 2395188, 2351573.5, 2314827, 
+                      2286821.5, 2280358, 2269279.5, 2250714, 2253531.5, 2247544.5, 
+                      2228617, 2198609.5, 2140170.5, 2095592.5, 2044455.5, 1991673, 
+                      1976504.5, 1962822.5, 1971290, 2049211.5, 2136816, 2125059.5, 
+                      2056906, 2029010)),
+      class = "data.frame", row.names = c(NA,  -41L))
+    )
+}
+
+popUSA <- PopAgeUSA()
+
+NSFG_ENADID <- addWeights (NSFG_ENADID, popUSA)
+rm(popUSA)
+
+#### IMPUTATION OF DATE OF END OF UNION FOR THE 2000 SURVEY ####
+# As noted by Ruggles and Kennedy (2015) two sets of women had no end of union date:
+# "Marital dissolution data are missing entirely for currently separated respondents,
+# resulting in very high rates of missing data for marriages that dissolved in periods close to the survey administration.
+# In addition, marriages in which the male partner had children from a prior union were also skipped out of the marriage dissolution questions."
+# The women in the first set are 229 cases where RMARITAL = 5 (separated) and no date of end of union 
+# The women in the second set
+
+##### imputation-prep: per-slot target flags for the 2002 dissolution gaps #####
+# Run AFTER select() (they add new columns) and AFTER cleanENADID (they read the
+# finalized union_end NA pattern). Defined in NSFG_impute_dissolution.R (sourced
+# at the top of this file).
+NSFG_ENADID <- add_union_husb_priorKids(NSFG_ENADID)   # issue 2: husband had prior children
+NSFG_ENADID <- add_union_sep_recent(NSFG_ENADID)       # issue 1: currently-separated unions
+
+##### imputation of missing dates of end of union for the 2002 survey fitting a model to the 2006-10 survey data #####
+train <- build_dissolution_training(NSFG_ENADID)
+fit   <- fit_dissolution_model(train, dist = "loglogistic")
+set.seed(1)
+NSFG_ENADID <- impute_sep_recent(NSFG_ENADID, fit)
+NSFG_ENADID <- impute_husb_priorKids(NSFG_ENADID, fit)
+
+chk <- check_imputation(NSFG_ENADID, fit)   # n_rep, propagate, seed all optional
+chk$summary
+
+# --- Date-quality summary over the FINAL data (3 headline stats) ---
+# Runs AFTER the 2006-10 model so its flags 41/42 are visible. Columns:
+#   removed_union   women with bad, un-repaired union dates
+#                   (= filterDateQuality(dropBadUnionDates = TRUE), the default)
+#   corrected_union union end repaired by a later union (20/21/22), the divorce
+#                   date (30/31) or the 2006-10 model (41/42)
+#   removed_birth   women with bad birth dates
+#                   (= filterDateQuality(dropBadBirthDates = TRUE))
+#   removed_bad_age impossible age (always removed)
+DATE_QUALITY_SUMMARY <- summarizeDateQuality(NSFG_ENADID)
+
+#### clean dataframe and reorder fields ####
+selColumns <- c(
+  "country","survey","surveyDate_cmc","indiv_dob_cmc","indiv_dob_cmc_I","indiv_age_survey","yBirth",
+  "indiv_weight", "weight", "popWeight",
+  "nBioKids","nUnion","union_status","lastYear","llave_muj",
+  "pregnant","pregnant_wanted","pregnant_want_another","pregnant_ideal_number",
+  "nullipar_fecund","nullipar_want_another","nullipar_ideal_number",
+  "mother_fecund","mother_want_another","mother_ideal_number","mother_less","mother_unwanted",
+  "motive_no_child","ideal_number","want_another",
+  "age_first_sex","ever_had_sex","ever_contraception"
+)
+
+for (u in (1:10)) {
+  selColumns <- c(selColumns, paste0("union_start_type",u),
+                  paste0("union_start_cmc",u),
+                  paste0("union_start_cmc_I",u),
+                  paste0("marriage_start_cmc",u),
+                  paste0("marriage_start_cmc_I",u),
+                  paste0("union_end_cmc",u),
+                  paste0("union_end_cmc_I",u),
+                  paste0("union_end_motive",u)
+  )
+}
+for (b in (1:17)) {
+  selColumns <- c(selColumns,
+                  paste0("dob_cmc",b),
+                  paste0("dob_cmc_I",b),
+                  paste0("dod_cmc",b),
+                  paste0("sex",b)
+  )
+}
+
+NSFG_ENADID <- NSFG_ENADID %>%
+  select(any_of(selColumns))
+
+
+#### save NSFG_ENADID ####
 pathNSFG_ENADID <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/NSFG_ENADID.Rdat"))
 save(NSFG_ENADID, file = pathNSFG_ENADID)
 
-#### Load ####
-load (file = pathNSFG_ENADID)
-
-surveys <- names(table(NSFG_ENADID$survey))
-if (!("NSFG1976" %in% surveys)) NSFG_ENADID <- dplyr::bind_rows (NSFG_ENADID, NSFG_ENADID_1976)
-if (!("NSFG1982" %in% surveys)) NSFG_ENADID <- dplyr::bind_rows (NSFG_ENADID, NSFG_ENADID_1982)
-
-save(NSFG_ENADID, file = pathNSFG_ENADID)
+print (DATE_QUALITY_SUMMARY)

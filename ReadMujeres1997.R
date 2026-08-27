@@ -1,4 +1,7 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source ("enadid_lib.r")
 #### Read ENADID 1997 ####
 library (tidyverse)
@@ -6,12 +9,24 @@ library (foreign)
 library(janitor)
 library(bit64) # Necessary for the integer64 type
 
-path_mujer <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1997/base_datos_enadid97_dbf/E97CMU.DBF"))
-path_general <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1997/base_datos_enadid97_dbf/E97DGE.DBF"))
-path_uniones <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1997/base_datos_enadid97_dbf/E97UNI.DBF"))
-path_embarazos <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/1997/base_datos_enadid97_dbf/E97HEM.DBF"))
-path_ENADID1997 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID1997.Rdat"))
-path_ENADID1997_mujeres <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID1997_mujeres.Rdat"))
+# ==== Month-imputation mode (per-survey switch) ====
+# FALSE = legacy (missing months imputed uniformly, as before).
+# TRUE  = constrained: imputed months capped to the survey date (Jan 1998) and
+#         ordered within each union of the full union history (union end >=
+#         union start; marriage >= union start). Births capped too.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- TRUE
+if (!exists("capMonth")) capMonth <- FALSE
+# survey cutoff used for all caps in this reader
+surveyCut_cmc <- compute_cmc(1L, 1998L)
+
+path_mujer <- path.expand(paste0(rootPath,mainPath,"ENADID/1997/base_datos_enadid97_dbf/E97CMU.DBF"))
+path_general <- path.expand(paste0(rootPath,mainPath,"ENADID/1997/base_datos_enadid97_dbf/E97DGE.DBF"))
+path_uniones <- path.expand(paste0(rootPath,mainPath,"ENADID/1997/base_datos_enadid97_dbf/E97UNI.DBF"))
+path_embarazos <- path.expand(paste0(rootPath,mainPath,"ENADID/1997/base_datos_enadid97_dbf/E97HEM.DBF"))
+path_ENADID1997 <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID1997.Rdat"))
+path_ENADID1997_mujeres <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID1997_mujeres.Rdat"))
 # read everything as character
 mujeres1997 <- foreign::read.dbf (path_mujer, as.is = TRUE)
 general <- foreign::read.dbf (path_general, as.is = TRUE)
@@ -181,19 +196,28 @@ getDatos1997 <- function (mujeres) {
   return (datos)
 }
 
-ENADID1997 <- bigDataWomen ( getDatos1997 (mujeres1997), hasFullUnionHistory = TRUE )
+ENADID1997 <- bigDataWomen ( getDatos1997 (mujeres1997), hasFullUnionHistory = TRUE, capMonth = capMonth )
 
 #### Uniones ####
 bigDataUniones1997 <- function(uniones) {
   ENADID_U <- data.frame(llave_muj = uniones$llave_muj)
   ENADID_U$nUnion <- uniones$P14_9
   
-  # Process dates
-  ENADID_U$union_start_cmc <- compute_cmc(uniones$P14_10A, uniones$P14_10B)
+  # Process dates (capped at the survey date when capMonth is on)
+  sc_cap <- if (isTRUE(capMonth)) surveyCut_cmc else NULL
+  ENADID_U$union_start_cmc <- compute_cmc(uniones$P14_10A, uniones$P14_10B, survey_cmc = sc_cap, capped = capMonth)
   ENADID_U$union_start_cmc_I <- imputed_date(uniones$P14_10A, uniones$P14_10B)
-  
-  ENADID_U$union_end_cmc <- compute_cmc(uniones$P14_13A, uniones$P14_13B)
+
+  ENADID_U$union_end_cmc <- compute_cmc(uniones$P14_13A, uniones$P14_13B, survey_cmc = sc_cap, capped = capMonth)
   ENADID_U$union_end_cmc_I <- imputed_date(uniones$P14_13A, uniones$P14_13B)
+
+  # Same-year ordering: if the union-end month was imputed, redraw it so that
+  # union end >= union start (slots = "" applies to the long, unsuffixed table)
+  if (isTRUE(capMonth)) {
+    ENADID_U <- enforce_month_order(ENADID_U, rep(surveyCut_cmc, nrow(ENADID_U)),
+                                    later = "union_end_cmc", earlier = "union_start_cmc",
+                                    later_flag = "union_end_cmc_I", slots = "")
+  }
   
   # Process union type
   ENADID_U$union_start_type <- uniones$P14_11
@@ -228,10 +252,18 @@ bigDataUniones1997 <- function(uniones) {
                                         levels = c(1, 2, 9),
                                         labels = c("yes", "no", "don't know"))
   
-  # Cohabitation start date
-  ENADID_U$union_cohab_start_cmc <- ifelse((!is.na(ENADID_U$union_cohab_before)) & 
-                                             (ENADID_U$union_cohab_before == "yes"), 
-                                           compute_cmc(uniones$P14_15A, uniones$P14_15B), 
+  # Cohabitation start date. The imputed cohab month is capped at the
+  # marriage/union date it precedes (binds in the same year only), besides the
+  # survey cap — otherwise it can land after a KNOWN marriage month.
+  cohab_cap <- if (isTRUE(capMonth)) {
+    pmin(rep(surveyCut_cmc, nrow(ENADID_U)),
+         ifelse(!is.na(ENADID_U$union_start_cmc) & ENADID_U$union_start_cmc < 9000L,
+                ENADID_U$union_start_cmc, NA_integer_),
+         na.rm = TRUE)
+  } else NULL
+  ENADID_U$union_cohab_start_cmc <- ifelse((!is.na(ENADID_U$union_cohab_before)) &
+                                             (ENADID_U$union_cohab_before == "yes"),
+                                           compute_cmc(uniones$P14_15A, uniones$P14_15B, survey_cmc = cohab_cap, capped = capMonth),
                                            NA)
   ENADID_U$union_cohab_start_cmc_I <- ifelse((!is.na(ENADID_U$union_cohab_before)) & 
                                              (ENADID_U$union_cohab_before == "yes"), 
@@ -251,6 +283,14 @@ bigDataUniones1997 <- function(uniones) {
   ENADID_U$union_cohab_before <- NULL
   ENADID_U$union_cohab_start_cmc <- NULL
   ENADID_U$union_cohab_start_cmc_I <- NULL
+
+  # Same-year ordering after the cohab adjustment: marriage >= union start
+  # (only differs from union start in the cohabitation-before-marriage case)
+  if (isTRUE(capMonth)) {
+    ENADID_U <- enforce_month_order(ENADID_U, rep(surveyCut_cmc, nrow(ENADID_U)),
+                                    later = "marriage_start_cmc", earlier = "union_start_cmc",
+                                    later_flag = "marriage_start_cmc_I", slots = "")
+  }
   
   # PIVOT TO WIDE FORMAT
   # Order by woman and union number
@@ -362,7 +402,7 @@ ENADID1997_full$lastUnion_end_motive <- factor(ENADID1997_full$lastUnion_end_mot
 # Childbirths
 bigDataChildbirths <- function (embarazos) {
   ENADID_P <- data.frame(llave_muj=embarazos$llave_muj, sex=embarazos$P9_12)
-  ENADID_P$dob_cmc <- compute_cmc(embarazos$P9_17A, embarazos$P9_17B)
+  ENADID_P$dob_cmc <- compute_cmc(embarazos$P9_17A, embarazos$P9_17B, survey_cmc = if (isTRUE(capMonth)) surveyCut_cmc else NULL, capped = capMonth)
   ENADID_P$dob_cmc_I <- imputed_date(embarazos$P9_17A, embarazos$P9_17B)
   ENADID_P$sex_dead <- embarazos$P9_15
   ENADID_P$sex <- ifelse(is.na(ENADID_P$sex),ENADID_P$sex_dead,ENADID_P$sex)
@@ -442,6 +482,14 @@ ENADID_P <- bigDataChildbirths (embarazos)
 
 #### append the birth histories ####
 ENADID1997_full <- dplyr::left_join(ENADID1997_full, ENADID_P, by = "llave_muj")
+
+m_cmc <- compute_cmc(uniones$P14_10A, uniones$P14_10B)   # marriage/union date
+c_cmc <- compute_cmc(uniones$P14_15A, uniones$P14_15B)   # cohab-before date
+idx <- !is.na(uniones$P14_14) & uniones$P14_14 == 1 &
+  !is.na(m_cmc) & !is.na(c_cmc) & m_cmc < 9000 & c_cmc < 9000 &
+  m_cmc < c_cmc
+print (table(same_year = ((m_cmc[idx] - 1) %/% 12) == ((c_cmc[idx] - 1) %/% 12)))
+
 rm(ENADID1997)
 rm(ENADID_U)
 rm(ENADID_P)
@@ -454,6 +502,7 @@ ENADID1997_full$nChildren[is.na(ENADID1997_full$nChildren)] <- 0
 cat ("differences between nBioKids and nChildren:", sum(ENADID1997_full$nBioKids != ENADID1997_full$nChildren), "\n")
 ENADID1997_full$nBioKids <- ENADID1997_full$nChildren
 
+ENADID1997_full <- split_birth_vs_union(ENADID1997_full, capMonth = capMonth)
 ENADID1997_full <- cleanENADID(ENADID1997_full)
 ENADID1997_full <- reorder_birthHistory(ENADID1997_full)
 

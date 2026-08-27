@@ -1,4 +1,7 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source ("enadid_lib.r")
 #### Read ENADID 2006 ####
 library (tidyverse)
@@ -6,10 +9,21 @@ library (foreign)
 library(janitor)
 library(bit64) # Necessary for the integer64 type
 
-path_mujer <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/2006/ENADID06_Mujer.csv"))
-path_embarazos <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/2006/ENADID06_Fecundidad.csv"))
-path_ENADID2006 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID2006.Rdat"))
-path_ENADID2006_mujer <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID2006_mujer.Rdat"))
+# ==== Month-imputation mode (per-survey switch) ====
+# FALSE = legacy (missing months imputed uniformly, as before).
+# TRUE  = constrained: imputed months capped to the survey date and ordered
+#         within a union (marriage >= union start; union end >= union start and
+#         >= marriage). 2006 has per-woman interview dates, so the births cap
+#         is matched by llave_muj.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- TRUE
+if (!exists("capMonth")) capMonth <- FALSE
+
+path_mujer <- path.expand(paste0(rootPath,mainPath,"ENADID/2006/ENADID06_Mujer.csv"))
+path_embarazos <- path.expand(paste0(rootPath,mainPath,"ENADID/2006/ENADID06_Fecundidad.csv"))
+path_ENADID2006 <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID2006.Rdat"))
+path_ENADID2006_mujer <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID2006_mujer.Rdat"))
 # read everything as character
 mujeres2006 <- read.csv (path_mujer)
 embarazos <- read.csv (path_embarazos)
@@ -111,13 +125,15 @@ getDatos2006 <- function (mujer) {
 }
 
 # create a big dataframe
-ENADID2006 <- bigDataWomen( getDatos2006(mujeres2006))
+ENADID2006 <- bigDataWomen( getDatos2006(mujeres2006), capMonth = capMonth)
 
 # Childbirths
 bigDataChildbirths <- function (embarazos) {
   ENADID_P <- data.frame(llave_muj=embarazos$claveres, sex=embarazos$sexovivo)
   ENADID_P$sex <- ifelse(!is.na(embarazos$sexofac), embarazos$sexofac, ENADID_P$sex)
-  ENADID_P$dob_cmc <- compute_cmc(embarazos$p05d13m, embarazos$p05d13a)
+  # per-woman survey date (interview dates vary in 2006), matched by llave_muj
+  sc_birth <- if (isTRUE(capMonth)) ENADID2006$surveyDate_cmc[match(embarazos$claveres, ENADID2006$llave_muj)] else NULL
+  ENADID_P$dob_cmc <- compute_cmc(embarazos$p05d13m, embarazos$p05d13a, survey_cmc = sc_birth, capped = capMonth)
   ENADID_P$dob_cmc_I <- imputed_date(embarazos$p05d13m, embarazos$p05d13a)
   ENADID_P$orden <- embarazos$renglon
   ##### date of death #####
@@ -203,6 +219,7 @@ rm(embarazos)
 rm(ENADID_P)
 rm(ENADID2006)
 
+ENADID2006_full <- split_birth_vs_union(ENADID2006_full, capMonth = capMonth)
 ENADID2006_full <- cleanENADID(ENADID2006_full)
 ENADID2006_full <- reorder_birthHistory(ENADID2006_full)
 

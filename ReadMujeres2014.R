@@ -1,15 +1,29 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
+if (scriptDir != getwd()) {
+  setwd(scriptDir)
+}
 source ("enadid_lib.r")
 #### Read ENADID 2014 ####
 library (tidyverse)
 library(janitor)
 library(bit64) # Necessary for the integer64 type
 
-path_mujer1 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/2014/enadid_2014_csv/tmmujer1_enadid2014/conjunto_de_datos/tmmujer1.csv"))
-path_mujer2 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/2014/enadid_2014_csv/tmmujer2_enadid2014/conjunto_de_datos/tmmujer2.csv"))
-path_embarazos <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/2014/enadid_2014_csv/tfec_hemb_enadid2014/conjunto_de_datos/tfec_hemb.csv"))
-path_ENADID2014 <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID2014.Rdat"))
-path_ENADID2014_mujeres <- path.expand(paste0(rootPath,"/INEGI/Encuestas/ENADID/ENADID2014_mujeres.Rdat"))
+# ==== Month-imputation mode (per-survey switch) ====
+# FALSE = legacy (missing months imputed uniformly, as before).
+# TRUE  = constrained: imputed months capped to the survey date and ordered
+#         within a union (marriage >= union start; union end >= union start and
+#         >= marriage). ENADID carries real months, so this only touches the
+#         sporadic imputed cases.
+# Master switch lives in ReadENADID.R; the line below is only the default when
+# this file is run standalone. Uncomment the override to test individually.
+# capMonth <- TRUE
+if (!exists("capMonth")) capMonth <- FALSE
+
+path_mujer1 <- path.expand(paste0(rootPath,mainPath,"ENADID/2014/enadid_2014_csv/tmmujer1_enadid2014/conjunto_de_datos/tmmujer1.csv"))
+path_mujer2 <- path.expand(paste0(rootPath,mainPath,"ENADID/2014/enadid_2014_csv/tmmujer2_enadid2014/conjunto_de_datos/tmmujer2.csv"))
+path_embarazos <- path.expand(paste0(rootPath,mainPath,"ENADID/2014/enadid_2014_csv/tfec_hemb_enadid2014/conjunto_de_datos/tfec_hemb.csv"))
+path_ENADID2014 <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID2014.Rdat"))
+path_ENADID2014_mujeres <- path.expand(paste0(rootPath,mainPath,"ENADID/ENADID2014_mujeres.Rdat"))
 # read everything as character
 mujer1 <- readr::read_csv(path_mujer1, col_types = cols(.default = "c"))
 mujer2 <- readr::read_csv(path_mujer2, col_types = cols(.default = "c"))
@@ -136,12 +150,12 @@ getDatos2014 <- function (mujeres) {
   return (datos)
 }
 
-ENADID2014 <- bigDataWomen ( getDatos2014 (mujeres2014))
+ENADID2014 <- bigDataWomen ( getDatos2014 (mujeres2014), capMonth = capMonth)
 
 # Childbirths
 bigDataChildbirths <- function (embarazos) {
   ENADID_P <- data.frame(llave_muj=embarazos$llave_muj, sex=embarazos$p5_12)
-  ENADID_P$dob_cmc <- compute_cmc(embarazos$p5_17_1, embarazos$p5_17_2)
+  ENADID_P$dob_cmc <- compute_cmc(embarazos$p5_17_1, embarazos$p5_17_2, survey_cmc = if (isTRUE(capMonth)) compute_cmc(10L, 2014L) else NULL, capped = capMonth)
   ENADID_P$dob_cmc_I <- imputed_date(embarazos$p5_17_1, embarazos$p5_17_2)
   ENADID_P$sex_dead <- embarazos$p5_15
   ENADID_P$orden <- embarazos$ordenhnv
@@ -225,6 +239,7 @@ if (!all.equal(ENADID2014_full$nChildren, ENADID2014_full$nBioKids)) stop ("nBio
 rm(ENADID_P)
 rm(ENADID2014)
 
+ENADID2014_full <- split_birth_vs_union(ENADID2014_full, capMonth = capMonth)
 ENADID2014_full <- cleanENADID(ENADID2014_full)
 ENADID2014_full <- reorder_birthHistory(ENADID2014_full)
 

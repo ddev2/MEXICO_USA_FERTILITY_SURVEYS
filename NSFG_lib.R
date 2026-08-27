@@ -321,7 +321,20 @@ complete_union_history <- function (df=NULL, df_NSFG=NULL, nMarr=6) {
   return (UH_ordered)
 }
 
-raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NULL) {
+# enforce_month_order() now lives in enadid_lib.R (shared by NSFG and ENADID).
+
+
+raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NULL,
+                               survey_cmc=NULL, capped=FALSE) {
+  # survey_cmc: per-respondent interview CMC (aligned to df rows, e.g.
+  #   datos$surveyDate_cmc). When supplied, imputed months are capped so a
+  #   year-only event cannot be placed after the interview (binds in the
+  #   survey year only). NULL -> legacy behaviour (uniform month, no cap).
+  # capped: master old/new switch for NSFG. No event-ordering (after_cmc) is
+  #   used here, so the only constraint is the survey cap. FALSE reproduces the
+  #   legacy uniform imputation (no cap); TRUE applies the survey-date cap so a
+  #   year-only event cannot land after the interview (binds in survey year).
+  if (!isTRUE(capped)) survey_cmc <- NULL
   compute_cmc_fields <- function (dfIn, dfOut, fieldName, cmc, month, year, end, endTot) {
     isCMC <- grepl("_cmc",fieldName)
     nms <- names (dfIn)
@@ -341,21 +354,26 @@ raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NUL
     
     dfOut[[fieldName_cmc]] <- NA
     if (isTRUE(isCMC)) dfOut[[fieldName_cmc_I]] <- NA
+    # "Year missing" MUST be tested the same way compute_cmc() decides it:
+    # century_year() first, then > 2100. Older NSFG cycles code a DK year as the
+    # 2-digit 99, which century_year() maps to 9999 (so compute_cmc sets cmc =
+    # 9999). A raw "year > 9000" test misses 99, leaving cmc = 9999 with flag
+    # 0/1 -- a year-unknown date that never gets flagged 10/11.
     if (isTRUE(isCMC)) {
       if ((!(cmc %in% nms)) & (!(month %in% nms)) & (year %in% nms)) {
         # only the year, month and cmc are missing
-        dfOut[[fieldName_cmc]] <- ifelse(is.na(dfIn[[year]]), NA, compute_cmc (imputed_month(nrow(dfIn)), dfIn[[year]]))
-        dfOut[[fieldName_cmc]] <- ifelse(dfIn[[year]] > 9000, 9999, dfOut[[fieldName_cmc]])
+        dfOut[[fieldName_cmc]] <- ifelse(is.na(dfIn[[year]]), NA, compute_cmc (imputed_month(nrow(dfIn), year_vec = dfIn[[year]], survey_cmc = survey_cmc, capped = capped), dfIn[[year]]))
+        dfOut[[fieldName_cmc]] <- ifelse(century_year(dfIn[[year]]) > 2100, 9999, dfOut[[fieldName_cmc]])
         dfOut[[fieldName_cmc_I]] <- ifelse(is.na(dfIn[[year]]), NA, 1)
-        dfOut[[fieldName_cmc_I]] <- ifelse(dfIn[[year]] > 9000, 11, dfOut[[fieldName_cmc_I]])
+        dfOut[[fieldName_cmc_I]] <- ifelse(century_year(dfIn[[year]]) > 2100, 11, dfOut[[fieldName_cmc_I]])
       }
       if ((!(cmc %in% nms)) & (month %in% nms) & (year %in% nms)) {
         # only the month and the year, not the cmc
-        vecMonth <- ifelse((!is.na(dfIn[[month]]))&(!(dfIn[[month]] %in% (1:12))), imputed_month(nrow(dfIn)), dfIn[[month]])
+        vecMonth <- ifelse((!is.na(dfIn[[month]]))&(!(dfIn[[month]] %in% (1:12))), imputed_month(nrow(dfIn), year_vec = dfIn[[year]], survey_cmc = survey_cmc, capped = capped), dfIn[[month]])
         dfOut[[fieldName_cmc_I]] <- ifelse(is.na(dfIn[[month]]), NA, 0)
         dfOut[[fieldName_cmc_I]] <- ifelse(is.na(dfIn[[month]]) | !(dfIn[[month]] %in% 1:12), 1, 0)
         dfOut[[fieldName_cmc]] <- compute_cmc (vecMonth, dfIn[[year]])
-        dfOut[[fieldName_cmc_I]] <- ifelse(dfIn[[year]] > 9000, dfOut[[fieldName_cmc_I]] + 10, dfOut[[fieldName_cmc_I]])
+        dfOut[[fieldName_cmc_I]] <- ifelse(century_year(dfIn[[year]]) > 2100, dfOut[[fieldName_cmc_I]] + 10, dfOut[[fieldName_cmc_I]])
       }
       if (cmc %in% nms) {
         # we have the cmc date
@@ -383,6 +401,8 @@ raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NUL
     marriage_deathHusband_cmc_I <- paste0("marriage_deathHusband_cmc_I", end)
     marriage_stopLiving_cmc <- paste0("marriage_stopLiving_cmc", end)
     marriage_stopLiving_cmc_I <- paste0("marriage_stopLiving_cmc_I", end)
+    marriage_divorce_cmc <- paste0("marriage_divorce_cmc", end)
+    marriage_divorce_cmc_I <- paste0("marriage_divorce_cmc_I", end)
     union_start_type <- paste0("union_start_type", end)
     union_start_cmc <- paste0("union_start_cmc", end)
     union_start_cmc_I <- paste0("union_start_cmc_I", end)
@@ -401,8 +421,16 @@ raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NUL
     df[[union_start_cmc_I]] <- ifelse (is.na(df[[marriage_cohabBef_cmc]]),df[[marriage_start_cmc_I]],df[[marriage_cohabBef_cmc_I]])
     df[[union_end_cmc]] <- ifelse (is.na(df[[marriage_stopLiving_cmc]]),df[[marriage_deathHusband_cmc]],df[[marriage_stopLiving_cmc]])
     df[[union_end_cmc_I]] <- ifelse (is.na(df[[marriage_stopLiving_cmc]]),df[[marriage_deathHusband_cmc_I]],df[[marriage_stopLiving_cmc_I]])
+
+    needs_div <- is.na(df[[union_end_cmc]])
+    div_I <- df[[marriage_divorce_cmc_I]]
+    div_I <- ifelse(div_I == 1, 31, ifelse(div_I == 10, 32, ifelse(div_I == 11, 33, 30)))
+    df[[union_end_cmc_I]] <- ifelse(needs_div, div_I, df[[union_end_cmc_I]])
+    df[[union_end_cmc]]   <- ifelse(needs_div, df[[marriage_divorce_cmc]], df[[union_end_cmc]])
+    
     df[[union_end_motive]] <- ifelse (is.na(df[[union_start_cmc]]),NA,0) # NA: no union, 0: union
     df[[union_end_motive]] <- ifelse (is.na(df[[marriage_stopLiving_cmc]]),df[[union_end_motive]],2) # 2: separation
+    df[[union_end_motive]] <- ifelse (is.na(df[[marriage_divorce_cmc]]),df[[union_end_motive]],2) # 2: separation
     df[[union_end_motive]] <- ifelse (is.na(df[[marriage_deathHusband_cmc]]),df[[union_end_motive]],1) # 1: widowhood
     df[[union_end_motive]] <- factor (df[[union_end_motive]], levels=c(0,1,2,9),
                                              labels=c("in union", "widowhood", "separation", "unknown"))
@@ -458,6 +486,7 @@ raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NUL
     datos <- compute_cmc_fields (df, datos, "marriage_cohabBef_cmc", "CMPMCOHX", "STRTOGHX_M", "STRTOGHX_Y", vIn[u], vOut[u])
     datos <- compute_cmc_fields (df, datos, "marriage_deathHusband_cmc", "CMHSBDIEX", "WNDIEHX_M", "WNDIEHX_Y", vIn[u], vOut[u])
     datos <- compute_cmc_fields (df, datos, "marriage_stopLiving_cmc", "CMSTPHSBX", "WNSTPHX_M", "WNSTPHX_Y", vIn[u], vOut[u])
+    datos <- compute_cmc_fields (df, datos, "marriage_divorce_cmc", "CMDIVORCX", "DIVDATHX_M", "DIVDATHX_Y", vIn[u], vOut[u])
     datos <- compute_marriage_otherFields (datos, vOut[u])
   }
   # current cohabitation
@@ -506,12 +535,35 @@ raw_union_history <- function (df=df_NSFG_2011_13, names2022_23=FALSE, datos=NUL
     }
   }
   
+  # Same-year ordering when months were imputed (NSFG-specific; EDER handles its
+  # own). Gated by capped, so default output is unchanged. Within a year force:
+  #   union end      >= union start
+  #   marriage start >= cohabitation-before-marriage start (so an imputed
+  #                     marriage month is not placed before the cohabitation
+  #                     that preceded it -- the "marriage before union" case)
+  if (isTRUE(capped)) {
+    datos <- enforce_month_order(datos, survey_cmc,
+                                 "marriage_start_cmc", "union_start_cmc",
+                                 "marriage_start_cmc_I", vOut)
+    datos <- enforce_month_order(datos, survey_cmc,
+                                 "union_end_cmc", "union_start_cmc",
+                                 "union_end_cmc_I", vOut)
+    datos <- enforce_month_order(datos, survey_cmc,
+                                 "union_end_cmc", "marriage_start_cmc",
+                                 "union_end_cmc_I", vOut)
+  }
+
   UH_ordered <- order_union_history (zap_label(datos))
 
   return (UH_ordered)
 }
 
-live_birth_history <- function (df_NSFG_preg=NULL) {
+live_birth_history <- function (df_NSFG_preg=NULL, capped=FALSE) {
+  # capped: master old/new switch for NSFG births (same role as in
+  #   raw_union_history). When TRUE and the pregnancy file carries CMINTVW
+  #   (century month of interview), imputed birth and child-death months are
+  #   capped so a year-only event cannot fall after the interview. FALSE, or a
+  #   pregnancy file without CMINTVW, reproduces the legacy uniform imputation.
   # for pregnancies file starting with year 2002
   # the variable OUTCOME should exist in the file
   if (!("OUTCOME" %in% names(df_NSFG_preg))) {
@@ -612,19 +664,26 @@ live_birth_history <- function (df_NSFG_preg=NULL) {
     } else {
       hasWHENDIED_Y1 <- ("WHENDIED_Y1" %in% nm)
       if (isTRUE(hasWHENDIED_Y1)) {
-        df_NSFG_preg$CMKIDIED1 <- compute_cmc (imputed_month(nrow(df_NSFG_preg)), df_NSFG_preg$WHENDIED_Y1)
-        df_NSFG_preg$CMKIDIED2 <- compute_cmc (imputed_month(nrow(df_NSFG_preg)), df_NSFG_preg$WHENDIED_Y2)
-        df_NSFG_preg$CMKIDIED3 <- compute_cmc (imputed_month(nrow(df_NSFG_preg)), df_NSFG_preg$WHENDIED_Y3)
+        survey_cmc_preg <- if (isTRUE(capped) && ("CMINTVW" %in% names(df_NSFG_preg)))
+          df_NSFG_preg$CMINTVW else NULL
+        df_NSFG_preg$CMKIDIED1 <- compute_cmc (imputed_month(nrow(df_NSFG_preg), year_vec = df_NSFG_preg$WHENDIED_Y1, survey_cmc = survey_cmc_preg, capped = capped), df_NSFG_preg$WHENDIED_Y1)
+        df_NSFG_preg$CMKIDIED2 <- compute_cmc (imputed_month(nrow(df_NSFG_preg), year_vec = df_NSFG_preg$WHENDIED_Y2, survey_cmc = survey_cmc_preg, capped = capped), df_NSFG_preg$WHENDIED_Y2)
+        df_NSFG_preg$CMKIDIED3 <- compute_cmc (imputed_month(nrow(df_NSFG_preg), year_vec = df_NSFG_preg$WHENDIED_Y3, survey_cmc = survey_cmc_preg, capped = capped), df_NSFG_preg$WHENDIED_Y3)
       }
     }
   }
   if (!("CMKIDIED4" %in% nm)) df_NSFG_preg$CMKIDIED4 <- NA
   
+  # Carry the per-pregnancy interview-month cap through the pivot below so the
+  # year-only birth/death imputations can use it. NA where not capping.
+  df_NSFG_preg$survcmc <- if (isTRUE(capped) && ("CMINTVW" %in% names(df_NSFG_preg)))
+    df_NSFG_preg$CMINTVW else NA_integer_
+
   # 1. Selection and Filtering
   df_children_final <- df_NSFG_preg %>%
     filter(OUTCOME == 1) %>%
     dplyr::select(
-      CaseID, PREGORDR, DATEND, DATEND_I,
+      CaseID, PREGORDR, DATEND, DATEND_I, survcmc,
       BABYSEX1, BABYSEX2, BABYSEX3, BABYSEX4,
       CMKIDIED1, CMKIDIED2, CMKIDIED3, CMKIDIED4
     ) %>%
@@ -659,13 +718,13 @@ live_birth_history <- function (df_NSFG_preg=NULL) {
   #cmc or year?
   df_children_final$dob_cmc <- ifelse((df_children_final$yBirth>0)&(df_children_final$yBirth<1560),
                                       df_children_final$yBirth, #cmc
-                                      adjust_cmc_2002_after (compute_cmc(imputed_month(nrow(df_children_final)),df_children_final$yBirth)))
+                                      adjust_cmc_2002_after (compute_cmc(imputed_month(nrow(df_children_final), year_vec = df_children_final$yBirth, survey_cmc = df_children_final$survcmc, capped = capped),df_children_final$yBirth)))
   df_children_final$dob_cmc_I <- ifelse((df_children_final$yBirth>0)&(df_children_final$yBirth<1560),
                                       0, #cmc
                                       1)
   df_children_final$dod_cmc <- ifelse((df_children_final$dod_cmc>0)&(df_children_final$dod_cmc<1560),
                                       df_children_final$dod_cmc, #cmc
-                                      adjust_cmc_2002_after (compute_cmc(imputed_month(nrow(df_children_final)),df_children_final$dod_cmc)))
+                                      adjust_cmc_2002_after (compute_cmc(imputed_month(nrow(df_children_final), year_vec = df_children_final$dod_cmc, survey_cmc = df_children_final$survcmc, capped = capped),df_children_final$dod_cmc)))
   df_children_final$dod_cmc_I <- ifelse((df_children_final$dod_cmc>0)&(df_children_final$dod_cmc<1560),
                                       0, #cmc
                                       1)

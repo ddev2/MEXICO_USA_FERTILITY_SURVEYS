@@ -1,0 +1,11171 @@
+Pregnancy File :: Section :: Respondent ID and Section B raw variables
+CASEID(1-5)
+Variable Type : Raw
+Description : Case identification number
+value
+
+label
+
+Total
+
+26141-42680 Respondent ID number
+Total
+
+20492
+20492
+
+Universe : Applicable for all pregnancies
+pregordr(6-7)
+Variable Type : Computed
+Description : Pregnancy order (number)
+value label
+
+Total
+
+01
+
+1ST PREGNANCY
+
+7538
+
+02
+
+2ND PREGNANCY
+
+5610
+
+03
+
+3RD PREGNANCY
+
+3515
+
+04
+
+4TH PREGNANCY
+
+1899
+
+05
+
+5TH PREGNANCY
+
+942
+
+06
+
+6TH PREGNANCY
+
+477
+
+07
+
+7TH PREGNANCY
+
+235
+
+08
+
+8TH PREGNANCY
+
+122
+
+09
+
+9TH PREGNANCY
+
+57
+
+10
+
+10TH PREGNANCY
+
+35
+
+11
+
+11TH PREGNANCY
+
+22
+
+12
+
+12TH PREGNANCY
+
+15
+
+13
+
+13TH PREGNANCY
+
+9
+
+14
+
+14TH PREGNANCY
+
+4
+
+15
+
+15TH PREGNANCY
+
+4
+
+16
+
+16TH PREGNANCY
+
+3
+
+17
+
+17TH PREGNANCY
+
+2
+
+18
+
+18TH PREGNANCY
+
+2
+
+19
+
+19TH PREGNANCY
+
+1
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+HOWPREG_N(8-9)
+Variable Type : Raw
+BB-2 : How many weeks or months pregnant are you now? (NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19075
+
+0-50
+
+0-50
+
+1408
+
+99
+
+Don't know
+Total
+
+9
+20492
+
+Universe : Applicable if pregnancy is a current pregnancy (prgoutcome = 3) (respondent-level variable)
+HOWPREG_P(10-10)
+
+Variable Type : Raw
+BB-2 : How many weeks or months pregnant are you now? (UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19084
+
+1
+
+Weeks
+
+2
+
+Months
+
+436
+
+Total
+
+20492
+
+972
+
+Universe : Applicable if pregnancy is a current pregnancy (prgoutcome = 3) (respondent-level variable)
+moscurrp(11-16)
+Variable Type : Computed
+Description : Number of Months Currently Pregnant (computed in Flow Check B-5)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19075
+
+0-11
+
+0-11 MONTHS
+
+1416
+
+99
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if pregnancy is a current pregnancy (prgoutcome = 3) (respondent-level variable)
+Notes : use recode PRGLNGTH
+NOWPRGDK(17-17)
+Variable Type : Raw
+BB-3 : Are you in your first trimester, in your second trimester, or in your third trimester?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20483
+
+1
+
+First trimester
+
+8
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a current pregnancy (prgoutcome = 3) and R did not know or refused to
+answer current gestational length (BB-2 HOWPREG_N = DK/RF) (respondent-level variable)
+PREGEND1(18-18)
+Variable Type : Raw
+BC-1 : In which of the ways shown on Card 13 did the pregnancy end? (1st mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+524
+
+1
+
+Miscarriage
+
+2958
+
+2
+
+Stillbirth
+
+165
+
+3
+
+Abortion
+
+2288
+
+4
+
+Ectopic or tubal pregnancy
+
+281
+
+5
+
+Live birth by Cesarean section
+
+3420
+
+6
+
+Live birth by vaginal delivery
+
+10849
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+2
+5
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+
+Notes : Use recode OUTCOME
+PREGEND2(19-19)
+Variable Type : Raw
+BC-1 : In which of the ways shown on Card 13 did the pregnancy end? (2nd mention)
+value label
+
+Total
+
+.
+
+20462
+
+INAPPLICABLE
+
+1
+
+Miscarriage
+
+1
+
+2
+
+Stillbirth
+
+1
+
+3
+
+Abortion
+
+2
+
+5
+
+Live birth by Cesarean section
+
+8
+
+6
+
+Live birth by vaginal delivery
+
+18
+
+Total
+
+20492
+
+Universe : Applicable if more than 1 pregnancy outcome was reported for this completed pregnancy (see BC-1
+PREGEND1)
+Notes : Use recode OUTCOME
+PREGEND3(20-20)
+Variable Type : Raw
+BC-1 : In which of the ways shown on Card 13 did the pregnancy end? (3rd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+4
+
+Ectopic or tubal pregnancy
+Total
+
+1
+20492
+
+Universe : Applicable if more than 2 pregnancy outcomes was reported for this completed pregnancy (see BC-1
+PREGEND1)
+Notes : Use recode OUTCOME
+HOWENDDK(21-21)
+Variable Type : Raw
+BC-1b : I understand that you may not want to answer this question in detail. If you are willing to say, did this
+(nth) pregnancy result in a baby or babies born alive, or did it end in some other way?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20485
+
+5
+
+Some other way
+
+4
+
+9
+
+Don't know
+Total
+
+3
+20492
+
+Universe : Applicable if R did not know or refused to answer how this pregnancy ended (BC-1 PREGEND1 = DK
+or RF)
+NBRNALIV(22-22)
+Variable Type : Raw
+BC-2 : (With your (nth) pregnancy,) How many babies did you have that were born alive? Please include babies
+that may have died shortly after birth and babies that you placed for adoption.
+value label
+.
+
+INAPPLICABLE
+
+Total
+6206
+
+1
+
+1 BABY
+
+14047
+
+2
+
+2 BABIES
+
+218
+
+3-6
+
+3 OR MORE BABIES
+Total
+
+21
+20492
+
+Universe : Applicable if pregnancy resulted in at least 1 live birth (prgoutcome = 1)
+MULTBRTH(23-23)
+Variable Type : Raw
+BC-3 : Did you have (twins/triplets/all of these babies with this [nth] pregnancy)?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20253
+
+1
+
+Yes
+
+5
+
+No
+
+203
+36
+
+Total
+
+20492
+
+Universe : Applicable if more than 1 liveborn baby reported from this pregnancy (BC-2 NBRNALIV > 1)
+bornaliv(24-24)
+Variable Type : Computed
+Description : Number of babies born alive from this pregnancy (computed in Flow Check B-10)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+1
+
+1 BABY
+
+14083
+
+2
+
+2 BABIES
+
+197
+
+3-6
+
+3 OR MORE BABIES
+Total
+
+6
+20492
+
+Universe : Applicable if pregnancy resulted in at least 1 live birth (prgoutcome = 1)
+DATPRGEN_M(25-26)
+Variable Type : Raw
+BC-4a : In what month and year did this pregnancy end? (MONTH)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14813
+
+1-12
+
+January - December
+
+4691
+
+13
+
+Winter
+
+109
+
+14
+
+Spring
+
+156
+
+15
+
+Summer
+
+292
+
+16
+
+Fall
+
+124
+
+98
+
+Refused
+
+99
+
+Don't know
+Total
+
+1
+306
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy but did not end in live birth (prgoutcome = 2)
+DATPRGEN_Y(27-30)
+Variable Type : Raw
+BC-4a : In what month and year did this pregnancy end? (YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14813
+
+1919-2010 1919-2010
+
+5609
+
+9998
+
+Refused
+
+1
+
+9999
+
+Don't know
+
+69
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy but did not end in live birth (prgoutcome = 2)
+cmotpreg(31-34)
+Variable Type : Computed
+Description : Century Month for Pregnancy End Date (if nonlivebirth) (computed in Flow Check B-11)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14813
+
+522-1278 BEFORE JULY 2006
+
+4789
+
+1279-1290 JULY 2006-JUNE 2007
+
+311
+
+1291-1308 JULY 2007-DEC 2008
+
+379
+
+1309-1326 JAN 2009-JUN 2010
+
+130
+
+9998
+
+Refused
+
+1
+
+9999
+
+Don't know
+
+69
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy but did not end in live birth (prgoutcome = 2)
+Notes : use recode DATEND
+AGEATEND(35-36)
+Variable Type : Raw
+BC-4b : How old were you when this pregnancy ended?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19503
+
+5-19
+
+UNDER 20 YEARS
+
+305
+
+20-24
+
+20-24 YEARS
+
+328
+
+25-29
+
+25-29 YEARS
+
+206
+
+30-44
+
+30-44 YEARS
+
+123
+
+98
+
+Refused
+
+99
+
+Don't know
+
+1
+26
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer the month/year when this pregnancy ended
+(cmotpreg = DK/RF) or she reported season/DK/RF on the month when this pregnancy ended (BC-4a
+DATPRGEN_M = 13,14,15,16, or DK/RF)
+Notes : use recode AGEPREG
+GESTASUN_M(37-38)
+Variable Type : Raw
+BC-5 : How many months or weeks had you been pregnant when (the baby was born/the [twins/triplets] were
+born/that pregnancy ended)? (MONTHS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+527
+
+0-12
+
+0-12 MONTHS
+
+19840
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+Total
+
+124
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+GESTASUN_W(39-40)
+Variable Type : Raw
+BC-5 : How many months or weeks had you been pregnant when (the baby was born/the [twins/triplets] were
+born/that pregnancy ended)? (WEEKS)
+value label
+.
+
+INAPPLICABLE
+
+0-13
+
+13 WEEKS OR LESS
+
+Total
+527
+12723
+
+14-26
+
+14-26 WEEKS
+
+264
+
+27-95
+
+27 WEEKS OR LONGER
+
+6835
+
+98
+
+Refused
+
+99
+
+Don't know
+
+1
+142
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+wksgest(41-42)
+Variable Type : Computed
+Description : Gestational length of completed pregnancy (in weeks) (computed in Flow Check B-13)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+527
+
+0-13
+
+13 WEEKS OR LESS
+
+4853
+
+14-26
+
+14-26 WEEKS
+
+814
+
+27-95
+
+27 WEEKS OR LONGER
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+12
+
+Total
+
+14285
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+Notes : use recode PRGLNGTH
+mosgest(43-44)
+Variable Type : Computed
+Description : Gestational length of completed pregnancy (in months) (computed in Flow Check B-13)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+527
+
+0-12
+
+0-12 MONTHS
+
+19951
+
+97
+
+NOT ASCERTAINED
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+12
+
+Total
+
+1
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+Notes : use recode PRGLNGTH
+DK1GEST(45-45)
+
+Variable Type : Raw
+BC-6 : Was it less than 6 months, or 6 months or more?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20490
+
+2
+
+6 months or more
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if this pregnancy ended only in stillbirth (BC-1 PREGEND1 and PREGEND2 and PREGEND3
+only included code 2) and R did not know or refused to answer gestational length (BC-5 GESTASUN_M =
+DK/RF or GESTASUN_W = DK/RF)
+DK2GEST(46-46)
+Variable Type : Raw
+BC-7 : A preterm delivery is one that occurs at 36 weeks or earlier in pregnancy. As far as you know, did you
+have a preterm delivery?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20472
+
+1
+
+Yes
+
+5
+
+5
+
+No
+
+14
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if this pregnancy ended in live birth (prgoutcome = 1) and R did not know or refused to
+answer gestational length (BC-5 GESTASUN_M = DK/RF or GESTASUN_W = DK/RF)
+DK3GEST(47-47)
+Variable Type : Raw
+BC-8 : Was it less than 3 months, 3 months or more but less than 6 months, or 6 months or more?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20363
+
+1
+
+Less than 3 months
+
+107
+
+2
+
+3 months or more, but less than 6 months
+
+10
+
+8
+
+Refused
+
+1
+
+9
+
+Don't know
+
+11
+
+Total
+
+20492
+
+Universe : Applicable if this pregnancy ended only in miscarriage, abortion, or ectopic (BC-1 PREGEND1 and
+PREGEND2 and PREGEND3 only included codes 1, 3, or 4) and R did not know or refused to answer gestational
+length (BC-5 GESTASUN_M = DK/RF or GESTASUN_W = DK/RF)
+bpa_bdscheck1(48-48)
+Variable Type : Computed
+Description : Whether 1st liveborn baby from this pregnancy was unnamed and either placed for adoption or
+died shortly after birth (computed in Flow Check B-17)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+0
+
+Baby born alive and named
+
+14274
+
+1
+
+Baby unnamed and placed for adoption
+
+2
+
+Baby unnamed and died soon after birth
+Total
+
+8
+4
+20492
+
+Universe : Applicable if this pregnancy ended in live birth (prgoutcome = 1)
+bpa_bdscheck2(49-49)
+Variable Type : Computed
+Description : Whether 2nd liveborn baby from this pregnancy was unnamed and either placed for adoption or
+died shortly after birth (computed in Flow Check B-17)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+0
+
+Baby born alive and named
+
+14284
+
+2
+
+Baby unnamed and died soon after birth
+Total
+
+2
+20492
+
+Universe : Applicable if pregnancy ended in live birth (prgoutcome = 1) and there were 2 or more liveborn
+babies from this pregnancy (bornaliv > 1)
+bpa_bdscheck3(50-50)
+Variable Type : Computed
+Description : Whether 3rd liveborn baby from this pregnancy was unnamed and either placed for adoption or
+died shortly after birth (computed in Flow Check B-17)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+0
+
+Baby born alive and named
+
+14286
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended in live birth (prgoutcome = 1) and there were 3 or more liveborn
+babies from this pregnancy (bornaliv > 2)
+BABYSEX1(51-51)
+Variable Type : Raw
+BD-2 : ((Is/Was) (BABY'S NAME/the 1st baby) male or female?)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+1
+
+Male
+
+7223
+
+2
+
+Female
+
+7057
+
+9
+
+Don't know
+Total
+
+6
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+BIRTHWGT_LB1(52-53)
+Variable Type : Raw
+BD-3 : How much did (BABY'S NAME/this 1st baby) weigh at birth? (POUNDS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+0-5
+
+UNDER 6 POUNDS
+
+1788
+
+6
+
+6 POUNDS
+
+3385
+
+7
+
+7 POUNDS
+
+4955
+
+8
+
+8 POUNDS
+
+2861
+
+9-95
+
+9 POUNDS OR MORE
+
+1140
+
+99
+
+Don't know
+
+157
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+Notes : use recode LBW1
+BIRTHWGT_OZ1(54-55)
+Variable Type : Raw
+BD-3 : How much did (BABY'S NAME/this 1st baby) weigh at birth? (OUNCES)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6363
+
+0-15
+
+0-15 OUNCES
+
+14000
+
+99
+
+Don't know
+
+129
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1) and R did not say "don't know" or
+"refused" on the pounds question (BD-3 BIRTHWGT_LB1 NE DK/RF)
+Notes : use recode LBW1
+LOBTHWGT1(56-56)
+Variable Type : Raw
+BD-4 : Did (she/he) weigh 5 1/2 pounds or more, or less than 5 1/2 pounds? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20320
+
+1
+
+5 1/2 pounds or more
+
+119
+
+2
+
+Less than 5 1/2 pounds
+
+32
+
+9
+
+Don't know
+
+21
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer the baby's birthweight (BD-3 BIRTHWGT_LB1 =
+DK/RF or (BIRTHWGT_LB1 < 6 and BIRTHWGT_OZ1 = DK/RF)
+Notes : use recode LBW1
+BABYSEX2(57-57)
+Variable Type : Raw
+BD-2 : ((Is/Was) (BABY'S NAME/the 2nd baby) male or female?)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20286
+
+1
+
+Male
+
+80
+
+2
+
+Female
+
+124
+
+9
+
+Don't know
+Total
+
+2
+20492
+
+Universe : Applicable if pregnancy ended in more than 1 liveborn baby (bornaliv > 1)
+BIRTHWGT_LB2(58-59)
+Variable Type : Raw
+BD-3 : How much did (BABY'S NAME/this 2nd baby) weigh at birth? (POUNDS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+0-5
+
+UNDER 6 POUNDS
+
+20286
+150
+
+6
+
+6 POUNDS
+
+32
+
+7
+
+7 POUNDS
+
+13
+
+8
+
+8 POUNDS
+
+3
+
+9-95
+
+9 POUNDS OR MORE
+
+1
+
+99
+
+Don't know
+
+7
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended in more than 1 liveborn baby (bornaliv > 1)
+BIRTHWGT_OZ2(60-61)
+Variable Type : Raw
+BD-3 : How much did (BABYNAME/this 2nd baby) weigh at birth? (OUNCES)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20293
+
+0-15
+
+0-15 OUNCES
+
+197
+
+99
+
+Don't know
+Total
+
+2
+20492
+
+Universe : Applicable if pregnancy ended in more than 1 liveborn baby (bornaliv > 1) and R did not say "don't
+know" or "refused" on the pounds question (BD-3 BIRTHWGT_LB2 NE DK/RF)
+LOBTHWGT2(62-62)
+Variable Type : Raw
+BD-4 : Did (she/he) weigh 5 1/2 pounds or more, or less than 5 1/2 pounds? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20483
+
+1
+
+5 1/2 pounds or more
+
+1
+
+2
+
+Less than 5 1/2 pounds
+
+7
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer the baby's birthweight (BD-3 BIRTHWGT_LB2 =
+DK/RF or (BIRTHWGT_LB2 < 6 and BIRTHWGT_OZ2 = DK/RF)
+BABYSEX3(63-63)
+Variable Type : Raw
+BD-2 : ((Is/Was) (BABY'S NAME/the 3rd baby) male or female?)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20486
+
+1
+
+Male
+
+2
+
+Female
+
+4
+
+Total
+
+20492
+
+2
+
+Universe : Applicable if pregnancy ended in more than 2 liveborn babies (bornaliv > 2)
+BIRTHWGT_LB3(64-64)
+Variable Type : Raw
+BD-3 : How much did (BABY'S NAME/this 3rd baby) weigh at birth? (POUNDS)
+
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20486
+
+0-5
+
+UNDER 6 POUNDS
+Total
+
+6
+20492
+
+Universe : Applicable if pregnancy ended in more than 2 liveborn babies (bornaliv > 2)
+BIRTHWGT_OZ3(65-66)
+Variable Type : Raw
+BD-3 : How much did (BABY'S NAME/this 3rd baby) weigh at birth? (OUNCES)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20486
+
+0-15
+
+0-15 OUNCES
+Total
+
+6
+20492
+
+Universe : Applicable if pregnancy ended in more than 2 liveborn babies (bornaliv > 2) and R did not say "don't
+know" or "refused" on the pounds question (BD-3 BIRTHWGT_LB3 NE DK/RF)
+LOBTHWGT3(67-67)
+Variable Type : Raw
+BD-4 : Did (she/he) weigh 5 1/2 pounds or more, or less than 5 1/2 pounds? (3rd child from this pregnancy)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer the baby's birthweight (BD-3 BIRTHWGT_LB3 =
+DK/RF or (BIRTHWGT_LB3 < 6 and BIRTHWGT_OZ3 = DK/RF)
+BABYDOB_M(68-69)
+Variable Type : Raw
+BD-5 : In what month and year ((was she/was he/were the [twins/triplets]) born)/did this pregnancy end)?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6206
+
+1-12
+
+January - December
+
+14259
+
+13
+
+Winter
+
+2
+
+15
+
+Summer
+
+5
+
+16
+
+Fall
+
+2
+
+98
+
+Refused
+
+7
+
+99
+
+Don't know
+Total
+
+11
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+BABYDOB_Y(70-73)
+Variable Type : Raw
+BD-5 : In what month and year ((was she/was he/were the [twins/triplets]) born)/did this pregnancy end)?
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+1919-2010 1919-2010
+9998
+
+Refused
+
+Total
+6206
+14270
+6
+
+9999
+
+Don't know
+
+10
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+cmbabdob(74-77)
+Variable Type : Computed
+Description : Century Month for baby's or babies' date of birth (delivery date) (computed in Flow Check B-19b)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+6206
+
+522-1278 BEFORE JULY 2006
+
+12419
+
+1279-1290 JULY 2006-JUNE 2007
+
+816
+
+1291-1308 JULY 2007-DEC 2008
+
+813
+
+1309-1326 JAN 2009-JUN 2010
+
+222
+
+9998
+9999
+
+Refused
+
+6
+
+Don't know
+
+10
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+Notes : use recode DATEND
+kidage(78-80)
+Variable Type : Computed
+Description : Current Age (in months) of R's child(ren) from this pregnancy (computed in Flow Check B-19b)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6222
+
+0-994
+
+0-994
+
+14270
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1) and bpa_bdscheck1 = 0.
+HPAGELB(81-82)
+Variable Type : Raw
+BD-6 : Asked in Years 1 and 2: How old was the father when (he/she/the [twins/triplets]) (was/were) born?
+Asked starting in Year 3: How old was the father when (BABY'S NAME/the [twins/triplets]) (was/were) born?
+value label
+.
+
+INAPPLICABLE
+
+Total
+6206
+
+LOW-19 UNDER 20 YEARS
+
+1388
+
+20-24
+
+20-24 YEARS
+
+3817
+
+25-29
+
+25-29 YEARS
+
+3814
+
+30-44
+
+30-44 YEARS
+
+4807
+
+45-95
+
+45 YEARS OR OLDER
+
+283
+
+98
+
+Refused
+
+99
+
+Don't know
+Total
+
+8
+169
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1)
+BIRTHPLC(83-83)
+Variable Type : Raw
+
+BD-7 : Where did you give birth? Was it in a hospital, in a birthing center, in your home, or some other place?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15502
+
+1
+
+In a hospital
+
+4884
+
+2
+
+In a birthing center
+
+72
+
+3
+
+In your home
+
+22
+
+4
+
+Some other place
+
+11
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1) and delivery occurred on or after
+January [YEAR OF INTERVIEW - 5] (cmbabdob GE cmjan5yr)
+PAYBIRTH1(84-84)
+Variable Type : Raw
+BD-8 : When ([BABY'S NAME] was born/your [twins/triplets] were born,) in which of the ways on Card 16 was
+the delivery bill paid? (1st mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15502
+
+1
+
+Insurance
+
+2190
+
+2
+
+Co-payment or out-of-pocket payment
+
+147
+
+3
+
+Medicaid
+
+2542
+
+4
+
+No payment required
+
+47
+
+5
+
+Some other way
+
+54
+
+9
+
+Don't know
+Total
+
+10
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1) and delivery occurred in or after
+January [YEAR OF INTERVIEW - 5] (cmbabdob GE cmjan5yr)
+Notes : use recode PAYDELIV
+PAYBIRTH2(85-85)
+Variable Type : Raw
+BD-8 : When ([BABY'S NAME] was born/your [twins/triplets] were born,) in which of the ways on Card 16 was
+the delivery bill paid? (2nd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19234
+
+1
+
+Insurance
+
+2
+
+Co-payment or out-of-pocket payment
+
+1057
+
+3
+
+Medicaid
+
+140
+
+5
+
+Some other way
+Total
+
+47
+
+14
+20492
+
+Universe : Applicable if more than 1 form of payment reported for this delivery (see BD-8 PAYBIRTH1)
+Notes : use recode PAYDELIV
+PAYBIRTH3(86-86)
+Variable Type : Raw
+BD-8 : When ([BABY'S NAME] was born/your [twins/triplets] were born,) in which of the ways on Card 16 was
+the delivery bill paid? (3rd mention)
+
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20467
+
+1
+
+Insurance
+
+1
+
+2
+
+Co-payment or out-of-pocket payment
+
+7
+
+3
+
+Medicaid
+
+12
+
+5
+
+Some other way
+
+5
+
+Total
+
+20492
+
+Universe : Applicable if more than 2 forms of payment reported for this delivery (see BD-8 PAYBIRTH1)
+Notes : use recode PAYDELIV
+PAYBIRTH4(87-87)
+Variable Type : Raw
+BD-8 : When ([BABY'S NAME] was born/your [twins/triplets] were born,) in which of the ways on Card 16 was
+the delivery bill paid? (4th mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20489
+
+5
+
+Some other way
+
+3
+
+Total
+
+20492
+
+Universe : Applicable if more than 3 forms of payment reported for this delivery (see BD-8 PAYBIRTH1)
+Notes : use recode PAYDELIV
+CSECPRIM(88-88)
+Variable Type : Raw
+BD-9 : Was this your first cesarean delivery, or had you had one before this?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19514
+
+1
+
+Yes
+
+5
+
+No
+
+407
+
+Total
+
+20492
+
+571
+
+Universe : Applicable if QuestYear >= 2 and if only pregnancy outcome was cesarean delivery (BC-1
+PREGEND1 and PREGEND2 and PREGEND3 only includes code 5) and R has not already reported on her first
+cesarean delivery (PRIMVAR NE 1)
+CSECMED1(89-89)
+Variable Type : Raw
+BD-10 : Please look at Card 16b. Which of these medical reasons, if any, were there for this cesarean delivery?
+(1st MENTION)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19921
+
+1
+
+Labor was taking too long
+
+2
+
+Maternity care provider concerned that baby was too big
+
+45
+
+3
+
+Baby was in the wrong position (e.g, breech)
+
+115
+
+131
+
+4
+
+Maternity care provider concerned about your health
+
+75
+
+5
+
+Maternity care provider concerned about your baby's health
+
+107
+
+6
+
+Some other medical reason
+
+91
+
+7
+
+There was no medical reason
+
+6
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if QuestYear >= 2 and if this is R's first cesarean delivery (BD-9 CSECPRIM = 1) and R
+has not already reported on her first cesarean delivery (PRIMVAR NE 1)
+CSECMED2(90-90)
+Variable Type : Raw
+BD-10 : Please look at Card 16b. Which of these medical reasons, if any, were there for this cesarean delivery?
+(2nd MENTION)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20307
+
+1
+
+Labor was taking too long
+
+16
+
+2
+
+Maternity care provider concerned that baby was too big
+
+22
+
+3
+
+Baby was in the wrong position (e.g, breech)
+
+16
+
+4
+
+Maternity care provider concerned about your health
+
+29
+
+5
+
+Maternity care provider concerned about your baby's health
+
+74
+
+6
+
+Some other medical reason
+Total
+
+28
+20492
+
+Universe : Applicable if R reported more than 1 medical reason for her first cesarean delivery (see BD-10
+CSECMED1)
+CSECMED3(91-91)
+Variable Type : Raw
+BD-10 : Please look at Card 16b. Which of these medical reasons, if any, were there for this cesarean delivery?
+(3rd MENTION)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20438
+
+2
+
+Maternity care provider concerned that baby was too big
+
+3
+
+Baby was in the wrong position (e.g, breech)
+
+4
+
+4
+
+Maternity care provider concerned about your health
+
+11
+
+5
+
+Maternity care provider concerned about your baby's health
+
+26
+
+6
+
+Some other medical reason
+Total
+
+1
+
+12
+20492
+
+Universe : Applicable if R reported more than 2 medical reasons for her first cesarean delivery (see BD-10
+CSECMED1)
+CSECMED4(92-92)
+Variable Type : Raw
+BD-10 : Please look at Card 16b. Which of these medical reasons, if any, were there for this cesarean delivery?
+(4th MENTION)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20482
+
+3
+
+Baby was in the wrong position (e.g, breech)
+
+1
+
+4
+
+Maternity care provider concerned about your health
+
+1
+
+5
+
+Maternity care provider concerned about your baby's health
+
+5
+
+6
+
+Some other medical reason
+Total
+
+3
+20492
+
+Universe : Applicable if R reported more than 3 medical reasons for her first cesarean delivery (see BD-10
+CSECMED1)
+
+CSECMED5(93-93)
+Variable Type : Raw
+BD-10 : Please look at Card 16b. Which of these medical reasons, if any, were there for this cesarean delivery?
+(5th MENTION)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+5
+
+Maternity care provider concerned about your baby's health
+Total
+
+1
+20492
+
+Universe : Applicable if R reported more than 4 medical reasons for her first cesarean delivery (see BD-10
+CSECMED1)
+CSECPLAN(94-94)
+Variable Type : Raw
+BD-11 : Was this cesarean the result of your own idea to have a planned cesarean before labor began?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20479
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+4
+9
+20492
+
+Universe : Applicable if R reported no medical reason for her first cesarean delivery (BD-10 CSECMED1 = 7)
+KNEWPREG(95-96)
+Variable Type : Raw
+BE-1 : How many weeks pregnant were you when you learned that you were pregnant this (nth) time?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14126
+
+0-13
+
+13 WEEKS OR LESS
+
+6024
+
+14-26
+
+14-26 WEEKS
+
+252
+
+27-50
+
+27 WEEKS OR LONGER
+
+18
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+71
+
+Total
+
+20492
+
+Universe : Applicable if this is a completed pregnancy ending in or after January [YEAR OF INTERVIEW - 5]
+(either cmbabdob or cmotpreg GE cmjan5yr) and it did not end in induced abortion (BC-1 PREGEND1 and
+PREGEND2 and PREGEND3 did not include code 3) and not all liveborn babies from this pregnancy were placed
+for adoption (not all BPA_BDScheck1 - 3 = 1)
+TRIMESTR(97-97)
+Variable Type : Raw
+BE-2a : Was it less than 3 months, at least 3 months but less than 6 months, or six or more months?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20459
+
+1
+
+Less than 3 months,
+
+16
+
+2
+
+At least 3 months, but less than 6 months
+
+4
+
+3
+
+6 months or more
+
+1
+
+9
+
+Don't know
+
+12
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer when she learned she was pregnant (BE-1
+KNEWPREG = DK/RF) and gestational length was 6 months or longer (mosgest GE 6)
+LTRIMEST(98-98)
+Variable Type : Raw
+BE-2b : Was it less than 3 months or 3 months or more?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+1
+
+Less than 3 months
+
+1
+
+2
+
+3 months or more
+
+2
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer when she learned she was pregnant (BE-1
+KNEWPREG = DK/RF) and gestational length was between 3 and 6 months (3 LE mosgest LT 6)
+PRIORSMK(99-99)
+Variable Type : Raw
+BE-3 : Please look at Card 17. In the 6 months before you found out you were pregnant this (nth) time, how
+many cigarettes did you smoke a day, on the average?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14126
+
+0
+
+None
+
+4611
+
+1
+
+About one cigarette a day or less
+
+162
+
+2
+
+Just a few cigarettes a day (2-4)
+
+377
+
+3
+
+About half a pack a day (5-14)
+
+676
+
+4
+
+About a pack a day (15-24)
+
+443
+
+5
+
+About 1 1/2 packs a day (25-34)
+
+69
+
+6
+
+About 2 packs a day (35-44)
+
+17
+
+7
+
+More than 2 packs a day (45 or more)
+
+10
+
+8
+
+Refused
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if this is a completed pregnancy ending in or after January [YEAR OF INTERVIEW - 5]
+(either cmbabdob or cmotpreg GE cmjan5yr) and it did not end in induced abortion (BC-1 PREGEND1 and
+PREGEND2 and PREGEND3 did not include code 3) and not all liveborn babies from this pregnancy were placed
+for adoption (not all BPA_BDScheck1 - 3 = 1)
+POSTSMKS(100-100)
+Variable Type : Raw
+BE-4 : After you found out you were pregnant this (nth) time, did you smoke cigarettes at all during the
+pregnancy?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14126
+
+1
+
+Yes
+
+905
+
+5
+
+No
+
+5456
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+1
+4
+20492
+
+Universe : Applicable if this is a completed pregnancy ending in or after January [YEAR OF INTERVIEW - 5]
+(either cmbabdob or cmotpreg GE cmjan5yr) and it did not end in induced abortion (BC-1 PREGEND1 and
+PREGEND2 and PREGEND3 did not include code 3) and not all liveborn babies from this pregnancy were placed
+
+for adoption (not all BPA_BDScheck1 - 3 = 1)
+NPOSTSMK(101-101)
+Variable Type : Raw
+BE-5 : Looking at Card 18, on the average, how many cigarettes did you smoke per day after you found out
+that you were pregnant this (nth) time?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19587
+
+1
+
+About one cigarette a day or less
+
+133
+
+2
+
+Just a few cigarettes a day (2-4)
+
+316
+
+3
+
+About half a pack a day (5-14)
+
+283
+
+4
+
+About a pack a day (15-24)
+
+141
+
+5
+
+About 1 1/2 packs a day (25-34)
+
+21
+
+6
+
+About 2 packs a day (35-44)
+
+6
+
+7
+
+More than 2 packs a day (45 or more)
+
+3
+
+8
+
+Refused
+
+1
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if R reported any cigarette smoking during this pregnancy (BE-4 POSTSMKS = 1)
+GETPRENA(102-102)
+Variable Type : Raw
+BE-6 : During this (nth) pregnancy, did you ever visit a doctor or other medical care provider for prenatal care,
+that is, for one or more pregnancy check-ups?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14126
+
+1
+
+Yes
+
+5686
+
+5
+
+No
+
+672
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+1
+7
+20492
+
+Universe : Applicable if this is a completed pregnancy ending in or after January [YEAR OF INTERVIEW - 5]
+(either cmbabdob or cmotpreg GE cmjan5yr) and it did not end in induced abortion (BC-1 PREGEND1 and
+PREGEND2 and PREGEND3 did not include code 3) and not all liveborn babies from this pregnancy were placed
+for adoption (not all BPA_BDScheck1 - 3 = 1)
+Notes : use recode PNCAREWK
+BGNPRENA(103-104)
+Variable Type : Raw
+BE-7 : How many weeks pregnant were you at the time of your first prenatal care visit?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14806
+
+0-13
+
+13 WEEKS OR LESS
+
+5102
+
+14-26
+
+14-26 WEEKS
+
+510
+
+27-50
+
+27 WEEKS OR LONGER
+
+33
+
+99
+
+Don't know
+Total
+
+41
+20492
+
+Universe : Applicable if R reported any prenatal care during this pregnancy (BE-6 GETPRENA = 1)
+
+Notes : use recode PNCAREWK
+PNCTRIM(105-105)
+Variable Type : Raw
+BE-8a : Was it less than 3 months, at least 3 months but less than 6 months, or 6 or more months?
+value label
+
+Total
+
+.
+
+20465
+
+INAPPLICABLE
+
+1
+
+Less than 3 months,
+
+17
+
+2
+
+At least 3 months , but less than 6 months
+
+4
+
+3
+
+6 or more months
+
+2
+
+9
+
+Don't know
+
+4
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer when she began prenatal care (BE-7 BGNPRENA =
+DK/RF) and gestational length was 6 months or longer (mosgest GE 6)
+Notes : use recode PNCAREWK
+LPNCTRI(106-106)
+Variable Type : Raw
+BE-8b : Was it less than 3 months or 3 months or more?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20478
+
+1
+
+Less than 3 months
+
+9
+
+Don't know
+Total
+
+10
+4
+20492
+
+Universe : Applicable if R did not know or refused to answer when she began prenatal care (BE-7 BGNPRENA =
+DK/RF) and gestational length was between 3 and 6 months (3 LE mosgest LT 6)
+Notes : use recode PNCAREWK
+WORKPREG(107-107)
+Variable Type : Raw
+BF-1 : At any time while you were pregnant with ([BABY'S NAME]/this baby/your [twins/triplets]), were you
+employed at a job for pay?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15507
+
+1
+
+Yes
+
+3088
+
+5
+
+No
+
+1882
+
+6
+
+R volunteers she worked during pregnancy, but quit job before delivery
+
+9
+
+Don't know
+Total
+
+13
+2
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1) and delivery occurred in or after
+January [YEAR OF INTERVIEW - 5] (cmbabdob GE cmjan5yr) and at least 1 baby from this delivery was named
+and not placed for adoption (at least 1 value of BPA_BDSCheck1 - 3 = 0)
+WORKBORN(108-108)
+Variable Type : Raw
+BF-2 : Maternity leave is any leave, paid or unpaid, due to pregnancy and childbirth that a woman takes from a
+job to which she expects to return, at least when she starts the leave. Did you ever take maternity leave, paid
+
+or unpaid, from a job you held when you were pregnant with ([BABY'S NAME]/this baby/your[twins/triplets])?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+17404
+
+1
+
+Yes
+
+1971
+
+5
+
+No
+
+1116
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if R reported working at all during this pregnancy (BF-1 WORKPREG = 1)
+Notes : use recode MATERNLV
+DIDWORK(109-109)
+Variable Type : Raw
+BF-3 : Was this because you did not need to take maternity leave, you were not offered or allowed to take
+leave, or for some other reason?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19375
+
+1
+
+Did not need to take maternity leave
+
+193
+
+2
+
+Were not offered or allowed to take maternity leave
+
+238
+
+3
+
+Some other reason
+
+686
+
+Total
+
+20492
+
+Universe : Applicable if R did not take maternity leave with this pregnancy or responded DK/RF on this question
+(BF-2 WORKBORN = 5, DK or RF)
+Notes : use recode MATERNLV
+MATWEEKS(110-111)
+Variable Type : Raw
+BF-4 : In total, how many weeks of maternity leave, paid or unpaid, did you take?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+18521
+
+0-13
+
+13 WEEKS OR LESS
+
+1648
+
+14-95
+
+14 WEEKS OR LONGER
+
+311
+
+99
+
+Don't know
+
+12
+
+Total
+
+20492
+
+Universe : Applicable if R took maternity leave with this pregnancy (BF-2 WORKBORN = 1)
+WEEKSDK(112-112)
+Variable Type : Raw
+BF-5 : Did you take 4 weeks or less or longer than 4 weeks?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+1
+
+4 weeks or less
+
+3
+
+2
+
+Longer than 4 weeks
+
+8
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if R did not know or refused to answer how many weeks of maternity leave she took for
+this pregnancy (BF-4 MATWEEKS = DK/RF)
+
+MATLEAVE(113-114)
+Variable Type : Raw
+BF-6 : Some women receive pay from their jobs during their maternity leave, through vacation pay, sick pay,
+maternity benefits, and other kinds of paid leave. In total, how many weeks of paid leave did you receive from
+your job while you were on maternity leave?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+18521
+
+0-13
+
+13 WEEKS OR LESS
+
+1877
+
+14-95
+
+14 WEEKS OR LONGER
+
+99
+
+Don't know
+
+90
+4
+
+Total
+
+20492
+
+Universe : Applicable if R took maternity leave with this pregnancy (BF-2 WORKBORN = 1)
+LIVEHERE1(115-115)
+Variable Type : Raw
+BG-1 : Earlier I don't think you mentioned (BABY'S NAME) when you told me who lives with you. Does (BABY'S
+NAME) still live with you? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+16352
+
+1
+
+Yes
+
+3017
+
+5
+
+No
+
+1123
+
+Total
+
+20492
+
+Universe : Applicable if 1st liveborn child from this pregnancy did not match any biological child reported in the
+household roster (no NAME[X] with RELAR[X]=3 from household roster matches BABYNAME1)
+Notes : see recode LIVCHILD
+ALIVENOW1(116-116)
+Variable Type : Raw
+BG-2 : Is (she/he) still living? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19369
+
+1
+
+Yes
+
+982
+
+5
+
+No
+
+134
+
+9
+
+Don't know
+Total
+
+7
+20492
+
+Universe : Applicable if child not living with R (BG-1 LIVEHERE1 = 5/DK/RF)
+WHENDIED_M1(117-118)
+Variable Type : Raw
+BG-3 : When did (BABY'S NAME) die? (1st child from this pregnancy; MONTH)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20358
+
+1-12
+
+January - December
+
+15
+
+Summer
+
+99
+
+Don't know
+Total
+
+130
+2
+2
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW1 = 5)
+WHENDIED_Y1(119-122)
+Variable Type : Raw
+BG-3 : When did (BABY'S NAME) die? (1st child from this pregnancy; YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20358
+
+1919-2010 1919-2010
+Total
+
+134
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW1 = 5)
+cmkidied1(123-126)
+Variable Type : Computed
+Description : Century Month for child's date of death - 1st from this pregnancy (computed in Flow Check B-35)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20358
+
+522-1278 BEFORE JULY 2006
+
+117
+
+1279-1290 JULY 2006-JUNE 2007
+
+8
+
+1291-1308 JULY 2007-DEC 2008
+
+7
+
+1309-1326 JAN 2009-JUN 2010
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW1 = 5)
+WHENLEFT_M1(127-128)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (1st child from this pregnancy; MONTH)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19503
+
+1-12
+
+January - December
+
+854
+
+13
+
+Winter
+
+13
+
+14
+
+Spring
+
+11
+
+15
+
+Summer
+
+44
+
+16
+
+Fall
+
+9
+
+98
+
+Refused
+
+2
+
+99
+
+Don't know
+
+56
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW1 = 1/DK/RF)
+WHENLEFT_Y1(129-132)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (1st child from this pregnancy; YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19503
+
+1919-2010 1919-2010
+
+964
+
+9998
+
+Refused
+
+2
+
+9999
+
+Don't know
+
+23
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW1 = 1/DK/RF)
+cmkidlft1(133-136)
+Variable Type : Computed
+Description : Century Month for date child'stopped living w/R - 1st from this pregnancy (computed in Flow
+Check B-36)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19503
+
+522-1278 BEFORE JULY 2006
+
+651
+
+1279-1290 JULY 2006-JUNE 2007
+
+133
+
+1291-1308 JULY 2007-DEC 2008
+
+113
+
+1309-1326 JAN 2009-JUN 2010
+
+67
+
+9998
+
+Refused
+
+2
+
+9999
+
+Don't know
+
+23
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW1 = 1/DK/RF)
+lastage1(137-139)
+Variable Type : Computed
+Description : Age (in months) when child last lived w/R-1st from this pregnancy (computed in Flow Check
+B-38)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19394
+
+0-994
+
+0-994
+
+1094
+
+997
+
+Not Ascertained
+Total
+
+4
+20492
+
+Universe : Applicable if child no longer lives with R (BG-1 LIVEHERE1 = 5/DK/RF)
+WHERENOW1(140-140)
+Variable Type : Raw
+BG-5 : Please look at Card 19. Where does (BABY'S NAME) now live? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19503
+
+1
+
+With biological father
+
+360
+
+2
+
+With other relatives
+
+371
+
+3
+
+With adoptive family
+
+111
+
+4
+
+Away at school/college
+
+14
+
+5
+
+Living on own
+
+52
+
+6
+
+Other
+
+74
+
+9
+
+Don't know
+Total
+
+7
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW1 = 1/DK/RF)
+Notes : see recode LIVCHILD
+LEGAGREE1(141-141)
+Variable Type : Raw
+BG-6 : Do you and (BABY'S NAME)'s father have a legal agreement about (BABY'S NAME) regarding
+
+child'support, alimony, custody, visitation, or where the child lives? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20132
+
+1
+
+Yes
+
+240
+
+5
+
+No
+
+119
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if child lives with biological father (BG-5 WHERENOW1 = 1)
+PARENEND1(142-142)
+Variable Type : Raw
+BG-7 : Are you still the legal mother of (BABY'S NAME)? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19628
+
+1
+
+Yes
+
+787
+
+5
+
+No
+
+75
+
+8
+
+Refused
+
+1
+
+9
+
+Don't know
+Total
+
+1
+20492
+
+Universe : Applicable if child lives with biological father, other relatives, on own, or somewhere else, or if R did
+not know or refused to answer where child lives (BG-5 WHERENOW1 = 1, 2, 5, 6, DK, or RF)
+ANYNURSE1(143-143)
+Variable Type : Raw
+BH-1 : (When (BABY'S NAME) was an infant,) (Have/did) you breastfeed (him/her) at all? (1st child from this
+pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+7695
+
+1
+
+Yes
+
+7961
+
+5
+
+No
+
+4835
+
+8
+
+Refused
+Total
+
+1
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (prgoutcome = 1), child lived with R for at least 2
+months (lastage1 GE 2), and child is currently 18 years or younger (kidage LT 228)
+Notes : use recode BFEEDWKS
+FEDSOLID1(144-144)
+Variable Type : Raw
+BH-2 : Besides breastmilk, babies are sometimes given formula, baby food, or other liquid or solid foods. (Did
+you feed/Have you fed) [BABY'S NAME] something other than breast milk yet? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19909
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+507
+76
+20492
+
+Universe : Applicable if child is younger than 1 year (lastage1 = blank and kidage < 12) or child stopped living
+with R at age younger than 1 year (lastage1 < 12 and kidage < 12)
+
+FRSTEATD_N1(145-147)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (1st child from
+this pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12607
+
+0-994
+
+0-994
+
+7878
+
+999
+
+Don't know
+Total
+
+7
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID1 = blank or 1)
+FRSTEATD_P1(148-148)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (1st child from
+this pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12614
+
+1
+
+Months
+
+5254
+
+2
+
+Weeks
+
+1385
+
+3
+
+Days
+
+1239
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID1 = blank or 1)
+FRSTEATD1(149-150)
+Variable Type : Raw
+Description : Age (in months) when 1st supplemented - 1st from this preg (computed in Flow Check B-39b)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12614
+
+0
+
+LESS THAN 1 MONTH
+
+1917
+
+1
+
+1 MONTH
+
+1089
+
+2
+
+2 MONTHS
+
+687
+
+3
+
+3 MONTHS
+
+1075
+
+4
+
+4 MONTHS
+
+1042
+
+5
+
+5 MONTHS
+
+468
+
+6
+
+6 MONTHS
+
+994
+
+7-95
+
+7 OR MORE MONTHS
+Total
+
+606
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID1 = blank or 1)
+QUITNURS1(151-151)
+Variable Type : Raw
+BH-4 : (Have/Had) you stopped breast-feeding (her/him) altogether? (1st child from this pregnancy)
+value label
+
+Total
+
+.
+
+19268
+
+INAPPLICABLE
+
+1
+
+Yes
+
+5
+
+No
+
+958
+266
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1), child was ever fed something other
+than breastmilk (BH-2 FEDSOLID1 = blank or 1), and child is either 2 years or younger or last lived with R at
+age 2 years or younger (lastage1 LE 24 or (lastage1 = blank and kidage LE 24))
+Notes : use recode BFEEDWKS
+AGEQTNUR_N1(152-154)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (1st child from this
+pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12873
+
+0-994
+
+0-994
+
+7608
+
+996
+
+Still breastfeeding this child
+
+8
+
+998
+
+Refused
+
+1
+
+999
+
+Don't know
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS1 = blank or 1)
+Notes : use recode BFEEDWKS
+AGEQTNUR_P1(155-155)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (1st child from this
+pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12884
+
+1
+
+Months
+
+6194
+
+2
+
+Weeks
+
+1189
+
+3
+
+Days
+
+225
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS1 = blank or 1)
+Notes : use recode BFEEDWKS
+AGEQTNUR1(156-157)
+Variable Type : Raw
+Description : Age (in months) when R stopped nursing child - 1st from this preg (computed in Flow Check
+B-40_1)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12884
+
+0
+
+LESS THAN 1 MONTH OLD
+
+658
+
+1
+
+1 MONTH OLD
+
+950
+
+2
+
+2 MONTHS OLD
+
+629
+
+3
+
+3 MONTHS OLD
+
+786
+
+4-6
+
+4-6 MONTHS OLD
+
+1604
+
+7-12
+
+7-12 MONTHS OLD
+
+1976
+
+13-24
+
+13-24 MONTHS OLD
+
+867
+
+25-95
+
+25 MONTHS OR OLDER
+
+138
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE1 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS1 = blank or 1)
+Notes : use recode BFEEDWKS
+LIVEHERE2(158-158)
+Variable Type : Raw
+BG-1 : Earlier I don't think you mentioned (BABY'S NAME) when you told me who lives with you. Does (BABY'S
+NAME) still live with you? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20424
+
+1
+
+Yes
+
+5
+
+45
+
+No
+
+23
+
+Total
+
+20492
+
+Universe : Applicable if 2nd liveborn child from this pregnancy did not match any biological child reported in the
+household roster (no NAME[X] with RELAR[X]=3 from household roster matches BABYNAME2)
+ALIVENOW2(159-159)
+Variable Type : Raw
+BG-2 : Is (she/he) still living? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20469
+
+1
+
+Yes
+
+5
+
+12
+
+No
+
+11
+
+Total
+
+20492
+
+Universe : Applicable if child not living with R (BG-1 LIVEHERE2 = 5/DK/RF)
+WHENDIED_M2(160-161)
+Variable Type : Raw
+BG-3 : When did (BABY'S NAME) die? (2nd child from this pregnancy; MONTH)
+value label
+
+Total
+
+.
+
+20481
+
+1-12
+
+INAPPLICABLE
+January - December
+Total
+
+11
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW2 = 5)
+WHENDIED_Y2(162-165)
+Variable Type : Raw
+BG-3 : When did (BABY'S NAME) die? (2nd child from this pregnancy; YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20481
+
+1919-2010 1919-2010
+Total
+
+11
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW2 = 5)
+cmkidied2(166-169)
+Variable Type : Computed
+Description : Century Month for child's date of death - 2nd from this pregnancy (computed in Flow Check B-35)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20481
+
+522-1278 BEFORE JULY 2006
+
+9
+
+1279-1290 JULY 2006-JUNE 2007
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW2 = 5)
+WHENLEFT_M2(170-171)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (2nd child from this pregnancy; MONTH)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+1-12
+
+January - December
+
+15
+
+Summer
+
+11
+1
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW2 = 1/DK/RF)
+WHENLEFT_Y2(172-175)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (2nd child from this pregnancy; YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+1919-2010 1919-2010
+Total
+
+12
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW2 = 1/DK/RF)
+cmkidlft2(176-179)
+Variable Type : Computed
+Description : Century Month for date child'stopped living w/R - 2nd from this pregnancy (computed in Flow
+Check B-36)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+522-1278 BEFORE JULY 2006
+
+9
+
+1279-1290 JULY 2006-JUNE 2007
+
+2
+
+1291-1308 JULY 2007-DEC 2008
+Total
+
+1
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW2 = 1/DK/RF)
+
+lastage2(180-182)
+Variable Type : Computed
+Description : Age (in months) when child last lived w/R-2nd from this pregnancy (computed in Flow Check
+B-38)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20470
+
+0-994
+
+0-994
+
+997
+
+Not Ascertained
+
+20
+2
+
+Total
+
+20492
+
+Universe : Applicable if child no longer lives with R (BG-1 LIVEHERE2 = 5/DK/RF)
+WHERENOW2(183-183)
+Variable Type : Raw
+BG-5 : Please look at Card 19. Where does (BABY'S NAME) now live? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+1
+
+With biological father
+
+2
+
+2
+
+With other relatives
+
+6
+
+3
+
+With adoptive family
+
+3
+
+6
+
+Other
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW2 = 1/DK/RF)
+LEGAGREE2(184-184)
+Variable Type : Raw
+BG-6 : Do you and (BABY'S NAME)'s father have a legal agreement about (BABY'S NAME) regarding
+child'support, alimony, custody, visitation, or where the child lives? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20490
+
+5
+
+No
+
+1
+
+9
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if child lives with biological father (BG-5 WHERENOW2 = 1)
+PARENEND2(185-185)
+Variable Type : Raw
+BG-7 : Are you still the legal mother of (BABY'S NAME)? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20483
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+6
+3
+20492
+
+Universe : Applicable if child lives with biological father, other relatives, on own, or somewhere else, or if R did
+not know or refused to answer where child lives (BG-5 WHERENOW2 = 1, 2, 5, 6, DK, or RF)
+ANYNURSE2(186-186)
+
+Variable Type : Raw
+BH-1 : (When (BABY'S NAME) was an infant,) (Have/did) you breastfeed (him/her) at all? (2nd child from this
+pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20310
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+109
+73
+20492
+
+Universe : Applicable if pregnancy resulted in more than 1 liveborn baby (bornaliv > 2), child lived with R for at
+least 2 months (lastage2 GE 2), and child is currently 18 years or younger (kidage LT 228)
+FEDSOLID2(187-187)
+Variable Type : Raw
+BH-2 : Besides breastmilk, babies are sometimes given formula, baby food, or other liquid or solid foods. (Did
+you feed/Have you fed) [BABY'S NAME] something other than breast milk yet? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20479
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+11
+2
+20492
+
+Universe : Applicable if child is younger than 1 year (lastage2 = blank and kidage < 12) or child stopped living
+with R at age younger than 1 year (lastage2 < 12 and kidage < 12)
+FRSTEATD_N2(188-188)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (2nd child from
+this pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+20385
+
+0-994
+
+INAPPLICABLE
+0-994
+
+107
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID2 = blank or 1)
+FRSTEATD_P2(189-189)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (2nd child from
+this pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20385
+
+1
+
+Months
+
+57
+
+2
+
+Weeks
+
+21
+
+3
+
+Days
+
+29
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID2 = blank or 1)
+
+FRSTEATD2(190-190)
+Variable Type : Raw
+Description : Age (in months) when 2nd supplemented - 2nd from this preg (computed in Flow Check B-39b)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20385
+
+0
+
+LESS THAN 1 MONTH
+
+41
+
+1
+
+1 MONTH
+
+16
+
+2
+
+2 MONTHS
+
+16
+
+3
+
+3 MONTHS
+
+7
+
+4
+
+4 MONTHS
+
+8
+
+5
+
+5 MONTHS
+
+8
+
+6
+
+6 MONTHS
+
+6
+
+7-95
+
+7 OR MORE MONTHS
+
+5
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID2 = blank or 1)
+QUITNURS2(191-191)
+Variable Type : Raw
+BH-4 : (Have/Had) you stopped breast-feeding (her/him) altogether? (2nd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20462
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+27
+3
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1), child was ever fed something other
+than breastmilk (BH-2 FEDSOLID2 = blank or 1), and child is either 2 years or younger or last lived with R at
+age 2 years or younger (lastage2 LE 24 or (lastage2 = blank and kidage LE 24))
+AGEQTNUR_N2(192-193)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (2nd child from this
+pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20388
+
+0-994
+
+0-994
+
+104
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS2 = blank or 1)
+AGEQTNUR_P2(194-194)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (2nd child from this
+pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20388
+
+1
+
+Months
+
+77
+
+2
+
+Weeks
+
+3
+
+Days
+
+25
+2
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS2 = blank or 1)
+AGEQTNUR2(195-196)
+Variable Type : Raw
+Description : Age (in months) when R stopped nursing child - 2nd from this preg (computed in Flow Check
+B-40_1)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20388
+
+0
+
+LESS THAN 1 MONTH OLD
+
+11
+
+1
+
+1 MONTH OLD
+
+18
+
+2
+
+2 MONTHS OLD
+
+16
+
+3
+
+3 MONTHS OLD
+
+15
+
+4-6
+
+4-6 MONTHS OLD
+
+20
+
+7-12
+
+7-12 MONTHS OLD
+
+19
+
+13-24
+
+13-24 MONTHS OLD
+
+4
+
+25-95
+
+25 MONTHS OR OLDER
+Total
+
+1
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE2 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS2 = blank or 1)
+LIVEHERE3(197-197)
+Variable Type : Raw
+BG-1 : Earlier I don't think you mentioned (BABY'S NAME) when you told me who lives with you. Does (BABY'S
+NAME) still live with you? (3rd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20489
+
+1
+
+Yes
+
+2
+
+5
+
+No
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if 3rd liveborn child from this pregnancy did not match any biological child reported in the
+household roster (no NAME[X] with RELAR[X]=3 from household roster matches BABYNAME3)
+ALIVENOW3(198-198)
+Variable Type : Raw
+BG-2 : Is (she/he) still living? (3rd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+5
+
+No
+Total
+
+1
+20492
+
+Universe : Applicable if child not living with R (BG-1 LIVEHERE3 = 5/DK/RF)
+WHENDIED_M3(199-199)
+Variable Type : Raw
+
+BG-3 : When did (BABY'S NAME) die? (3rd child from this pregnancy; MONTH)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+1-12
+
+January - December
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW3 = 5)
+WHENDIED_Y3(200-203)
+Variable Type : Raw
+BG-3 : When did (BABY'S NAME) die? (3rd child from this pregnancy; YEAR)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+1919-2010 1919-2010
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW3 = 5)
+cmkidied3(204-207)
+Variable Type : Computed
+Description : Century Month for child's date of death - 3rd from this pregnancy (computed in Flow Check B-35)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+1279-1290 JULY 2006-JUNE 2007
+Total
+
+1
+20492
+
+Universe : Applicable if child died (BG-2 ALIVENOW3 = 5)
+WHENLEFT_M3(208-208)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (3rd child from this pregnancy; MONTH)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW3 = 1/DK/RF)
+WHENLEFT_Y3(209-209)
+Variable Type : Raw
+BG-4 : When did (BABY'S NAME) stop living with you? (3rd child from this pregnancy; YEAR)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW3 = 1/DK/RF)
+cmkidlft3(210-210)
+Variable Type : Computed
+
+Description : Century Month for date child'stopped living w/R - 3rd from this pregnancy (computed in Flow
+Check B-36)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW3 = 1/DK/RF)
+lastage3(211-211)
+Variable Type : Computed
+Description : Age (in months) when child last lived w/R-3rd from this pregnancy (computed in Flow Check
+B-38)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+0-994
+
+0-994
+
+1
+
+Total
+
+20492
+
+Universe : Applicable if child no longer lives with R (BG-1 LIVEHERE3 = 5/DK/RF)
+WHERENOW3(212-212)
+Variable Type : Raw
+BG-5 : Please look at Card 19. Where does (BABY'S NAME) now live? (3rd child from this pregnancy)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child stopped living with R (BG-2 ALIVENOW3 = 1/DK/RF)
+LEGAGREE3(213-213)
+Variable Type : Raw
+BG-6 : Do you and (BABY'S NAME)'s father have a legal agreement about (BABY'S NAME) regarding
+child'support, alimony, custody, visitation, or where the child lives? (3rd child from this pregnancy)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child lives with biological father (BG-5 WHERENOW3 = 1)
+PARENEND3(214-214)
+Variable Type : Raw
+BG-7 : Are you still the legal mother of (BABY'S NAME)? (3rd child from this pregnancy)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child lives with biological father, other relatives, on own, or somewhere else, or if R did
+not know or refused to answer where child lives (BG-5 WHERENOW3 = 1, 2, 5, 6, DK, or RF)
+ANYNURSE3(215-215)
+
+Variable Type : Raw
+BH-1 : (When (BABY'S NAME) was an infant,) (Have/did) you breastfeed (him/her) at all? (3rd child from this
+pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20487
+
+1
+
+Yes
+
+5
+
+No
+Total
+
+4
+1
+20492
+
+Universe : Applicable if pregnancy ended with more than 2 liveborn babies (bornaliv > 2), child lived with R for
+at least 2 months (lastage3 GE 2), and child is currently 18 years or younger (kidage LT 228)
+FEDSOLID3(216-216)
+Variable Type : Raw
+BH-2 : Besides breastmilk, babies are sometimes given formula, baby food, or other liquid or solid foods. (Did
+you feed/Have you fed) [BABY'S NAME] something other than breast milk yet? (3rd child from this pregnancy)
+value label
+.
+
+Total
+
+INAPPLICABLE
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable if child is younger than 1 year (lastage3 = blank and kidage < 12) or child stopped living
+with R at age younger than 1 year (lastage3 < 12 and kidage < 12)
+FRSTEATD_N3(217-217)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (3rd child from
+this pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+0-994
+
+0-994
+
+4
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID3 = blank or 1)
+FRSTEATD_P3(218-218)
+Variable Type : Raw
+BH-3 : How old was (she/he) when you first fed (her/him) something other than breast milk? (3rd child from
+this pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+2
+
+Weeks
+
+3
+
+Days
+
+3
+
+Total
+
+20492
+
+1
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID3 = blank or 1)
+FRSTEATD3(219-219)
+Variable Type : Raw
+
+BH-3 : Age (in months) when 3rd supplemented - 3rd from this preg (computed in Flow Check B-39b)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+0
+
+LESS THAN 1 MONTH
+
+1
+
+1 MONTH
+
+3
+1
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and child was ever fed something
+other than breastmilk (BH-2 FEDSOLID3 = blank or 1)
+QUITNURS3(220-220)
+Variable Type : Raw
+BH-4 : (Have/Had) you stopped breast-feeding (her/him) altogether? (3rd child from this pregnancy)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20491
+
+1
+
+Yes
+Total
+
+1
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1), child was ever fed something other
+than breastmilk (BH-2 FEDSOLID3 = blank or 1), and child is either 2 years or younger or last lived with R at
+age 2 years or younger (lastage3 LE 24 or (lastage3 = blank and kidage LE 24))
+AGEQTNUR_N3(221-222)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (3rd child from this
+pregnancy; NUMBER)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+0-994
+
+0-994
+
+4
+
+Total
+
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS3 = blank or 1)
+AGEQTNUR_P3(223-223)
+Variable Type : Raw
+BH-5 : How old was (she/he) when you stopped breast-feeding (her/him) altogether? (3rd child from this
+pregnancy; UNITS)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+1
+
+Months
+
+2
+
+Weeks
+
+2
+
+Total
+
+20492
+
+2
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS3 = blank or 1)
+AGEQTNUR3(224-225)
+Variable Type : Raw
+Description : Age (in months) when R'stopped nursing child - 3rd from this preg (computed in Flow Check
+
+B-40_1)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20488
+
+1
+
+1 MONTH OLD
+
+1
+
+2
+
+2 MONTHS OLD
+
+1
+
+3
+
+3 MONTHS OLD
+
+1
+
+7-12
+
+7-12 MONTHS OLD
+Total
+
+1
+20492
+
+Universe : Applicable if child was ever breastfed (BH-1 ANYNURSE3 = 1) and R has stopped breastfeeding child
+altogether (BH-4 QUITNURS3 = blank or 1)
+prgoutcome(226-226)
+Variable Type : Computed
+Description : Outcome of Pregnancy (based on priority ordering) (computed in Flow Check B-42a)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+1
+
+LIVE BIRTH
+
+14286
+
+12
+
+2
+
+PREGNANCY LOSS OR ABORTION
+
+5678
+
+3
+
+CURRENT PREGNANCY
+
+516
+
+Total
+
+20492
+
+Universe : Applicable if this is a current pregnancy or R reported any pregnancy outcome for this pregnancy
+((BC-1 PREGEND1 = 1-6) or (BC-1b HOWENDDK = 1 or 5))
+Notes : use recode OUTCOME
+outcom_s(227-227)
+Variable Type : Computed
+Description : Outcome of pregnancy (based on corrected/chron sorted data) (computed in Flow Check B-42d)
+value label
+
+Total
+
+1
+
+LIVE BIRTH
+
+14290
+
+2
+
+PREGNANCY LOSS OR ABORTION
+
+5684
+
+3
+
+CURRENT PREGNANCY
+
+516
+
+7
+
+Not Ascertained
+
+2
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+Notes : use recode OUTCOME
+nbrnlv_s(228-228)
+Variable Type : Computed
+Description : Number of babies born alive from this pregnancy (based on corrected/chron sorted data)
+(computed in Flow Check B-42d)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6199
+
+1
+
+1 BABY
+
+14085
+
+2
+
+2 BABIES
+
+200
+
+3-6
+
+3 OR MORE BABIES
+Total
+
+8
+20492
+
+Universe : Applicable if pregnancy resulted in live birth (outcom_s = 1)
+cmprgend(229-232)
+Variable Type : Computed
+Description : Century Month for Pregnancy End Date (regardless of outcome) (computed in Flow Check B-42a)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+529
+
+522-1278 BEFORE JULY 2006
+
+17206
+
+1279-1290 JULY 2006-JUNE 2007
+
+1127
+
+1291-1308 JULY 2007-DEC 2008
+
+1192
+
+1309-1326 JAN 2009-JUN 2010
+
+352
+
+9998
+
+Refused
+
+7
+
+9999
+
+Don't know
+
+79
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (prgoutcome = 1 or 2)
+Notes : use recode DATEND
+cmendp_s(233-236)
+Variable Type : Computed
+Description : Century Month for Pregnancy End Date (regardless of outcome) (based on corrected/chron
+sorted data) (computed in Flow Check B-42d)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+519
+
+522-1278 BEFORE JULY 2006
+
+17211
+
+1279-1290 JULY 2006-JUNE 2007
+
+1131
+
+1291-1308 JULY 2007-DEC 2008
+
+1193
+
+1309-1326 JAN 2009-JUN 2010
+
+352
+
+9998
+9999
+
+Refused
+
+7
+
+Don't know
+Total
+
+79
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (outcom_s = 1 or 2)
+Notes : use recode DATEND
+cmprgbeg(237-240)
+Variable Type : Computed
+Description : Century Month for Pregnancy Begin Date (regardless of outcome) (computed in Flow Check
+B-42a)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+13
+
+522-1278 BEFORE JULY 2006
+
+17958
+
+1279-1290 JULY 2006-JUNE 2007
+
+1069
+
+1291-1308 JULY 2007-DEC 2008
+
+1087
+
+1309-1326 JAN 2009-JUN 2010
+
+270
+
+9998
+
+Refused
+
+8
+
+9999
+
+Don't know
+
+87
+
+Total
+
+20492
+
+Universe : Applicable if R reported an end date for this completed pregnancy (cmprgend ne .) and reported a
+gestational length, either for this completed or current pregnancy ((prgoutcome = 1 or 2 and mosgest ne .) or
+
+(prgoutcome = 3 and moscurrp ne .))
+Notes : use recode DATECON
+cmpbeg_s(241-244)
+Variable Type : Computed
+Description : Century Month for Pregnancy Begin Date (regardless of outcome) (based on corrected/chron
+sorted data) (computed in Flow Check B-42d)
+value
+
+label
+
+Total
+
+522-1278 BEFORE JULY 2006
+
+17961
+
+1279-1290 JULY 2006-JUNE 2007
+
+1073
+
+1291-1308 JULY 2007-DEC 2008
+
+1086
+
+1309-1326 JAN 2009-JUN 2010
+
+270
+
+9997
+
+Not Ascertained
+
+4
+
+9998
+
+Refused
+
+11
+
+9999
+
+Don't know
+Total
+
+87
+20492
+
+Universe : Applicable for all pregnancies
+Notes : use recode DATECON
+cmlastlb(245-248)
+Variable Type : Computed
+Description : Century Month for R's most recent live birth (based on corrected/chron sorted data) (computed in
+Flow Check B-42d; respondent variable)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+1254
+
+522-1278 BEFORE JULY 2006
+
+14531
+
+1279-1290 JULY 2006-JUNE 2007
+
+1928
+
+1291-1308 JULY 2007-DEC 2008
+
+2069
+
+1309-1326 JAN 2009-JUN 2010
+
+675
+
+9998
+
+Refused
+
+6
+
+9999
+
+Don't know
+
+29
+
+Total
+
+20492
+
+Universe : Applicable if R has ever had a live birth (nbabes_s = 1) (respondent-level variable)
+cmlstprg(249-252)
+Variable Type : Computed
+Description : Century Month for R's most recent completed pregnancy (based on corrected/chron sorted data)
+(computed in Flow Check B-42d; respondent variable)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+172
+
+522-1278 BEFORE JULY 2006
+
+13984
+
+1279-1290 JULY 2006-JUNE 2007
+
+2307
+
+1291-1308 JULY 2007-DEC 2008
+
+2759
+
+1309-1326 JAN 2009-JUN 2010
+
+1071
+
+9998
+
+Refused
+
+10
+
+9999
+
+Don't know
+
+189
+
+Total
+
+20492
+
+Universe : Applicable if R has ever had a completed pregnancy ((npregs_s = 1 and currpreg = 5) or (npregs_s
+
+> 1)) (respondent-level variable)
+cmfstprg(253-256)
+Variable Type : Computed
+Description : Century Month for R's first completed pregnancy (based on corrected/chron sorted data)
+(computed in Flow Check B-42d; respondent variable)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+172
+
+522-1278 BEFORE JULY 2006
+
+19288
+
+1279-1290 JULY 2006-JUNE 2007
+
+519
+
+1291-1308 JULY 2007-DEC 2008
+
+423
+
+1309-1326 JAN 2009-JUN 2010
+
+74
+
+9998
+
+Refused
+
+6
+
+9999
+
+Don't know
+
+10
+
+Total
+
+20492
+
+Universe : Applicable if R has ever had a completed pregnancy ((npregs_s = 1 and currpreg = 5) or (npregs_s
+> 1)) (respondent-level variable)
+cmpg1beg(257-260)
+Variable Type : Computed
+Description : Century Month when R's first pregnancy began (based on corrected/chron sorted data)
+(computed in Flow Check B-42d; respondent variable)
+value
+
+label
+
+Total
+
+522-1278 BEFORE JULY 2006
+
+19626
+
+1279-1290 JULY 2006-JUNE 2007
+
+403
+
+1291-1308 JULY 2007-DEC 2008
+
+303
+
+1309-1326 JAN 2009-JUN 2010
+
+60
+
+9997
+
+Not Ascertained
+
+47
+
+9998
+
+Refused
+
+5
+
+9999
+
+Don't know
+
+48
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Notes : use recode DATCON01 on resp file or DATECON on preg file where PREGORDR=1
+Pregnancy File :: Section :: Section E raw variables
+cmintstr(261-264)
+Variable Type : Computed
+Description : Century Month for date of beginning of pregnancy interval (computed in Flow Check E-68)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+541
+
+522-1278 BEFORE JULY 2006
+
+19169
+
+1279-1290 JULY 2006-JUNE 2007
+
+370
+
+1291-1308 JULY 2007-DEC 2008
+
+242
+
+1309-1326 JAN 2009-JUN 2010
+
+11
+
+9997
+
+Not Ascertained
+
+2
+
+9998
+
+Refused
+
+44
+
+9999
+
+Don't know
+Total
+
+113
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (outcom_s = 1 or 2)
+cmintfin(265-268)
+Variable Type : Computed
+Description : Century Month for date of end of pregnancy interval (computed in Flow Check E-68)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+553
+
+522-1278 BEFORE JULY 2006
+
+17180
+
+1279-1290 JULY 2006-JUNE 2007
+
+1130
+
+1291-1308 JULY 2007-DEC 2008
+
+1191
+
+1309-1326 JAN 2009-JUN 2010
+
+352
+
+9998
+
+Refused
+
+7
+
+9999
+
+Don't know
+
+79
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (outcom_s = 1 or 2)
+cmintstrop(269-272)
+Variable Type : Computed
+Description : Open interval: Century Month of date of beginning (computed in Flow Check E-68)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+194
+
+522-1278 BEFORE JULY 2006
+
+14086
+
+1279-1290 JULY 2006-JUNE 2007
+
+2321
+
+1291-1308 JULY 2007-DEC 2008
+
+2755
+
+1309-1326 JAN 2009-JUN 2010
+
+1071
+
+9998
+
+Refused
+
+6
+
+9999
+
+Don't know
+
+59
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is R's highest-order completed pregnancy ((pregordr = npregs_s and
+currpreg = 5) or (pregordr = (npregs_s - 1) and currpreg = 1))
+cmintfinop(273-276)
+Variable Type : Computed
+Description : Open interval: Century Month of date of end (month of interview) (computed in Flow Check E-68)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+139
+
+522-1278 BEFORE JULY 2006
+
+102
+
+1279-1290 JULY 2006-JUNE 2007
+
+5035
+
+1291-1308 JULY 2007-DEC 2008
+
+6991
+
+1309-1326 JAN 2009-JUN 2010
+
+8225
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is R's highest-order completed pregnancy ((pregordr = npregs_s and
+currpreg = 5) or (pregordr = (npregs_s - 1) and currpreg = 1))
+cmintstrcr(277-280)
+Variable Type : Computed
+Description : Currently pregnant: Century Month of date of beginning of interval (computed in Flow Check
+E-68)
+
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19072
+
+522-1278 BEFORE JULY 2006
+
+861
+
+1279-1290 JULY 2006-JUNE 2007
+
+225
+
+1291-1308 JULY 2007-DEC 2008
+
+250
+
+1309-1326 JAN 2009-JUN 2010
+
+81
+
+9998
+
+Refused
+
+1
+
+9999
+
+Don't know
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a current pregnancy (outcom_s = 3)
+cmintfincr(281-284)
+Variable Type : Computed
+Description : Currently pregnant: Century Month of date of end of interval (month of interview) (computed in
+Flow Check E-68)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19068
+
+522-1278 BEFORE JULY 2006
+
+2
+
+1279-1290 JULY 2006-JUNE 2007
+
+381
+
+1291-1308 JULY 2007-DEC 2008
+
+500
+
+1309-1326 JAN 2009-JUN 2010
+
+541
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a current pregnancy (outcom_s = 3)
+anyusint(285-285)
+Variable Type : Computed
+Description : Any method used in pregnancy interval? (computed in Flow Check E-69)
+value label Total
+1
+
+Yes
+
+6057
+
+5
+
+No
+
+14435
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+EVUSEINT(286-286)
+Variable Type : Raw
+EG-1 : Did you ever use any method of birth control between (your first intercourse/[BABY NAME's] birth in
+[DATE]/your [Nth] pregnancy which ended in [DATE]) and (DATE OF Nth+1 pregnancy end)/[BABY NAME's]
+birth)? Remember to include methods men use--that is condoms, vasectomy, and withdrawal--in your answer.
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+4456
+
+1
+
+Yes
+
+11719
+
+5
+
+No
+
+4282
+
+8
+
+Refused
+
+9
+
+9
+
+Don't know
+
+26
+
+Total
+
+20492
+
+Universe : Applicable if R did not know or refused to answer pregnancy beginning date and ever used a method
+(cmpbeg_s = DK/RF and everused = 1 or . ) or pregnancy began prior to January [YEAR OF INTERVIEW - 3]
+(cmpbeg_s < cmjan3yr) and date of first method use was unknown/refused or date of first sex was
+
+unknown/refused (cmfirsm = DK/RF or cmintstr = DK/RF) or if first method use preceded start of pregnancy
+interval (cmfirsm < cmintstr) (note: if first method use was within pregnancy interval, EVUSEINT is set to "yes"
+(if cmintstr <= cmfirsm <= cmintfin, EVUSEINT = 1)
+STOPDUSE(287-287)
+Variable Type : Raw
+EG-2 : Before you became pregnant (with your (NTH) pregnancy which ended in [DATE of Nth pregnancy
+end]/this time), had you stopped using all methods of birth control?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+8195
+
+1
+
+Yes
+
+7215
+
+5
+
+No
+
+5063
+
+8
+
+Refused
+
+2
+
+9
+
+Don't know
+
+17
+
+Total
+
+20492
+
+Universe : Applicable if [pregnancy began prior to January [YEAR OF INTERVIEW - 3] (cmpbeg_s < cmjan3yr)
+and first method use was within pregnancy interval (between 1st sex/previous pregnancy end and end of this
+pregnancy) (cmintstr <= cmfirsm <= cmintfin)] or [pregnancy began on or after Jan [YEAR OF INTERVIEW 3] (cmpbeg_s >= cmjan3yr) and R used a method in month pregnancy began (ED-6 METHX1 through
+METHX192 corresponding to cmpbeg_s NE 1) and did not use a method in month after pregnancy began (ED-6
+METHX1 through METHX192 corresponding to cmpbeg_s + 1 = 1) ] or R used a method in the month
+pregnancy began and also in the month after pregnancy began, but they were different methods (ED-6
+METHX1 - METHX192 for cmpbeg_s ne 1 and ED-6 METHX1 - METHX192 for cmpbeg_s + 1 ne 1 and ne
+method for cmpbeg_s) or R used a method within pregnancy interval (between 1st sex/previous pregnancy
+end and end of this pregnancy) (EG-1 EVUSEINT = 1)
+WHYSTOPD(288-288)
+Variable Type : Raw
+EG-3 : Was the reason you stopped using all methods of birth control because you yourself wanted to become
+pregnant?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+13277
+
+1
+
+Yes
+
+4282
+
+5
+
+No
+
+2927
+
+9
+
+Don't know
+Total
+
+6
+20492
+
+Universe : Applicable if R stopped using all methods before becoming pregnant (EG-2 STOPDUSE = 1)
+WHATMETH01(289-290)
+Variable Type : Raw
+EG-4 : You may have already told me, but looking at Card 38, what methods were you using at the time you
+became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time)? (1st mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14418
+
+1
+
+No method used
+
+489
+
+3
+
+Birth control pills
+
+2042
+
+4
+
+Condom
+
+1985
+
+5
+
+Partner's vasectomy
+
+6
+
+Female sterilizing operation, such as tubal sterilization and hysterectomy
+
+14
+33
+
+7
+
+Withdrawal, pulling out
+
+743
+
+8
+
+Depo-Provera, injectables
+
+259
+
+9
+
+Hormonal implant (Norplant or Implanon)
+
+14
+
+10
+
+Rhythm or safe period by calendar
+
+131
+
+11
+
+Safe period by temperature or cervical mucus test, natural family planning
+
+25
+
+12
+
+Diaphragm
+
+30
+
+13
+
+Female condom, vaginal pouch
+
+2
+
+14
+
+Foam
+
+34
+
+15
+
+Jelly or cream
+
+16
+
+17
+
+Suppository, insert
+
+16
+
+18
+
+Today sponge
+
+22
+
+19
+
+IUD, coil, or loop
+
+57
+
+20
+
+Emergency contraception
+
+5
+
+21
+
+Other method
+
+6
+
+22
+
+Respondent was sterile
+
+1
+
+23
+
+Respondent's partner was sterile
+
+3
+
+24
+
+Lunelle injectable (monthly shot)
+
+12
+
+25
+
+Contraceptive patch
+
+92
+
+26
+
+Vaginal contraceptive ring
+
+35
+
+98
+
+Refused
+
+2
+
+99
+
+Don't know
+Total
+
+6
+20492
+
+Universe : Applicable if (pregnancy began on or after January[YEAR OF INTERVIEW-3 (cmpbeg_s >=
+cmjan3yr) and R used a method in the month pregnancy began (ED-6 METHX1 -- METHX192 corresponding to
+cmpbeg_s NE 1) and also in the month after pregnancy began, and it was the same method in both months
+(ED-6 METHX1 -- METHX192 corresponding to cmpbeg_s + 1 NE 1 and is equal to method for cmpbeg_s) or R
+had not stopped using all methods before becoming pregnant, or responded "don't know" or "refused" (EG-2
+STOPDUSE = 5 / DK/ RF)
+WHATMETH02(291-292)
+Variable Type : Raw
+EG-4 : You may have already told me, but looking at Card 38, what methods were you using at the time you
+became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time)? (2nd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19546
+
+1
+
+No method used
+
+3
+
+3
+
+Birth control pills
+
+39
+
+4
+
+Condom
+
+327
+
+5
+
+Partner's vasectomy
+
+6
+
+Female sterilizing operation, such as tubal sterilization and hysterectomy
+
+7
+
+Withdrawal, pulling out
+
+357
+
+8
+
+Depo-Provera, injectables
+
+30
+
+9
+
+Hormonal implant (Norplant or Implanon)
+
+1
+
+10
+
+Rhythm or safe period by calendar
+
+59
+
+11
+
+Safe period by temperature or cervical mucus test, natural family planning
+
+15
+
+12
+
+Diaphragm
+
+8
+
+13
+
+Female condom, vaginal pouch
+
+2
+
+14
+
+Foam
+
+33
+
+15
+
+Jelly or cream
+
+13
+
+16
+
+Cervical cap
+
+1
+
+17
+
+Suppository, insert
+
+12
+
+18
+
+Today sponge
+
+11
+
+19
+
+IUD, coil, or loop
+
+3
+
+20
+
+Emergency contraception
+
+3
+
+2
+5
+
+21
+
+Other method
+
+7
+
+25
+
+Contraceptive patch
+
+15
+
+Total
+
+20492
+
+Universe : Applicable if more than 1 method was being used before R became pregnant this time (see EG-4
+WHATMETH01)
+WHATMETH03(293-294)
+Variable Type : Raw
+EG-4 : You may have already told me, but looking at Card 38, what methods were you using at the time you
+became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time)? (3rd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20386
+
+3
+
+Birth control pills
+
+5
+
+4
+
+Condom
+
+6
+
+5
+
+Partner's vasectomy
+
+1
+
+7
+
+Withdrawal, pulling out
+
+31
+
+8
+
+Depo-Provera, injectables
+
+2
+
+9
+
+Hormonal implant (Norplant or Implanon)
+
+2
+
+10
+
+Rhythm or safe period by calendar
+
+16
+
+11
+
+Safe period by temperature or cervical mucus test, natural family planning
+
+3
+
+12
+
+Diaphragm
+
+3
+
+13
+
+Female condom, vaginal pouch
+
+1
+
+14
+
+Foam
+
+9
+
+15
+
+Jelly or cream
+
+7
+
+16
+
+Cervical cap
+
+1
+
+17
+
+Suppository, insert
+
+3
+
+18
+
+Today sponge
+
+8
+
+19
+
+IUD, coil, or loop
+
+1
+
+20
+
+Emergency contraception
+
+3
+
+21
+
+Other method
+
+2
+
+25
+
+Contraceptive patch
+
+2
+
+Total
+
+20492
+
+Universe : Applicable if more than 2 methods were being used before R became pregnant this time (see EG-4
+WHATMETH01)
+WHATMETH04(295-296)
+Variable Type : Raw
+EG-4 : You may have already told me, but looking at Card 38, what methods were you using at the time you
+became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time)? (4th mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+3
+
+Birth control pills
+
+1
+
+4
+
+Condom
+
+2
+
+7
+
+Withdrawal, pulling out
+
+1
+
+10
+
+Rhythm or safe period by calendar
+
+2
+
+12
+
+Diaphragm
+
+1
+
+15
+
+Jelly or cream
+
+1
+
+17
+
+Suppository, insert
+
+3
+
+18
+
+Today sponge
+Total
+
+1
+20492
+
+Universe : Applicable if more than 3 methods were being used before R became pregnant this time (see EG-4
+WHATMETH01)
+RESNOUSE(297-297)
+Variable Type : Raw
+
+EG-5 : (IF R NEVER USED A METHOD:) Before you became pregnant (with your (NTH) pregnancy which ended
+in (DATE)/this time), was the reason you did not use any birth control methods because you, yourself, wanted
+to become pregnant?
+(IF USED A METHOD BETWEEN FIRST SEX/LAST PREGNANCY AND THIS ONE:) You told me you had stopped
+using a birth control method before you became pregnant (with your (NTH) pregnancy which ended in
+(DATE)/this time). Was the reason you had stopped using any methods because you yourself wanted to
+become pregnant?
+(IF DID NOT USE A METHOD BETWEEN FIRST SEX/LAST PREGNANCY AND THIS ONE:) You did not use any
+method of birth control from (your first intercourse/[BABY NAME's] birth in [DATE]/your [Nth] pregnancy which
+ended in [DATE]) until you became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time).
+Was the reason you were not using any methods because you yourself wanted to become pregnant?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+13421
+
+1
+
+Yes
+
+3421
+
+5
+
+No
+
+3593
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+13
+44
+20492
+
+Universe : Applicable if R did not know or refused to answer pregnancy beginning date and never used a
+method of birth control (cmpbeg_s = DK/RF and everused = 5) or [pregnancy began prior to January[YEAR OF
+INTERVIEW - 3] (cmpbeg_s < cmjan3yr) and R has never used a method of birth control (everused = 5) or R's
+first method use was after the end of the pregnancy (cmintfin < cmfirsm)] or [pregnancy began on or after
+January[YEAR OF INTERVIEW - 3] (cmpbeg_s < cmjan3yr) and R did not use a method in the month
+pregnancy began (ED-6 METHX1 through METHX192 corresponding to cmpbeg_s = 1) or R did not use a
+method within pregnancy interval (between 1st sex/previous pregnancy end and end of this pregnancy) or
+responded "don't know" or "refused" (EG-1 EVUSEINT = 5,DK,RF)]
+WANTBOLD(298-298)
+Variable Type : Raw
+EG-6 : Right before you became pregnant (with your (NTH) pregnancy which ended in (DATE)/this time), did
+you yourself want to have a(nother) baby at any time in the future?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+7703
+
+1
+
+Yes
+
+8537
+
+5
+
+No
+
+3871
+
+6
+
+Not sure, Don't know
+
+351
+
+8
+
+Refused
+
+10
+
+9
+
+Don't know
+
+20
+
+Total
+
+20492
+
+Universe : Applicable if R responded "no" to whether she stopped using all methods of birth control because
+she wanted to become pregnant (EG-3 WHYSTOPD = 5) or R responded "no" to whether the reason she did
+not use a method in the pregnancy interval was because she wanted to become pregnant (EG-5 RESNOUSE =
+5)
+Notes : see recode WANTRESP
+PROBBABE(299-299)
+Variable Type : Raw
+EG-7 : It is sometimes difficult to recall these things but, right before (this/that) pregnancy began, would you
+say you probably wanted a(nother) baby at some time in the future or probably not?
+value label
+
+Total
+
+.
+
+20111
+
+INAPPLICABLE
+
+1
+
+Probably yes
+
+208
+
+5
+
+Probably not
+
+87
+
+6
+
+Didn't care
+
+53
+
+8
+
+Refused
+
+11
+
+9
+
+Don't know
+
+22
+
+Total
+
+20492
+
+Universe : Applicable if R responded "not sure, don't know" about wanting a(nother) baby at any time in the
+future (EG-6 WANTBOLD = 6)
+CNFRMNO(300-300)
+Variable Type : Raw
+EG-8 : So right before you became pregnant (this time/that time), you thought you did not want to have (any
+children/a Nth child from this pregnancy) at any time in the future, is that correct?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20421
+
+1
+
+Correct
+
+2
+
+Incorrect
+Total
+
+64
+7
+20492
+
+Universe : Applicable if R is younger than 20 years (age_r < 20) and: R responded "no" about wanting
+a(nother) baby at any time in the future (EG-6 WANTBOLD = 6) or R responded "probably not" about whether
+she probably wanted or didn't want a(nother) baby at some time in the future (EG-7 PROBBABE = 5)
+WANTBLD2(301-301)
+Variable Type : Raw
+EG-9 : Right before you became pregnant (with your (Nth) pregnancy (which ended in (DATE)/this time), did
+you yourself want to have a(nother) baby at any time in the future?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20485
+
+1
+
+Yes
+
+6
+
+Not sure, Don't know
+
+6
+
+Total
+
+1
+20492
+
+Universe : Applicable if question confirming that R did not want to have a(nother) child at any time was
+answered "incorrect" or "don't know" or "refused" (EG-8 CNFRMNO = 5 or DK/RF)
+TIMINGOK(302-302)
+Variable Type : Raw
+EG-10 : So would you say you became pregnant too soon, at about the right time, or later than you wanted?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+4038
+
+1
+
+Sooner
+
+6402
+
+2
+
+Right time
+
+8637
+
+3
+
+Later
+
+1213
+
+4
+
+Didn't care
+
+184
+
+9
+
+Don't know
+Total
+
+18
+20492
+
+Universe : Applicable if R responded "yes" to whether she stopped using all methods of birth control because
+she wanted to become pregnant (EG-3 WHYSTOPD = 1) or R responded "yes" to whether the reason she did
+not use a method in the pregnancy interval was because she wanted to become pregnant (EG-5 RESNOUSE =
+
+1) or R responded "yes" to whether, right before pregnancy, she wanted to have a baby at any time in the
+future (EG-6 WANTBOLD = 1) or R responded "probably yes" to whether, right before pregnancy, she probably
+wanted to have a baby at some time in the future (EG-7 PROBBABE = 1) or R responded "yes" to the second
+time she was asked whether, right before pregnancy, she wanted to have a baby at any time in the future (EG-9
+WANTBLD2 = 1)
+Notes : use recode WANTRESP
+TOOSOON_N(303-305)
+Variable Type : Raw
+EG-11 : How much sooner than you wanted did you become pregnant? (number of months or years)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14090
+
+1-100
+
+1-100
+
+6248
+
+998
+
+Refused
+
+999
+
+Don't know
+Total
+
+7
+147
+20492
+
+Universe : Applicable if R said she became pregnant "too soon" (EG-10 TIMINGOK = 1)
+TOOSOON_P(306-306)
+Variable Type : Raw
+EG-11 : (How much sooner than you wanted did you become pregnant?) (unit -- months or years)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14090
+
+1
+
+Months
+
+575
+
+2
+
+Years
+
+5710
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+7
+110
+20492
+
+Universe : Applicable if R said she became pregnant "too soon" (EG-10 TIMINGOK = 1)
+WTHPART1(307-307)
+Variable Type : Raw
+EG-12a : Right before (the/this/that) pregnancy, did you want to have a(nother) baby with that partner? Would
+you say definitely yes, probably yes, probably no, or definitely no?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+10589
+
+1
+
+Definitely yes
+
+8402
+
+2
+
+Probably yes
+
+894
+
+3
+
+Probably no
+
+258
+
+4
+
+Definitely no
+
+336
+
+9
+
+Don't know
+Total
+
+13
+20492
+
+Universe : Applicable if R responded that she became pregnant at the "right time" or "later" than she wanted
+(EG-10 TIMINGOK = 2 or 3) or R responded "didn't care " to whether she probably wanted a(nother) baby at
+some time in the future (EG-7 PROBBABE = 6)
+WTHPART2(308-308)
+Variable Type : Raw
+
+EG-12b : Right before (the/this/that) pregnancy, did you think you might ever want to have a(nother) baby
+with that partner? Would you say definitely yes, probably yes, probably no, or definitely no?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+9903
+
+1
+
+Definitely yes
+
+3646
+
+2
+
+Probably yes
+
+2032
+
+3
+
+Probably no
+
+1452
+
+4
+
+Definitely no
+
+3398
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+10
+51
+20492
+
+Universe : Applicable if R responded that she became pregnant "too soon" or "didn't care" about the timing or
+"don't know" or "refused" (EG-10 TIMINGOK = 1 or 4 or DK/RF) or R responded "no" or "don't know" or
+"refused" to whether she probably wanted a(nother) baby at some time in the future (EG-7 PROBBABE = 6) or
+R responded "no", "not sure", "don't know" or "refused" to whether, right before pregnancy, she wanted to
+have a baby at any time in the future (EG-6 WANTBOLD NE 1) or R responded "probably not", "didn't care ",
+"Don't know" or "refused" to whether she probably wanted a(nother) baby at some time in the future (EG-7
+PROBBABE NE 1) or R responded "no", "not sure", "didn't care", "don't know" or "refused" to the second time
+she was asked whether, right before pregnancy, she wanted to have a baby at any time in the future (EG-9
+WANTBLD2 NE 1)
+FEELINPG(309-310)
+Variable Type : Raw
+EG-13 : Please look at the scale on Card 39. On this scale, a one means that you were very unhappy to be
+pregnant and a ten means that you were very happy to be pregnant. Tell me which number on the card best
+describes how you felt when you found out you were pregnant.
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15363
+
+1
+
+VERY UNHAPPY
+
+666
+
+2
+
+2
+
+125
+
+3
+
+3
+
+213
+
+4
+
+4
+
+177
+
+5
+
+5
+
+469
+
+6
+
+6
+
+210
+
+7
+
+7
+
+304
+
+8
+
+8
+
+391
+
+9
+
+9
+
+286
+
+10
+
+VERY HAPPY
+
+2256
+
+98
+
+REFUSED
+
+1
+
+99
+
+DON'T KNOW
+
+31
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended on or after January [YEAR OF INTERVIEW - 3] (cmendp_s GE
+cmjan3yr)
+HPWNOLD(311-311)
+Variable Type : Raw
+EG-16 : Right before you became pregnant (this time/that (Nth) time,) did the father want you to have
+a(nother) baby at any time in the future?
+value label
+
+Total
+
+1
+
+Yes
+
+14813
+
+5
+
+No
+
+4384
+
+6
+
+Not sure, Don't know
+
+1249
+
+8
+
+Refused
+
+9
+
+Don't know
+
+13
+33
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+TIMOKHP(312-312)
+Variable Type : Raw
+EG-17 : So would you say you became pregnant sooner than he wanted, at about the right time, or later than
+he wanted?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+5679
+
+1
+
+Sooner
+
+3852
+
+2
+
+Right time
+
+9505
+
+3
+
+Later
+
+1102
+
+4
+
+Didn't care
+
+308
+
+9
+
+Don't know
+
+46
+
+Total
+
+20492
+
+Universe : Applicable if R responded "yes" to whether father of pregnancy wanted her to have baby at any time
+in the future (EG-16 HPWNOLD = 1)
+Notes : use recode WANTPART
+COHPBEG(313-313)
+Variable Type : Raw
+EG-18a : Were you either married to or living with the father of (the pregnancy/this pregnancy/your (Nth)
+pregnancy which ended in (DATE)) at the beginning of the pregnancy? By living together, we mean having a
+sexual relationship while sharing the same usual address.
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+5849
+
+1
+
+Yes
+
+8146
+
+5
+
+No
+
+6463
+
+8
+
+Refused
+
+9
+
+9
+
+Don't know
+
+25
+
+Total
+
+20492
+
+Universe : Applicable if R is not currently married (AB-1 MARSTAT ne 1) or married more than once, or times
+married is unknown (CA-1 TIMESMAR>1 or DK/RF) or 1st marriage began after pregnancy ended (cmmarrhx >
+cmendp_s) or 1st marriage start date is unknown (cmmarrhx = DK/RF) or date pregnancy ended is unknown
+(cmendp_s = DK/RF)
+COHPEND(314-314)
+Variable Type : Raw
+EG-18b : (When [BABY NAME] was born, were you either married to or living with (his/her) father? / Were you
+either married to or living with the father of (the/that) pregnancy when ([BABY NAME] was born/the pregnancy
+ended))?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6137
+
+1
+
+Yes
+
+8150
+
+5
+
+No
+
+6177
+
+8
+
+Refused
+
+7
+
+9
+
+Don't know
+Total
+
+21
+20492
+
+Universe : Applicable if pregnancy is not current (outcom_s NE 3) and conditions for EG-18a COHPBEG are met
+TELLFATH(315-315)
+Variable Type : Raw
+EG-19 : Did you tell the father of (the pregnancy/that (Nth) pregnancy/your current pregnancy) that you
+(were/are) pregnant?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12250
+
+1
+
+Yes
+
+7594
+
+5
+
+No
+
+619
+
+8
+
+Refused
+
+7
+
+9
+
+Don't know
+
+22
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy did not result in a live birth (outcom_s NE 1) or R was not living with the
+father of the pregnancy when the pregnancy ended (EG-18 COHPEND NE 1) or responded "don't
+know/refused" (EG-18 COHPEND = DK/RF)
+WHENTELL(316-316)
+Variable Type : Raw
+EG-20 : When did you tell him that you were pregnant - during the pregnancy or after the baby was born/after
+the pregnancy ended?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+12898
+
+1
+
+During the pregnancy
+
+7202
+
+2
+
+After the [pregnancy ended/baby was born]
+
+388
+
+8
+
+Refused
+
+9
+
+Don't know
+
+1
+3
+
+Total
+
+20492
+
+Universe : Applicable if R told the father of the pregnancy that she was pregnant (EG-19 TELLFATH = 1) and if
+pregnancy is not current (outcom_s NE 3)
+TRYSCALE(317-318)
+Variable Type : Raw
+EG-21 : Look at the scale on Card 40, where a 0 means trying hard not to get pregnant, and a 10 means trying
+hard to get pregnant. If you had to rate how much you were trying to get pregnant or avoid pregnancy right
+before you got pregnant (this time/that time), how would you rate yourself?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15363
+
+0
+
+0
+
+985
+
+1
+
+1
+
+233
+
+2
+
+2
+
+248
+
+3
+
+3
+
+262
+
+4
+
+4
+
+258
+
+5
+
+5
+
+1080
+
+6
+
+6
+
+219
+
+7
+
+7
+
+226
+
+8
+
+8
+
+274
+
+9
+
+9
+
+118
+
+10
+
+10
+
+1201
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+24
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended on or after January [YEAR OF INTERVIEW - 3] (cmendp_s GE
+cmjan3yr) or pregnancy is current (outcom_s = 3)
+WANTSCAL(319-320)
+Variable Type : Raw
+EG-22 : Look at the scale on Card 41, where a 0 means you wanted to avoid a pregnancy and a 10 means you
+wanted to get pregnant. If you had to rate how much you wanted or didn't want a pregnancy right before you
+got pregnant (this time/that time), how would you rate yourself?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15363
+
+0
+
+0
+
+1212
+
+1
+
+1
+
+227
+
+2
+
+2
+
+191
+
+3
+
+3
+
+197
+
+4
+
+4
+
+165
+
+5
+
+5
+
+756
+
+6
+
+6
+
+181
+
+7
+
+7
+
+206
+
+8
+
+8
+
+222
+
+9
+
+9
+
+169
+
+10
+
+10
+
+1582
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+20
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended on or after January [YEAR OF INTERVIEW - 3] (cmendp_s GE
+cmjan3yr) or pregnancy is current (outcom_s = 3)
+WHYPRG1(321-321)
+Variable Type : Raw
+EG-23 : Please look at Card 42. (Earlier you told me (your/this/that) pregnancy occurred too soon / Earlier you
+told me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of
+the following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? Your birth control method failed, or you did not use your birth control
+method properly? (1st mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19447
+
+1
+
+Your birth control method failed
+
+442
+
+2
+
+You did not use your birth control method properly
+
+488
+
+3
+
+Respondent wasn t using a method
+
+108
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+2
+5
+20492
+
+Universe : Applicable if pregnancy ended on or after January [YEAR OF INTERVIEW - 3] (cmendp_s GE
+cmjan3yr) or pregnancy is current (outcom_s = 3) and R responded that she became pregnant "too soon"
+(EG-10 TIMINGOK = 1) or R responded "no" to whether, right before pregnancy, she wanted to have a baby at
+any time in the future (EG-6 WANTBOLD = 5) or R responded "probably not" to whether she probably wanted
+a(nother) baby at some time in the future (EG-7 PROBBABE = 5) or R responded "no" to the second time she
+
+was asked whether, right before pregnancy, she wanted to have a baby at any time in the future (EG-9
+WANTBLD2 = 5) and R used a method in month pregnancy began (ED-6 METHX1 through METHX192
+corresponding to cmpbeg_s NE 1)
+WHYPRG2(322-322)
+Variable Type : Raw
+EG-23 : Please look at Card 42. (Earlier you told me (your/this/that) pregnancy occurred too soon / Earlier you
+told me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of
+the following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? Your birth control method failed, or you did not use your birth control
+method properly? (2nd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20472
+
+2
+
+You did not use your birth control method properly
+
+3
+
+Respondent wasn t using a method
+Total
+
+18
+2
+20492
+
+Universe : Applicable if more than one reason became pregnant with unintended pregnancy (see EG-23
+WHYPRG1)
+WHYNOUSE1(323-324)
+Variable Type : Raw
+EG-24 : Please look at Card 43. (Earlier you told me (your/that) pregnancy occurred too soon / Earlier you told
+me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of the
+following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? You did not use birth control because... (1st mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+19065
+
+1
+
+You did not expect to have sex
+
+223
+
+2
+
+You did not think you could get pregnant
+
+435
+
+3
+
+You didn t really mind if you got pregnant
+
+190
+
+4
+
+You were worried about the side effects of birth control
+
+149
+
+5
+
+Your male partner did not want you to use a birth control method
+
+72
+
+6
+
+Y1:Your male partner did not want to use a birth control method/Y2+:Your male partner himself did not want to use a birth control method
+
+78
+
+7
+
+(IF VOLUNTEERED:)Respondent was using a method
+
+111
+
+8
+
+Y1:[Not a response option]/Y2+:You could not get a method
+
+27
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+
+118
+
+98
+
+Refused
+
+1
+
+99
+
+Don't know
+
+23
+
+Total
+
+20492
+
+Universe : Applicable if conditions met for EG-23 WHYPRG1 and R did not use a method in month pregnancy
+began (ED-6 METHX1 through METHX192 corresponding to cmpbeg_s = 1)
+WHYNOUSE2(325-325)
+Variable Type : Raw
+EG-24 : Please look at Card 43. (Earlier you told me (your/that) pregnancy occurred too soon / Earlier you told
+me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of the
+following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? You did not use birth control because... (2nd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20287
+
+1
+
+You did not expect to have sex
+
+6
+
+2
+
+You did not think you could get pregnant
+
+38
+
+3
+
+You didn t really mind if you got pregnant
+
+31
+
+4
+
+You were worried about the side effects of birth control
+
+31
+
+5
+
+Your male partner did not want you to use a birth control method
+
+24
+
+6
+
+Y1:Your male partner did not want to use a birth control method/Y2+:Your male partner himself did not want to use a birth control method
+
+41
+
+7
+
+(IF VOLUNTEERED:)Respondent was using a method
+
+1
+
+8
+
+Y1:[Not a response option]/Y2+:You could not get a method
+
+10
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+Total
+
+23
+20492
+
+Universe : Applicable if more than one reason R didn't use a method before unintended pregnancy began (see
+EG-24 WHYNOUSE1)
+WHYNOUSE3(326-326)
+Variable Type : Raw
+EG-24 : Please look at Card 43. (Earlier you told me (your/that) pregnancy occurred too soon / Earlier you told
+me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of the
+following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? You did not use birth control because... (3rd mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20436
+
+1
+
+You did not expect to have sex
+
+5
+
+2
+
+You did not think you could get pregnant
+
+2
+
+3
+
+You didn t really mind if you got pregnant
+
+8
+
+4
+
+You were worried about the side effects of birth control
+
+8
+
+5
+
+Your male partner did not want you to use a birth control method
+
+6
+
+6
+
+Y1:Your male partner did not want to use a birth control method/Y2+:Your male partner himself did not want to use a birth control method
+
+17
+
+8
+
+Y1:[Not a response option]/Y2+:You could not get a method
+
+6
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+Total
+
+4
+20492
+
+Universe : Applicable if more than 2 reasons R didn't use a method before unintended pregnancy began (see
+EG-24 WHYNOUSE1)
+WHYNOUSE4(327-327)
+Variable Type : Raw
+EG-24 : Please look at Card 43. (Earlier you told me (your/that) pregnancy occurred too soon / Earlier you told
+me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of the
+following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? You did not use birth control because... (4th mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20480
+
+2
+
+You did not think you could get pregnant
+
+1
+
+4
+
+You were worried about the side effects of birth control
+
+3
+
+5
+
+Your male partner did not want you to use a birth control method
+
+1
+
+6
+
+Y1:Your male partner did not want to use a birth control method/Y2+:Your male partner himself did not want to use a birth control method
+
+3
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+Total
+
+4
+20492
+
+Universe : Applicable if more than 3 reasons R didn't use a method before unintended pregnancy began (see
+EG-24 WHYNOUSE1)
+WHYNOUSE5(328-328)
+Variable Type : Raw
+
+EG-24 : Please look at Card 43. (Earlier you told me (your/that) pregnancy occurred too soon / Earlier you told
+me that (your/this/that) pregnancy occurred at a time when you wanted no future pregnancies.) Which of the
+following statements applies to you right before you became pregnant (this time/that time (that is, with the
+pregnancy that ended in [DATE]))? You did not use birth control because... (5th mention)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20490
+
+6
+
+Y1:Your male partner did not want to use a birth control method/Y2+:Your male partner himself did not want to use a birth control method
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+
+1
+1
+
+Total
+
+20492
+
+Universe : Applicable if more than 4 reasons R didn't use a method before unintended pregnancy began (see
+EG-24 WHYNOUSE1)
+MAINOUSE(329-330)
+Variable Type : Raw
+EG-24a : Which one of these is the main reason that you did not use birth control?
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+20355
+
+1
+
+You did not expect to have sex
+
+22
+
+2
+
+You did not think you could get pregnant
+
+29
+
+3
+
+You didn't really mind if you got pregnant
+
+14
+
+4
+
+You were worried about the side effects of birth control
+
+18
+
+5
+
+Your male partner did not want you to use a birth control method
+
+8
+
+6
+
+Your male partner himself did not want to use a birth control method
+
+11
+
+8
+
+Y1:[Not a response option]/Y2+:You could not get a method
+
+7
+
+9
+
+Y1:[Not a response option]/Y2+:You were not taking, or using, your method consistently
+
+27
+
+99
+
+Don't know
+
+1
+
+Total
+
+20492
+
+Universe : Appicable if QuestYear >= 3 (asked starting in year 3) and R reported more than one reason why
+didn't use a method before unintended pregnancy began (2 or more of EG-24 WHYNOUSE1 through
+WHYNOUSE5 contain a valid response)
+Pregnancy File :: Section :: Section B pregnancy-based recodes
+PRGLNGTH(331-332)
+Variable Type : Preg recode
+Description : Duration of completed pregnancy in weeks (recode)
+value label
+
+Total
+
+0-13
+
+13 WEEKS OR LESS
+
+14-26
+
+14-26 WEEKS
+
+5032
+1013
+
+27-95
+
+27 WEEKS OR LONGER
+
+14447
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+OUTCOME(333-333)
+Variable Type : Preg recode
+Description : Pregnancy outcome (recode)
+value label
+
+Total
+
+1
+
+14292
+
+LIVE BIRTH
+
+2
+
+INDUCED ABORTION
+
+3
+
+STILLBIRTH
+
+2295
+166
+
+4
+
+MISCARRIAGE
+
+2945
+
+5
+
+ECTOPIC PREGNANCY
+
+278
+
+6
+
+CURRENT PREGNANCY
+
+516
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+BIRTHORD(334-335)
+Variable Type : Preg recode
+Description : Birth order (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6200
+
+01
+
+1ST BIRTH
+
+6683
+
+02
+
+2ND BIRTH
+
+4415
+
+03
+
+3RD BIRTH
+
+2030
+
+04
+
+4TH BIRTH
+
+734
+
+05
+
+5TH BIRTH
+
+269
+
+06
+
+6TH BIRTH
+
+102
+
+07
+
+7TH BIRTH
+
+36
+
+08
+
+8TH BIRTH
+
+13
+
+09
+
+9TH BIRTH
+
+7
+
+10
+
+10TH BIRTH
+
+2
+
+11
+
+11TH BIRTH
+Total
+
+1
+20492
+
+Universe : Applicable for all pregnancies that resulted in live birth (OUTCOME = 1)
+DATEND(336-339)
+Variable Type : Preg recode
+Description : Century month for date pregnancy ended (recode)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+516
+
+522-1278 BEFORE JULY 2006
+
+17291
+
+1279-1290 JULY 2006-JUNE 2007
+
+1136
+
+1291-1308 JULY 2007-DEC 2008
+
+1195
+
+1309-1326 JAN 2009-JUN 2010
+
+354
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (OUTCOME NE 6)
+AGEPREG(340-343)
+Variable Type : Preg recode
+Description : Age at pregnancy outcome (recode)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+516
+
+0-1999
+
+UNDER 20 YEARS
+
+4703
+
+2000-2499 20-24 YEARS
+
+6684
+
+2500-2999 25-29 YEARS
+
+4697
+
+3000-4499 30-44 YEARS
+Total
+
+3892
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (OUTCOME NE 6)
+DATECON(344-347)
+Variable Type : Preg recode
+Description : Century month for date of conception (recode)
+value
+
+label
+
+Total
+
+522-1278 BEFORE JULY 2006
+
+18021
+
+1279-1290 JULY 2006-JUNE 2007
+
+1079
+
+1291-1308 JULY 2007-DEC 2008
+
+1110
+
+1309-1326 JAN 2009-JUN 2010
+
+282
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+AGECON(348-351)
+Variable Type : Preg recode
+Description : Age at time of conception (recode)
+value
+
+label
+
+0-1999
+
+UNDER 20 YEARS
+
+Total
+5609
+
+2000-2499 20-24 YEARS
+
+6609
+
+2500-2999 25-29 YEARS
+
+4687
+
+3000-4499 30-44 YEARS
+Total
+
+3587
+20492
+
+Universe : Applicable for all pregnancies
+FMAROUT5(352-352)
+Variable Type : Preg recode
+Description : Formal marital status at pregnancy outcome (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+516
+
+1
+
+MARRIED
+
+8595
+
+2
+
+DIVORCED
+
+990
+
+3
+
+WIDOWED
+
+35
+
+4
+
+SEPARATED
+
+228
+
+5
+
+NEVER MARRIED
+
+10128
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (OUTCOME NE 6)
+PMARPREG(353-353)
+Variable Type : Preg recode
+Description : Whether pregnancy ended before R's 1st marriage (premaritally) (recode)
+value label
+.
+
+INAPPLICABLE
+
+1
+
+YES
+
+2
+
+Total
+516
+10128
+
+No
+
+9848
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (OUTCOME NE 6)
+
+RMAROUT6(354-354)
+Variable Type : Preg recode
+Description : Informal marital status at pregnancy outcome - 6 categories (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+516
+
+1
+
+MARRIED
+
+8595
+
+2
+
+DIVORCED
+
+566
+
+3
+
+WIDOWED
+
+17
+
+4
+
+SEPARATED
+
+228
+
+5
+
+COHABITING
+
+4851
+
+6
+
+NEVER MARRIED, NOT COHABITING
+Total
+
+5719
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (OUTCOME NE 6)
+FMARCON5(355-355)
+Variable Type : Preg recode
+Description : Formal marital status at conception - 5 categories (recode)
+value label
+
+Total
+
+1
+
+MARRIED
+
+8003
+
+2
+
+DIVORCED
+
+1006
+
+3
+
+WIDOWED
+
+35
+
+4
+
+SEPARATED
+
+213
+
+5
+
+NEVER MARRIED
+
+11235
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+RMARCON6(356-356)
+Variable Type : Preg recode
+Description : Informal marital status at conception - 6 categories (recode)
+value label
+
+Total
+
+1
+
+MARRIED
+
+8003
+
+2
+
+DIVORCED
+
+539
+
+3
+
+WIDOWED
+
+18
+
+4
+
+SEPARATED
+
+213
+
+5
+
+COHABITING
+
+5073
+
+6
+
+NEVER MARRIED, NOT COHABITING
+Total
+
+6646
+20492
+
+Universe : Applicable for all pregnancies
+LEARNPRG(357-358)
+Variable Type : Preg recode
+Description : Number of weeks pregnant when R learned she was pregnant (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14141
+
+0-13
+
+13 WEEKS OR LESS
+
+6072
+
+14-50
+
+14 weeks or later
+
+279
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (other than an induced abortion) (OUTCOME = 1
+3, 4, or 5) that ended in January [YEAR OF INTERVIEW - 5] or later (DATEND GE cmjan5yr), but not with an
+unnamed baby placed for adoption (no BPA_BDScheck1 - 3 = 1)
+PNCAREWK(359-360)
+Variable Type : Preg recode
+Description : Number of weeks pregnant at first prenatal care (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+14142
+
+0-13
+
+13 WEEKS OR LESS
+
+5115
+
+14-50
+
+14 WEEKS OR LATER
+
+555
+
+95
+
+NO PRENATAL CARE FOR THIS PREGNANCY
+Total
+
+680
+20492
+
+Universe : Applicable if pregnancy is a completed pregnancy (other than an induced abortion) (OUTCOME = 1
+3, 4, or 5) that ended in January [YEAR OF INTERVIEW - 5] or later (DATEND GE cmjan5yr), but not with an
+unnamed baby placed for adoption (no BPA_BDScheck1 - 3 = 1)
+PAYDELIV(361-361)
+Variable Type : Preg recode
+Description : Payment for delivery (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15507
+
+1
+
+OWN INCOME ONLY
+
+103
+
+2
+
+INSURANCE ONLY
+
+1040
+
+3
+
+OWN INCOME & INSURANCE ONLY
+
+1029
+
+4
+
+MEDICAID/GOVT ASSISTANCE MENTIONED AT ALL
+
+2698
+
+5
+
+ALL OTHER COMBINATIONS OF PAYMENT METHODS
+Total
+
+115
+20492
+
+Universe : Applicable if pregnancy ended in live birth in January [INTERVIEW YEAR - 5] or later (OUTCOME = 1
+and DATEND GE cmjan5yr)
+LBW1(362-362)
+Variable Type : Preg recode
+Description : Low birthweight - Baby 1 (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+1
+
+YES, LOW BIRTH WEIGHT
+
+6200
+1318
+
+2
+
+NO, NOT LOW BIRTH WEIGHT
+
+12974
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended in live birth (OUTCOME = 1)
+LIVCHILD(363-363)
+Variable Type : Preg recode
+Description : Current living arrangements of 1st liveborn child from this pregnancy (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+6200
+
+1
+
+Child lives with R
+
+13152
+
+2
+
+Child is dead
+
+136
+
+3
+
+Child lives with adoptive parents/family
+
+119
+
+4
+
+Child lives with biological father
+
+360
+
+5
+
+Child lives with other relatives
+
+371
+
+6
+
+Child's living arrangements are other or unknown
+Total
+
+154
+20492
+
+Universe : Applicable if pregnancy ended in live birth (OUTCOME = 1)
+BFEEDWKS(364-366)
+Variable Type : Preg recode
+Description : Duration of breastfeeding in weeks (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+0
+
+LESS THAN 1 WEEK
+
+7877
+142
+
+1-4
+
+1-4 weeks
+
+1187
+
+5-8
+
+5-8 weeks
+
+328
+
+9-26
+
+9-26 weeks
+
+2896
+
+27-52
+
+27-52 weeks (> 6mos, < 1 yr)
+
+1966
+
+53-993 53 WEEKS OR LONGER (> 1 yr)
+
+1001
+
+994
+
+STILL BREASTFEEDING THIS CHILD
+
+331
+
+995
+
+NEVER BREAST-FED THIS CHILD
+
+4764
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended in single live birth (OUTCOME = 1 and nbrnlv_s = 1) and child is
+currently under age 19 lived with R at least 2 months (lastage1 GE 2 and kidage LT 228)
+MATERNLV(367-367)
+Variable Type : Preg recode
+Description : Use of maternity leave (recode)
+value label
+
+Total
+
+.
+
+INAPPLICABLE
+
+15515
+
+0
+
+NOT EMPLOYED DURING THIS PREGNANCY
+
+1890
+
+1
+
+TOOK MATERNITY LEAVE FROM JOB HELD DURING THIS PREGNANCY
+
+1970
+
+2
+
+DID NOT TAKE -- NOT NEEDED DUE TO JOB SCHEDULE OR SELF-EMPLOYMENT
+
+193
+
+3
+
+DID NOT TAKE -- NOT OFFERED OR ALLOWED BY EMPLOYER
+
+239
+
+4
+
+DID NOT TAKE -- OTHER REASONS
+
+685
+
+Total
+
+20492
+
+Universe : Applicable if pregnancy ended in live birth in or after January [YEAR OF INTERVIEW - 3] (OUTCOME
+= 1 and DATEND GE cmjan5yr) and child was named by R (neither placed for adoption or died shortly after
+birth without being named) (BPA_BDScheck1 - 3 NE 1 or 2)
+Pregnancy File :: Section :: Section E pregnancy-based recodes
+OLDWANTR(368-368)
+Variable Type : Preg recode
+Description : Wantedness of pregnancy - respondent - Cycle 4 version (recode)
+value label
+1
+
+LATER, OVERDUE
+
+Total
+1215
+
+2
+
+RIGHT TIME
+
+8648
+
+3
+
+TOO SOON, MISTIMED
+
+6408
+
+4
+
+DIDN'T CARE, INDIFFERENT
+
+186
+
+5
+
+UNWANTED
+
+3959
+
+6
+
+DON'T KNOW, NOT SURE
+Total
+
+76
+20492
+
+Universe : Applicable for all pregnancies
+OLDWANTP(369-369)
+Variable Type : Preg recode
+Description : Wantedness of preg - R's partner (father of pregnancy) - Cycle 4 version (recode)
+value label
+
+Total
+
+1
+
+LATER, OVERDUE
+
+1106
+
+2
+
+RIGHT TIME
+
+9526
+
+3
+
+TOO SOON, MISTIMED
+
+3871
+
+4
+
+DIDN'T CARE, INDIFFERENT
+
+319
+
+5
+
+UNWANTED
+
+4387
+
+6
+
+DON'T KNOW, NOT SURE
+Total
+
+1283
+20492
+
+Universe : Applicable for all pregnancies
+WANTRESP(370-370)
+Variable Type : Preg recode
+Description : Wantedness of pregnancy - respondent - Cycle 5, 6 version (recode)
+value label
+
+Total
+
+1
+
+LATER, OVERDUE
+
+1215
+
+2
+
+RIGHT TIME
+
+8648
+
+3
+
+TOO SOON, MISTIMED
+
+6414
+
+4
+
+DIDN'T CARE, INDIFFERENT
+
+186
+
+5
+
+UNWANTED
+
+3953
+
+6
+
+DON'T KNOW, NOT SURE
+Total
+
+76
+20492
+
+Universe : Applicable for all pregnancies
+WANTPART(371-371)
+Variable Type : Preg recode
+Description : Wantedness of preg - R's partner (father of pregnancy) - Cycle 5, 6 version (recode)
+value label
+
+Total
+
+1
+
+LATER, OVERDUE
+
+1109
+
+2
+
+RIGHT TIME
+
+9534
+
+3
+
+TOO SOON, MISTIMED
+
+3877
+
+4
+
+DIDN'T CARE, INDIFFERENT
+
+329
+
+5
+
+UNWANTED
+
+4392
+
+6
+
+DON'T KNOW, NOT SURE
+Total
+
+1251
+20492
+
+Universe : Applicable for all pregnancies
+Pregnancy File :: Section :: Selected respondent file variables
+
+cmbirth(372-375)
+Variable Type : Computed
+Description : Century month of R's birth (computed; respondent variable)
+value
+
+label
+
+Total
+
+522-1278 BEFORE JULY 2006
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+AGER(376-377)
+Variable Type : Resp recode
+Description : Age at interview (respondent recode)
+value label
+
+Total
+
+15-19
+
+15-19 YEARS
+
+407
+
+20-24
+
+20-24 YEARS
+
+1975
+
+25-29
+
+25-29 YEARS
+
+4207
+
+30-34
+
+30-34 YEARS
+
+4809
+
+35-39
+
+35-39 YEARS
+
+4640
+
+40-45
+
+40-45 YEARS
+
+4454
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Notes : Respondents age 45 were 44 at screener
+agescrn(378-379)
+Variable Type : Computed
+Description : R's age at screener (computed; respondent variable)
+value label
+
+Total
+
+15-19
+
+15-19 YEARS
+
+414
+
+20-24
+
+20-24 YEARS
+
+1991
+
+25-29
+
+25-29 YEARS
+
+4202
+
+30-34
+
+30-34 YEARS
+
+4841
+
+35-39
+
+35-39 YEARS
+
+4607
+
+40-44
+
+40-44 YEARS
+Total
+
+4437
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+FMARITAL(380-380)
+Variable Type : Resp recode
+Description : Formal marital status (respondent recode)
+value label
+
+Total
+
+1
+
+MARRIED
+
+2
+
+WIDOWED
+
+162
+
+3
+
+DIVORCED
+
+2762
+
+4
+
+SEPARATED
+
+1594
+
+5
+
+NEVER MARRIED
+Total
+
+9309
+
+6665
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RMARITAL(381-381)
+Variable Type : Resp recode
+Description : Informal Marital Status (respondent recode)
+value label
+1
+
+Total
+
+CURRENTLY MARRIED
+
+9309
+
+2
+
+NOT MARRIED BUT LIVING WITH OPP SEX PARTNER
+
+3032
+
+3
+
+WIDOWED
+
+110
+
+4
+
+DIVORCED
+
+2091
+
+5
+
+SEPARATED FOR REASONS OF MARITAL DISCORD
+
+1355
+
+6
+
+NEVER BEEN MARRIED
+
+4595
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+EDUCAT(382-383)
+Variable Type : Resp recode
+Description : Education (completed years of schooling) (respondent recode)
+value label
+
+Total
+
+9
+
+9TH GRADE OR LESS
+
+3198
+
+10
+
+10TH GRADE
+
+1307
+
+11
+
+11TH GRADE
+
+1398
+
+12
+
+12TH GRADE
+
+5785
+
+13
+
+1 YEAR OF COLLEGE/GRAD SCHOOL
+
+2183
+
+14
+
+2 YEARS OF COLLEGE/GRAD SCHOOL
+
+2424
+
+15
+
+3 YEARS OF COLLEGE/GRAD SCHOOL
+
+844
+
+16
+
+4 YEARS OF COLLEGE/GRAD SCHOOL
+
+1779
+
+17
+
+5 YEARS OF COLLEGE/GRAD SCHOOL
+
+550
+
+18
+
+6 YEARS OF COLLEGE/GRAD SCHOOL
+
+549
+
+19
+
+7+ YEARS OF COLLEGE/GRAD SCHOOL
+Total
+
+475
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable) (This variable has been bottomcoded for
+public use.)
+HIEDUC(384-385)
+Variable Type : Resp recode
+Description : Highest completed year of school or degree (respondent recode)
+value label
+
+Total
+
+5
+
+9TH GRADE OR LESS
+
+2860
+
+6
+
+10TH GRADE
+
+1196
+
+7
+
+11TH GRADE
+
+1252
+
+8
+
+12TH GRADE, NO DIPLOMA (NOR GED)
+
+449
+
+9
+
+HIGH SCHOOL GRADUATE (DIPLOMA OR GED)
+
+5920
+
+10
+
+SOME COLLEGE BUT NO DEGREE
+
+3985
+
+11
+
+ASSOCIATE DEGREE IN COLLEGE/UNIVERSITY
+
+1657
+
+12
+
+BACHELOR'S DEGREE
+
+2259
+
+13
+
+MASTER'S DEGREE
+
+696
+
+14
+
+DOCTORATE DEGREE
+
+77
+
+15
+
+PROFESSIONAL DEGREE
+
+141
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable) (This variable has been bottomcoded for
+public use.)
+RACE(386-386)
+Variable Type : Resp recode
+Description : Race (respondent recode)
+value label
+
+Total
+
+1
+
+BLACK
+
+5616
+
+2
+
+WHITE
+
+12405
+
+3
+
+OTHER
+
+2471
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPANIC(387-387)
+Variable Type : Resp recode
+Description : Hispanic origin (respondent recode)
+value label
+
+Total
+
+1
+
+HISPANIC
+
+5300
+
+2
+
+NON-HISPANIC
+
+15192
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPRACE(388-388)
+Variable Type : Resp recode
+Description : Race & Hispanic origin of respondent - 1977 OMB standards (respondent recode)
+value label
+
+Total
+
+1
+
+Hispanic
+
+5300
+
+2
+
+Non-Hispanic White
+
+8929
+
+3
+
+Non-Hispanic Black
+
+5235
+
+4
+
+Non-Hispanic Other
+Total
+
+1028
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPRACE2(389-389)
+Variable Type : Resp recode
+Description : Race & Hispanic origin of respondent - 1997 OMB standards (respondent recode)
+value label
+
+Total
+
+1
+
+Hispanic
+
+5300
+
+2
+
+Non-Hispanic White, Single Race
+
+8694
+
+3
+
+Non-Hispanic Black, Single Race
+
+5027
+
+4
+
+Non-Hispanic Other or Multiple Race
+Total
+
+1471
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RCURPREG(390-390)
+Variable Type : Resp recode
+
+Description : Pregnant at time of interview (respondent recode)
+value label
+
+Total
+
+1
+
+YES (CURRENTLY PREGNANT)
+
+1417
+
+2
+
+NO (NOT CURRENTLY PREGNANT)
+
+19075
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PREGNUM(391-392)
+Variable Type : Resp recode
+Description : CAPI-based total number of pregnancies (respondent recode)
+value label
+
+Total
+
+1
+
+1 PREGNANCY
+
+1928
+
+2
+
+2 PREGNANCIES
+
+4190
+
+3
+
+3 PREGNANCIES
+
+4848
+
+4
+
+4 PREGNANCIES
+
+3828
+
+5
+
+5 PREGNANCIES
+
+2325
+
+6
+
+6 PREGNANCIES
+
+1452
+
+7-95
+
+7 OR MORE PREGNANCIES
+Total
+
+1921
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PARITY(393-394)
+Variable Type : Resp recode
+Description : Total number of live births (respondent recode)
+value label
+
+Total
+
+0
+
+0 BABIES
+
+1222
+
+1
+
+1 BABY
+
+3737
+
+2
+
+2 BABIES
+
+6432
+
+3
+
+3 BABIES
+
+4840
+
+4
+
+4 BABIES
+
+2355
+
+5-95
+
+5 OR MORE BABIES
+
+1906
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+CURR_INS(395-395)
+Variable Type : Resp recode
+Description : Current health insurance coverage status (respondent recode)
+value label
+
+Total
+
+1
+
+Currently covered by private health insurance or Medi-Gap
+
+9193
+
+2
+
+Currently covered by Medicaid, CHIP, or a state-sponsored health plan
+
+5587
+
+3
+
+Currently covered by Medicare, military health care, or other government health care
+
+788
+
+4
+
+Currently covered only by a single-service plan, only by the Indian Health Service, or currently not covered by health insurance
+
+4924
+
+Total
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PUBASSIS(396-396)
+Variable Type : Resp recode
+
+20492
+
+Description : Whether R received public assistance in 2001 (respondent recode)
+value label
+
+Total
+
+1
+
+YES (RECEIVED PUBLIC ASSISTANCE IN [INTERVIEW YEAR -1])
+
+10486
+
+2
+
+NO (DID NOT RECEIVE PUBLIC ASSISTANCE IN [INTERVIEW YEAR -1])
+
+10006
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+POVERTY(397-399)
+Variable Type : Resp recode
+Description : Poverty level income (respondent recode)
+value label
+
+Total
+
+000-099 000-99 PERCENT OF POVERTY LEVEL
+
+7301
+
+100-199 100-199 PERCENT OF POVERTY LEVEL
+
+5549
+
+200-299 200-299 PERCENT OF POVERTY LEVEL
+
+3348
+
+300-399 300-399 PERCENT OF POVERTY LEVEL
+
+2514
+
+400-499 400-499 PERCENT OF POVERTY LEVEL
+
+1238
+
+500
+
+500 PERCENT OF POVERTY LEVEL OR GREATER
+Total
+
+542
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable) (This variable has been topcoded for public
+use.)
+LABORFOR(400-400)
+Variable Type : Resp recode
+Description : Labor force status (respondent recode)
+value label
+
+Total
+
+1
+
+WORKING FULL-TIME
+
+8218
+
+2
+
+WORKING PART-TIME
+
+3215
+
+3
+
+WORKING-TEMP ILL/ETC
+
+783
+
+4
+
+WORKING-MATERNITY OR FAMILY LEAVE
+
+236
+
+5
+
+NOT WORKING BUT LOOKING FOR WORK
+
+1401
+
+6
+
+SCHOOL
+
+710
+
+7
+
+KEEPING HOUSE
+
+5251
+
+8
+
+CARING FOR FAMILY
+
+378
+
+9
+
+OTHER
+
+300
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable) (This variable has been recoded for public
+use.)
+RELIGION(401-401)
+Variable Type : Resp recode
+Description : Current religious affiliation (respondent recode)
+value label
+
+Total
+
+1
+
+NO RELIGION
+
+2
+
+CATHOLIC
+
+5261
+
+3
+
+PROTESTANT
+
+10245
+
+4
+
+OTHER RELIGIONS
+Total
+
+3510
+
+1476
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+METRO(402-402)
+Variable Type : Resp recode
+Description : Place of residence (Metropolitan / Nonmetropolitan) (respondent recode)
+value label
+
+Total
+
+1
+
+MSA, CENTRAL CITY
+
+8681
+
+2
+
+MSA, OTHER
+
+8677
+
+3
+
+NOT MSA
+
+3134
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+BRNOUT(403-403)
+Variable Type : Raw
+IB-8 : Were you born outside of the United States? (respondent variable)
+value label
+
+Total
+
+1
+
+Yes
+
+4207
+
+5
+
+No
+
+16275
+
+8
+
+Refused
+
+9
+
+Don't know
+Total
+
+8
+2
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+yrstrus(404-407)
+Variable Type : Computed
+Description : Year R came to the U.S. to stay (computed in post-processing; respondent variable)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+16285
+
+1919-2010 1919-2010
+9998
+
+Refused
+
+9999
+
+Don't know
+Total
+
+4185
+11
+11
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable) (This variable has been recoded for public
+use.)
+Pregnancy File :: Section :: Pregnancy recode imputation flags
+PRGLNGTH_I(408-408)
+Variable Type : Imputation flag
+Description : PRGLNGTH Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20471
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+16
+5
+20492
+
+Universe : Applicable for all pregnancies
+
+OUTCOME_I(409-409)
+Variable Type : Imputation flag
+Description : OUTCOME Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20480
+
+1
+
+Model-based imputation
+Total
+
+12
+20492
+
+Universe : Applicable for all pregnancies
+BIRTHORD_I(410-410)
+Variable Type : Imputation flag
+Description : BIRTHORD Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20480
+
+2
+
+Logical imputation
+Total
+
+12
+20492
+
+Universe : Applicable for all pregnancies
+DATEND_I(411-411)
+Variable Type : Imputation flag
+Description : DATEND Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20363
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+84
+45
+20492
+
+Universe : Applicable for all pregnancies
+AGEPREG_I(412-412)
+Variable Type : Imputation flag
+Description : AGEPREG Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20403
+
+1
+
+Model-based imputation
+
+84
+
+2
+
+Logical imputation
+
+5
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+DATECON_I(413-413)
+Variable Type : Imputation flag
+Description : DATECON Imputation Flag
+value label
+
+Total
+
+0
+
+20391
+
+Questionnaire data (not imputed)
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+83
+18
+20492
+
+Universe : Applicable for all pregnancies
+AGECON_I(414-414)
+Variable Type : Imputation flag
+Description : AGECON Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20392
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+83
+17
+20492
+
+Universe : Applicable for all pregnancies
+FMAROUT5_I(415-415)
+Variable Type : Imputation flag
+Description : FMAROUT5 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20367
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+111
+14
+20492
+
+Universe : Applicable for all pregnancies
+PMARPREG_I(416-416)
+Variable Type : Imputation flag
+Description : PMARPREG Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20394
+
+1
+
+Model-based imputation
+Total
+
+98
+20492
+
+Universe : Applicable for all pregnancies
+RMAROUT6_I(417-417)
+Variable Type : Imputation flag
+Description : RMAROUT6 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20375
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+102
+15
+20492
+
+Universe : Applicable for all pregnancies
+FMARCON5_I(418-418)
+
+Variable Type : Imputation flag
+Description : FMARCON5 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20364
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+116
+12
+20492
+
+Universe : Applicable for all pregnancies
+RMARCON6_I(419-419)
+Variable Type : Imputation flag
+Description : RMARCON6 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20370
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+110
+12
+20492
+
+Universe : Applicable for all pregnancies
+LEARNPRG_I(420-420)
+Variable Type : Imputation flag
+Description : LEARNPRG Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20283
+
+1
+
+Model-based imputation
+
+70
+
+2
+
+Logical imputation
+
+139
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+PNCAREWK_I(421-421)
+Variable Type : Imputation flag
+Description : PNCAREWK Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20323
+
+1
+
+Model-based imputation
+
+29
+
+2
+
+Logical imputation
+
+140
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+PAYDELIV_I(422-422)
+Variable Type : Imputation flag
+Description : PAYDELIV Imputation Flag
+value label
+
+Total
+
+0
+
+20456
+
+Questionnaire data (not imputed)
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+25
+11
+20492
+
+Universe : Applicable for all pregnancies
+LBW1_I(423-423)
+Variable Type : Imputation flag
+Description : LBW1 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20454
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+23
+15
+20492
+
+Universe : Applicable for all pregnancies
+LIVCHILD_I(424-424)
+Variable Type : Imputation flag
+Description : LIVCHILD Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20490
+
+2
+
+Logical imputation
+Total
+
+2
+20492
+
+Universe : Applicable for all pregnancies
+BFEEDWKS_I(425-425)
+Variable Type : Imputation flag
+Description : BFEEDWKS Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20413
+
+1
+
+Model-based imputation
+
+11
+
+2
+
+Logical imputation
+
+68
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies
+MATERNLV_I(426-426)
+Variable Type : Imputation flag
+Description : MATERNLV Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20458
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+11
+23
+20492
+
+Universe : Applicable for all pregnancies
+OLDWANTR_I(427-427)
+
+Variable Type : Imputation flag
+Description : OLDWANTR Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20463
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+25
+4
+20492
+
+Universe : Applicable for all pregnancies
+OLDWANTP_I(428-428)
+Variable Type : Imputation flag
+Description : OLDWANTP Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20433
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+57
+2
+20492
+
+Universe : Applicable for all pregnancies
+WANTRESP_I(429-429)
+Variable Type : Imputation flag
+Description : WANTRESP Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20463
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+25
+4
+20492
+
+Universe : Applicable for all pregnancies
+WANTPART_I(430-430)
+Variable Type : Imputation flag
+Description : WANTPART Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20400
+
+1
+
+Model-based imputation
+
+2
+
+Logical imputation
+Total
+
+90
+2
+20492
+
+Universe : Applicable for all pregnancies
+Pregnancy File :: Section :: Respondent recode imputation flags included on pregnancy file
+AGER_I(431-431)
+Variable Type : Imputation flag
+Description : AGER Imputation Flag
+
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+FMARITAL_I(432-432)
+Variable Type : Imputation flag
+Description : FMARITAL Imputation Flag
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RMARITAL_I(433-433)
+Variable Type : Imputation flag
+Description : RMARITAL Imputation Flag
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+EDUCAT_I(434-434)
+Variable Type : Imputation flag
+Description : EDUCAT Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20486
+
+1
+
+Model-based imputation
+Total
+
+6
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HIEDUC_I(435-435)
+Variable Type : Imputation flag
+Description : HIEDUC Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20486
+
+2
+
+Logical imputation
+Total
+
+6
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RACE_I(436-436)
+Variable Type : Imputation flag
+Description : RACE Imputation Flag
+
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPANIC_I(437-437)
+Variable Type : Imputation flag
+Description : HISPANIC Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20489
+
+1
+
+Model-based imputation
+Total
+
+3
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPRACE_I(438-438)
+Variable Type : Imputation flag
+Description : HISPRACE Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20489
+
+1
+
+Model-based imputation
+Total
+
+3
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+HISPRACE2_I(439-439)
+Variable Type : Imputation flag
+Description : HISPRACE2 Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20489
+
+1
+
+Model-based imputation
+Total
+
+3
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RCURPREG_I(440-440)
+Variable Type : Imputation flag
+Description : RCURPREG Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20490
+
+2
+
+Logical imputation
+Total
+
+2
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PREGNUM_I(441-441)
+Variable Type : Imputation flag
+Description : PREGNUM Imputation Flag
+
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PARITY_I(442-442)
+Variable Type : Imputation flag
+Description : PARITY Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20488
+
+2
+
+Logical imputation
+Total
+
+4
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+CURR_INS_I(443-443)
+Variable Type : Imputation flag
+Description : CURR_INS Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20462
+
+1
+
+Model-based imputation
+Total
+
+30
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+PUBASSIS_I(444-444)
+Variable Type : Imputation flag
+Description : PUBASSIS Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20115
+
+1
+
+Model-based imputation
+Total
+
+377
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+POVERTY_I(445-445)
+Variable Type : Imputation flag
+Description : POVERTY Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+19270
+
+1
+
+Model-based imputation
+Total
+
+1222
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+LABORFOR_I(446-446)
+Variable Type : Imputation flag
+Description : LABORFOR Imputation Flag
+
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20481
+
+1
+
+Model-based imputation
+
+11
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+RELIGION_I(447-447)
+Variable Type : Imputation flag
+Description : RELIGION Imputation Flag
+value label
+
+Total
+
+0
+
+Questionnaire data (not imputed)
+
+20444
+
+1
+
+Model-based imputation
+
+48
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+METRO_I(448-448)
+Variable Type : Imputation flag
+Description : METRO Imputation Flag
+value label
+0
+
+Total
+
+Questionnaire data (not imputed)
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Pregnancy File :: Section :: Weights and related variables
+FINALWGT30(449-466)
+Variable Type : Weight-related
+Description : Final weight for the 1st 2 1/2 years of data collection (quarters 1 to 10)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+
+63.415649365-169679.74488
+
+8271
+12221
+
+Total
+
+20492
+
+Universe : Applicable if case was sampled in Quarter 1-10
+WGTQ1Q16(467-484)
+Variable Type : Weight-related
+Description : Final weight for 4 years of data collection (quarters 1 to 16)
+value
+
+label Total
+
+44.023983505-30226.354508
+
+20492
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+WGTQ9Q16(485-502)
+Variable Type : Weight-related
+
+Description : Final weight for years 3 and 4 of data collection (quarters 9 to 16)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+Total
+
+103.44176604-55339.2214
+
+9815
+10677
+
+Total
+
+20492
+
+Universe : Applicable if case was sampled in Quarter 9-16
+Notes : Useful for analyzing questions added in year 3
+WGTQ5Q16(503-520)
+Variable Type : Weight-related
+Description : Final weight for years 2, 3, and 4 of data collection (quarters 5 to 16)
+value
+
+label
+
+.
+
+INAPPLICABLE
+
+12.991712209-37359.051142
+
+Total
+5124
+15368
+
+Total
+
+20492
+
+Universe : Applicable if case was sampled in Quarter 5-16
+Notes : Useful for analyzing questions added in year 2
+WGTQ1Q8(521-538)
+Variable Type : Weight-related
+Description : Final weight for years 1 and 2 of data collection (quarters 1 to 8)
+value
+
+label
+
+Total
+
+.
+
+INAPPLICABLE
+
+10677
+
+Total
+
+20492
+
+118.9863975-56551.782402
+
+9815
+
+Universe : Applicable if case was sampled in Quarter 1-8
+SECU(539-539)
+Variable Type : Weight-related
+Description : Randomized version of the sampling error computational unit
+value label Total
+1
+
+1
+
+8164
+
+2
+
+2
+
+6929
+
+3
+
+3
+
+2736
+
+4
+
+4
+
+2663
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+SEST(540-542)
+Variable Type : Weight-related
+Description : Randomized version of the stratum
+value label
+
+Total
+
+101-156 101-156
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Pregnancy File :: Section :: Date of interview and questionnaire model timepoints
+cmintvw(543-546)
+Variable Type : Computed
+Description : Century month of interview date (computed in Flow Check A-1; respondent variable)
+value
+
+label
+
+Total
+
+1278-1326 JUNE 2006-JUNE 2010
+Total
+
+20492
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+cmlstyr(547-550)
+Variable Type : Computed
+Description : Century month of interview minus 1 year (cmintvw-12) (computed in Flow Check A-1; respondent
+variable)
+value
+
+label
+
+Total
+
+1266-1278 JUNE 2005-JUNE 2006
+
+5174
+
+1279-1290 JULY 2006-JUNE 2007
+
+4671
+
+1291-1302 JULY 2007-JUNE 2008
+
+5091
+
+1303-1326 JULY 2008-JUNE 2010
+
+5556
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+cmjan3yr(551-554)
+Variable Type : Computed
+Description : Century month for the January three years prior to cmintvw (computed in Flow Check A-1;
+respondent variable)
+value
+
+label
+
+Total
+
+1237-1285 Jan 2003-Jan 2007
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+cmjan5yr(555-558)
+Variable Type : Computed
+Description : Century month for the January five years prior to cmintvw (computed in Flow Check A-1;
+respondent variable)
+value
+
+label
+
+Total
+
+1213-1261 Jan 2001-Jan 2005
+
+20492
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+questyear(559-559)
+Variable Type : Computed
+
+Description : Questionnaire version year (1, 2, 3, or 4)
+value label
+
+Total
+
+1
+
+Questionnaire version year 1
+
+2
+
+Questionnaire version year 2
+
+5124
+4691
+
+3-4
+
+Questionnaire version year 3
+
+10677
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Quarter(560-561)
+Variable Type : Raw
+Description : Quarter when case was sampled
+value label Total
+1-2
+
+2006
+
+3-6
+
+2007
+
+2773
+4744
+
+7-10
+
+2008
+
+4704
+
+11-14
+
+2009
+
+5383
+
+15-16
+
+2010
+
+2888
+
+Total
+
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+Phase(562-562)
+Variable Type : Raw
+Description : Regular- or double-sample portion of the quarter
+value label
+
+Total
+
+1
+
+First 10 weeks of quarter
+
+18754
+
+2
+
+Last 2 weeks of quarter (double sample)
+Total
+
+1738
+20492
+
+Universe : Applicable for all pregnancies (respondent-level variable)
+
+
