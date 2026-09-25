@@ -1878,7 +1878,7 @@ getDatos_2002 <- function (correctDissolution=TRUE) {
     NBRNALIV <- "BORNALIV"
   }
   df_birth_counts <- df_NSFG_2002_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(replace(.data [[NBRNALIV]], .data [[NBRNALIV]] == 9, 0), na.rm = TRUE))
   
@@ -2004,7 +2004,7 @@ getDatos_2006_10 <- function () {
   datos$nBioKids <- df_NSFG_2006_10$PARITY
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2006_10_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(BORNALIV, na.rm = TRUE))
   
@@ -2123,7 +2123,7 @@ getDatos_2011_13 <- function () {
   datos$nBioKids <- df_NSFG_2011_13$PARITY
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2011_13_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(BORNALIV, na.rm = TRUE))
   
@@ -2240,7 +2240,7 @@ getDatos_2013_15 <- function () {
   datos$nBioKids <- df_NSFG_2013_15$PARITY
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2013_15_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(BORNALIV, na.rm = TRUE))
   
@@ -2356,7 +2356,7 @@ getDatos_2015_17 <- function () {
   datos$nBioKids <- df_NSFG_2015_17$PARITY
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2015_17_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(BORNALIV, na.rm = TRUE))
   
@@ -2463,7 +2463,7 @@ getDatos_2017_19 <- function () {
   datos$nBioKids <- df_NSFG_2017_19$PARITY
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2017_19_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(NBRNLV_S, na.rm = TRUE))
   
@@ -2718,7 +2718,7 @@ getDatos_2022_23 <- function () {
   # check the parity and the number of live births is equal
   ###### count of live births #####
   df_birth_counts <- df_NSFG_2022_23_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     group_by(CaseID) %>%
     summarize(total_live_births = sum(BORNALIV, na.rm = TRUE))
   
@@ -2749,23 +2749,33 @@ NSFG_ENADID_2022_23 <-  reorder_birthHistory(NSFG_ENADID_2022_23)
 pathNSFG_ENADID_2022_23 <- path.expand(paste0(dataPath, "NSFG_ENADID_2022_23.Rdat"))
 save(NSFG_ENADID_2022_23, file = pathNSFG_ENADID_2022_23)
 
+# >>> Claude 2026-09-21
+# The list is NAMED. do.call() below passes the data frames by value, so the
+# substitute() trick inside check_bind_conflicts() cannot see the variable
+# names: without these labels its dataframe_name column came out holding the
+# deparsed CONTENTS of each survey, which tells you nothing about which survey
+# has the type clash. lapply() keeps the names, so harmonize_survey_types()
+# and bind_rows() below are unaffected.
 surveys_list <- list(
-  NSFG_ENADID_1973, NSFG_ENADID_1976, NSFG_ENADID_1982, NSFG_ENADID_1988,
-  NSFG_ENADID_1995, NSFG_ENADID_2002, NSFG_ENADID_2006_10,
-  NSFG_ENADID_2011_13, NSFG_ENADID_2013_15, NSFG_ENADID_2015_17,
-  NSFG_ENADID_2017_19, NSFG_ENADID_2022_23
+  NSFG1973    = NSFG_ENADID_1973,    NSFG1976    = NSFG_ENADID_1976,
+  NSFG1982    = NSFG_ENADID_1982,    NSFG1988    = NSFG_ENADID_1988,
+  NSFG1995    = NSFG_ENADID_1995,    NSFG2002    = NSFG_ENADID_2002,
+  NSFG2006_10 = NSFG_ENADID_2006_10, NSFG2011_13 = NSFG_ENADID_2011_13,
+  NSFG2013_15 = NSFG_ENADID_2013_15, NSFG2015_17 = NSFG_ENADID_2015_17,
+  NSFG2017_19 = NSFG_ENADID_2017_19, NSFG2022_23 = NSFG_ENADID_2022_23
 )
+# <<< Claude 2026-09-21
 
 #### harmonize fields ####
 surveys_list <- lapply(surveys_list, harmonize_survey_types)
-
-#This one was to unify with the MEXICO which has "don't know" (2 cases) when NSFG has "unknown" "refused" "don't remember" (0 case)
-#NSFG_ENADID <- harm_union_type (NSFG_ENADID, 10)
 
 res <- do.call(check_bind_conflicts, surveys_list)
 NSFG_ENADID <- dplyr::bind_rows(surveys_list)
 
 checkImputedMonth (NSFG_ENADID)
+#This one was to unify with the MEXICO which has "don't know" (2 cases) when NSFG has "unknown" "refused" "don't remember" (0 case)
+NSFG_ENADID <- harm_union_type (NSFG_ENADID, 10)
+
 
 #### reweight the surveys ####
 # We use two kinds of weights:
@@ -2962,3 +2972,4 @@ pathNSFG_ENADID <- path.expand(paste0(dataPath, "NSFG_ENADID.Rdat"))
 save(NSFG_ENADID, file = pathNSFG_ENADID)
 
 print (DATE_QUALITY_SUMMARY)
+

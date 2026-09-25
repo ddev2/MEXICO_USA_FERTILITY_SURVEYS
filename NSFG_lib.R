@@ -129,7 +129,7 @@ order_union_history <- function (df=NULL, CaseID="CaseID") {
     ) %>%
     
     # 3. Clean and Sort
-    filter(!is.na(union_start_cmc)) %>%
+    dplyr::filter(!is.na(union_start_cmc)) %>%
     arrange(CaseID, union_start_cmc) %>%
     
     # 4. Create new sequence and total count
@@ -679,9 +679,9 @@ live_birth_history <- function (df_NSFG_preg=NULL, capped=FALSE) {
   df_NSFG_preg$survcmc <- if (isTRUE(capped) && ("CMINTVW" %in% names(df_NSFG_preg)))
     df_NSFG_preg$CMINTVW else NA_integer_
 
-  # 1. Selection and Filtering
+  # 1. Selection and dplyr::filtering
   df_children_final <- df_NSFG_preg %>%
-    filter(OUTCOME == 1) %>%
+    dplyr::filter(OUTCOME == 1) %>%
     dplyr::select(
       CaseID, PREGORDR, DATEND, DATEND_I, survcmc,
       BABYSEX1, BABYSEX2, BABYSEX3, BABYSEX4,
@@ -699,7 +699,7 @@ live_birth_history <- function (df_NSFG_preg=NULL, capped=FALSE) {
     
     # 3. Clean up and Rename
     # Filter to keep only valid births (1=Male, 2=Female)
-    filter(BABYSEX %in% c(1, 2)) %>%
+    dplyr::filter(BABYSEX %in% c(1, 2)) %>%
     rename(
       sex = BABYSEX,
       yBirth = DATEND,      # Renaming to your target variable name

@@ -1,4 +1,6 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+source("lib/KaplanMeierLib.R")
+source("lib/unionType_lib.R")
 
 # ==== Project paths ====
 #
@@ -59,6 +61,16 @@ nsfgPath <- paste0(nsfgRoot, "/")
 # not run on any other machine. It is now bundled in lib/.
 
 source(file.path(scriptDir, "lib", "lib.R"))
+# >>> Claude 2026-09-21
+# harm_union_type() and UNION_TYPE_LEVELS. Sourced here because both
+# ReadENADID.R and "NSFG import.R" need it and both source this file.
+source(file.path(scriptDir, "lib", "unionType_lib.R"))
+# <<< Claude 2026-09-21
+# >>> Claude 2026-09-22
+# UNION_MOTIVE_MAP, which createUnionSep() now uses to resolve the end motive
+# instead of comparing it to the literal string "separation".
+source(file.path(scriptDir, "lib", "unionEpisodes.R"))
+# <<< Claude 2026-09-22
 
 library (tidyverse)
 library (haven)
@@ -1703,55 +1715,210 @@ reweight <- function(df, varWeight="weight") {
   return (df)
 }
 
-addWeights <- function (df, popData) {
-  # Pivot the population reference table to a long format for joining
+# >>> Claude 2026-09-21
+# addWeights REWRITTEN. The old version is in git; read this before accepting.
+#
+# WHAT WAS WRONG
+#   popWeight was calibrated on every single year of age, including ages the
+#   survey does not sample. In ENADID2014 one woman was recorded at age 14, so
+#   pop_count / weight_sum handed her the whole national population at that age,
+#   1,110,422. A clamp at 6 x the survey mean then cut her back to about 2,290.
+#   The clamp is one-sided: it removes weight and never returns it, so every
+#   survey came out 1.6 to 6.0 per cent below its own population target, and one
+#   or two boundary cells accounted for 26 to 100 per cent of that deficit.
+#
+# WHAT THIS VERSION DOES, in three steps
+#   (a) OUT OF UNIVERSE. Walking inwards from each end of the age range, a cell
+#       is set aside while it holds fewer than outFloor women or its expansion
+#       factor exceeds outRatio times the survey median. Its population leaves
+#       the calibration target, because the survey did not sample that age. The
+#       women themselves stay in the file and take the survey average factor, so
+#       they count like an average respondent instead of like a million people.
+#       Set outOfUniverse = "drop" to give them NA instead.
+#   (b) THIN BUT PRESENT. Among the retained cells, any holding fewer than
+#       minCellN women, or whose factor sits outside 1/maxFactorRatio to
+#       maxFactorRatio times the median, is merged with the next age until the
+#       group passes. A trailing group that still fails joins the one before it.
+#   (c) CALIBRATION. One expansion factor per group, popWeight = weight * factor.
+#       Each group then reproduces its population target exactly.
+#
+#   NOTE ON (b): merging is only safe once (a) has run. Pooling age 14 with age
+#   15 while age 14 keeps its full population would give every 15 year old twice
+#   the weight of a 16 year old. Setting the population aside first is what makes
+#   the merge harmless.
+#
+#   trimFactor is NULL by default, that is, NO CLAMP. Steps (a) and (b) remove
+#   the cells the clamp existed for. If you pass a number, the clamp is applied
+#   and the survey is then rescaled so the total survives it, which is the usual
+#   trim and redistribute step. Without the rescale a clamp always loses mass.
+#
+#   The calibration check now runs LAST, on the weights the function returns,
+#   and over the retained ages only.
+addWeights <- function (df, popData,
+                        outFloor = 30, outRatio = 5,
+                        minCellN = 100, maxFactorRatio = 3,
+                        outOfUniverse = c("average", "drop"),
+                        trimFactor = NULL, verbose = TRUE) {
+
+  outOfUniverse <- match.arg(outOfUniverse)
+
   pop_long <- popData %>%
-    tidyr::pivot_longer(
-      cols      = -Age,
-      names_to  = "survey",
-      values_to = "pop_count"
-    )
+    tidyr::pivot_longer(cols = -Age, names_to = "survey", values_to = "pop_count")
   names(pop_long)[1] <- "indiv_age_survey"
-  
-  # For each survey x age cell, compute the sum of individual weights
-  weight_sums <- df %>%
+
+  nNAw <- sum(is.na(df$weight))
+  if (nNAw > 0) {
+    message(sprintf("addWeights: %d case(s) have a missing individual weight; they add nothing to weight_sum", nNAw))
+  }
+
+  cells <- df %>%
     dplyr::group_by(survey, indiv_age_survey) %>%
-    dplyr::summarise(weight_sum = sum(weight), .groups = "drop")
-  
-  # Join both onto the individual-level data and compute popWeight
+    dplyr::summarise(nWomen = dplyr::n(), weight_sum = sum(weight, na.rm = TRUE),
+                     .groups = "drop") %>%
+    dplyr::left_join(pop_long, by = c("survey", "indiv_age_survey")) %>%
+    dplyr::arrange(survey, indiv_age_survey)
+
+  factorTab <- list()
+  auditTab  <- list()
+
+  for (sv in unique(cells$survey)) {
+    ce <- cells[cells$survey == sv, , drop = FALSE]
+    ce <- ce[order(ce$indiv_age_survey), , drop = FALSE]
+    nc <- nrow(ce)
+    f    <- ce$pop_count / ce$weight_sum
+    fref <- stats::median(f, na.rm = TRUE)
+    if (!is.finite(fref)) {
+      stop(sprintf("addWeights: survey '%s' has no usable population counts in popData", sv))
+    }
+
+    # (a) out of universe, from both ends inwards
+    isOut <- function (k) (is.na(f[k]) || (ce$nWomen[k] < outFloor) || (f[k] > outRatio * fref))
+    inUni <- rep(TRUE, nc)
+    i <- 1L
+    while ((i <= nc) && isOut(i)) { inUni[i] <- FALSE; i <- i + 1L }
+    j <- nc
+    while ((j >= 1L) && isOut(j)) { inUni[j] <- FALSE; j <- j - 1L }
+    if (!any(inUni)) inUni <- rep(TRUE, nc)
+
+    # (b) collapse the retained cells
+    tooThin <- function (n, ff) ((n < minCellN) || is.na(ff) ||
+                                   (ff > maxFactorRatio * fref) || (ff < fref / maxFactorRatio))
+    grp <- rep(NA_integer_, nc)
+    idx <- which(inUni)
+    g <- 0L
+    a <- 1L
+    while (a <= length(idx)) {
+      g <- g + 1L
+      b <- a
+      grp[idx[a]] <- g
+      nAcc <- ce$nWomen[idx[a]]
+      pAcc <- ce$pop_count[idx[a]]
+      wAcc <- ce$weight_sum[idx[a]]
+      while ((b < length(idx)) && tooThin(nAcc, pAcc / wAcc)) {
+        b <- b + 1L
+        grp[idx[b]] <- g
+        nAcc <- nAcc + ce$nWomen[idx[b]]
+        pAcc <- pAcc + ce$pop_count[idx[b]]
+        wAcc <- wAcc + ce$weight_sum[idx[b]]
+      }
+      a <- b + 1L
+    }
+    if (g > 1L) {
+      last <- which(grp == g)
+      if (tooThin(sum(ce$nWomen[last]), sum(ce$pop_count[last]) / sum(ce$weight_sum[last]))) {
+        grp[last] <- g - 1L
+      }
+    }
+
+    # (c) one expansion factor per group
+    gf   <- tapply(seq_len(nc)[inUni], grp[inUni],
+                   function (ii) sum(ce$pop_count[ii]) / sum(ce$weight_sum[ii]))
+    fRet <- sum(ce$pop_count[inUni]) / sum(ce$weight_sum[inUni])
+    ce$grp        <- grp
+    ce$inUniverse <- inUni
+    ce$nAges      <- ifelse(inUni, as.integer(table(grp)[as.character(grp)]), NA_integer_)
+    ce$expFactor  <- ifelse(inUni, gf[as.character(grp)],
+                            if (outOfUniverse == "average") fRet else NA_real_)
+
+    factorTab[[sv]] <- ce[, c("survey", "indiv_age_survey", "expFactor")]
+    auditTab[[sv]]  <- ce
+  }
+
+  factorTab <- do.call(rbind, factorTab)
+  audit     <- do.call(rbind, auditTab)
+
   df <- df %>%
-    dplyr::left_join(weight_sums, by = c("survey", "indiv_age_survey")) %>%
-    dplyr::left_join(pop_long,    by = c("survey", "indiv_age_survey")) %>%
-    dplyr::mutate(
-      popWeight = weight * (pop_count / weight_sum)
-    ) %>%
-    dplyr::select(-weight_sum, -pop_count)
-  
+    dplyr::left_join(factorTab, by = c("survey", "indiv_age_survey")) %>%
+    dplyr::mutate(popWeight = weight * expFactor) %>%
+    dplyr::select(-expFactor)
+
+  # optional clamp, followed by the rescale that keeps the calibration
+  if (!is.null(trimFactor)) {
+    mw <- df %>% dplyr::group_by(survey) %>%
+      dplyr::summarise(mean = mean(popWeight, na.rm = TRUE), .groups = "drop")
+    df <- df %>%
+      dplyr::left_join(mw, by = "survey") %>%
+      dplyr::mutate(popWeight = ifelse(!is.na(popWeight) & !is.na(mean) &
+                                         (popWeight > trimFactor * mean),
+                                       trimFactor * mean, popWeight)) %>%
+      dplyr::select(-mean)
+    # The rescale is read off the retained ages only, so that the weight carried
+    # by the out-of-universe women does not enter the calibration target.
+    kk <- df %>%
+      dplyr::inner_join(audit[audit$inUniverse, c("survey", "indiv_age_survey")],
+                        by = c("survey", "indiv_age_survey")) %>%
+      dplyr::group_by(survey) %>%
+      dplyr::summarise(after = sum(popWeight, na.rm = TRUE), .groups = "drop") %>%
+      dplyr::left_join(audit %>% dplyr::filter(inUniverse) %>%
+                         dplyr::group_by(survey) %>%
+                         dplyr::summarise(target = sum(pop_count), .groups = "drop"),
+                       by = "survey") %>%
+      dplyr::mutate(k = target / after)
+    df <- df %>%
+      dplyr::left_join(kk[, c("survey", "k")], by = "survey") %>%
+      dplyr::mutate(popWeight = popWeight * k) %>%
+      dplyr::select(-k)
+  }
+
   df <- relocate(df, popWeight, .after = weight)
-  
-  #### check popWeight ####
+
+  #### report and check popWeight, on what the function actually returns ####
+  if (isTRUE(verbose)) {
+    cellReport <- audit %>%
+      dplyr::group_by(survey) %>%
+      dplyr::summarise(ages          = paste0(min(indiv_age_survey), "-", max(indiv_age_survey)),
+                       outOfUniverse = paste(indiv_age_survey[!inUniverse], collapse = ","),
+                       nWomenOut     = sum(nWomen[!inUniverse]),
+                       nCells        = dplyr::n_distinct(grp[inUniverse]),
+                       nMerged       = sum(nAges > 1, na.rm = TRUE),
+                       .groups       = "drop")
+    message("addWeights: calibration cells")
+    print(as.data.frame(cellReport))
+
+    spread <- df %>%
+      dplyr::group_by(survey) %>%
+      dplyr::summarise(maxOverMean = round(max(popWeight, na.rm = TRUE) /
+                                             mean(popWeight, na.rm = TRUE), 1),
+                       nNoPopWeight = sum(is.na(popWeight)),
+                       .groups = "drop")
+    message("addWeights: largest popWeight relative to the survey mean")
+    print(as.data.frame(spread))
+  }
+
+  keep <- audit[audit$inUniverse, c("survey", "indiv_age_survey")]
   check_popWeight <- df %>%
     dplyr::group_by(survey, indiv_age_survey) %>%
-    dplyr::summarise(pop_count = sum(popWeight), .groups = "drop")
-  
-  compared <- comparePopCount(pop_long, check_popWeight)
-  result   <- summariseError(compared) 
-  
-  # if the age group has very few women, then popWeight will be very big
-  # We set popWeight to the mean value of popWeight if it exceeds 6 times the mean
-  mean_popWeight <- df %>%
-    dplyr::group_by(survey) %>%
-    dplyr::summarise(mean = mean(popWeight), .groups = "drop")
-  
-  df <- df %>%
-    dplyr::left_join(mean_popWeight, by = "survey") %>%
-    dplyr::mutate(
-      popWeight = ifelse(popWeight > 6 * mean, 6 * mean, popWeight)
-    ) %>%
-    dplyr::select(-mean)
-  
+    dplyr::summarise(pop_count = sum(popWeight), .groups = "drop") %>%
+    dplyr::inner_join(keep, by = c("survey", "indiv_age_survey"))
+
+  compared <- comparePopCount(dplyr::inner_join(pop_long, keep,
+                                                by = c("survey", "indiv_age_survey")),
+                              check_popWeight)
+  invisible(summariseError(compared))
+
   return (df)
 }
+# <<< Claude 2026-09-21
 
 compute_lastYear <- function (df) {
   library (tidyverse)
@@ -2018,73 +2185,214 @@ reasonIncomplete <- function(df, ageCap = 10) {
               .groups = "drop")
 }
 
-createUnionSep <- function (df=NULL) {
-  if ((exists("DEBUG1")) && (isTRUE(DEBUG1))) browser()
-  
-  union1_sep1 <- data.frame(surveyName=df$survey, country=df$country, cmc_birth=df$indiv_dob_cmc,
-                            yBirth=df$yBirth, cmc_survey=df$surveyDate_cmc,
-                            cmc_union1=df$union_start_cmc1,
-                            cmc_sep1=df$union_end_cmc1,
-                            sep1_motive=df$union_end_motive1,
-                            weight=df$weight,
-                            popWeight=df$popWeight)
-  
-  union1_sep1$ageSurvey <- trunc((union1_sep1$cmc_survey - union1_sep1$cmc_birth) / 12)
-  union1_sep1$sex <- 2
-  df <- compute_lastYear (df)
-  union1_sep1$lastYear <- df$lastYear
-  
-  #### clean union1_sep1
-  # only women who enter a first union
-  union1_sep1 <- subset (union1_sep1, (!is.na(cmc_union1)))
-  # first separation cannot occur before first union
-  befAll <- nrow(union1_sep1)
-  union1_sep1 <- subset ( union1_sep1, (is.na(cmc_sep1)) | (cmc_sep1 >= cmc_union1) )
-  if (befAll > nrow(union1_sep1)) cat (paste0("Excluded ", befAll - nrow(union1_sep1), " observations with first separation before union\n"))
-  # exclude bad date of survey, or first union and first separation that occurs after the date of survey
-  bef <- nrow(union1_sep1)
-  union1_sep1 <- subset (union1_sep1, (!is.na(cmc_survey)))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with NA as date of survey \n"))
-  bef <- nrow(union1_sep1)
-  union1_sep1 <- subset (union1_sep1, (cmc_union1 <= cmc_survey))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with first union after date survey \n"))
-  bef <- nrow(union1_sep1)
-  union1_sep1 <- subset (union1_sep1, (is.na(cmc_sep1)) | (cmc_sep1 <= cmc_survey))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with first separation after date survey \n"))
-  
-  # end of first union unknown motive are allocated to separation
-  levels(union1_sep1$sep1_motive)[levels(union1_sep1$sep1_motive) == "unknown"] <- "separation"
-  # widowhood is treated as censoring
-  union1_sep1$cmc_survey[union1_sep1$sep1_motive %in% "widowhood"] <- union1_sep1$cmc_sep1[union1_sep1$sep1_motive %in% "widowhood"]
-  #union1_sep1$cmc_survey <- ifelse((!is.na(union1_sep1$sep1_motive))&(union1_sep1$sep1_motive=="widowhood"),union1_sep1$cmc_sep1,union1_sep1$cmc_survey)
-  # cleaning...
-  # second round of cmc_survey: take a look at dates of widowhood which are NA
-  bef <- nrow(union1_sep1)
-  union1_sep1 <- subset(union1_sep1, !is.na(union1_sep1$cmc_survey))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with NA as date of first widowhood \n"))
-  bef <- nrow(union1_sep1)
-  # if there is a separation, we should have a cmc date for it
-  union1_sep1 <- dplyr::filter (union1_sep1, !(sep1_motive %in% "separation" & is.na(cmc_sep1)))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with NA as date of first separation \n"))
-  # we consider only separation as event
-  union1_sep1$cmc_sep1 <- ifelse((!is.na(union1_sep1$sep1_motive))&(union1_sep1$sep1_motive=="separation"),union1_sep1$cmc_sep1,NA)
-  #year of first union
-  union1_sep1$yUnion1 <- yearFrom_cmc(union1_sep1$cmc_union1)
-  union1_sep1$ageAtRisk <- (union1_sep1$cmc_union1 - union1_sep1$cmc_birth) / 12
-  bef <- nrow(union1_sep1)
-  union1_sep1 <- subset (union1_sep1, (!is.na(yUnion1)))
-  if (bef > nrow(union1_sep1)) cat (paste0("Excluded ", bef - nrow(union1_sep1), " observations with NA as date of first union \n"))
-  #year of first separation
-  union1_sep1$ySep1 <- yearFrom_cmc(union1_sep1$cmc_sep1)
-  union1_sep1$ageEvent <- (union1_sep1$cmc_sep1 - union1_sep1$cmc_birth) / 12
-  union1_sep1$durationEvent <- union1_sep1$cmc_sep1 - union1_sep1$cmc_union1
-  
-  if (befAll > nrow(union1_sep1)) cat (paste0("Excluded ", befAll - nrow(union1_sep1), " observations of a total of ", befAll, "\n"))
-  
-  union1_sep1$surveyName <- factor (union1_sep1$surveyName)
-  
-  return (union1_sep1)
+# >>> Claude 2026-09-22
+# createUnionSep REWRITTEN. The previous version is in git. Read this before accepting.
+#
+# WHAT CHANGES
+#   (1) The union order is an argument, u, defaulting to 1. Only the INPUT
+#       column names are indexed; compute_lastYear() needs nothing.
+#   (2) The motive is resolved through UNION_MOTIVE_MAP instead of being
+#       compared to the literal string "separation". The old test silently
+#       dropped 707 EDER2017 endings labelled "divorce" and 4 ENADID1997
+#       labelled "don't know", and in the USA 3 "refused" and 5 in the level
+#       literally named "NA". Those women kept their full exposure with no
+#       event, which is worse than removing them.
+#   (3) A record whose motive says "in union" but which carries an end date is
+#       an internal inconsistency. inUnionWithDate decides what happens to it,
+#       and the default matches buildUnionEpisodes(): the date decides WHETHER
+#       the union ended, the motive decides WHY, and an unusable motive is
+#       "unknown".
+#   (4) Every category is counted and reported, by survey.
+#
+# WHAT DOES NOT CHANGE
+#   Widowhood is still censoring: the woman leaves the risk set at the
+#   widowhood date and ppr_doIt() returns the NET probability of separating.
+#   That is deliberate. For the CRUDE probability use ppr_cr_doIt() in
+#   lib/pprCompetingRisks.R, which needs the widowhood YEAR as a column and
+#   varCens left at the survey date; this function returns yWid for that.
+#   A separation with no date is still removed. filterDateQuality() should
+#   already have taken those out (flag 10); the guard here is a backstop.
+#
+# OUTPUT NAMES
+#   yUnion / ySep / cmc_union / cmc_sep, plus unionOrder, rather than the old
+#   yUnion1 / ySep1. Calling a third union's variable "ySep1" would be worse
+#   than updating the call sites.
+#
+# TO REPRODUCE THE OLD BEHAVIOUR EXACTLY, for comparison:
+#   createUnionSep(df, motiveMap = c("separation" = "separation",
+#                                    "widowhood"  = "widowed",
+#                                    "unknown"    = "unknown"),
+#                      unknownEndAs = "ignore", inUnionWithDate = "in union")
+createUnionSep <- function (df = NULL, u = 1,
+                            motiveMap       = NULL,
+                            unknownEndAs    = c("separation", "censor", "drop", "ignore"),
+                            inUnionWithDate = c("unknown", "in union", "drop"),
+                            quiet = FALSE) {
+  #==> u: which union slot, so union_start_cmc<u> and friends
+  #==> motiveMap: named vector, lower-cased motive wording -> one of
+  #    "separation", "widowed", "unknown". NULL uses UNION_MOTIVE_MAP.
+  #==> unknownEndAs: a union that ended for a reason the data does not give.
+  #    "separation" counts it as one, which is what sections 2 to 4 of
+  #    KaplanMeier.R assume. "censor" removes her at the end date. "drop"
+  #    removes the woman. "ignore" leaves her at risk to the survey with no
+  #    event, which is the old behaviour and biases the rates down.
+  #==> inUnionWithDate: motive "in union" but an end date present.
+  #<== one row per woman at risk in union u, with yUnion / ySep / yWid
+
+  if (is.null(df)) stop("createUnionSep: df cannot be NULL")
+  unknownEndAs    <- match.arg(unknownEndAs)
+  inUnionWithDate <- match.arg(inUnionWithDate)
+  if (is.null(motiveMap)) {
+    if (!exists("UNION_MOTIVE_MAP")) {
+      stop("createUnionSep: UNION_MOTIVE_MAP not found. source(\"lib/unionEpisodes.R\") first.")
+    }
+    motiveMap <- UNION_MOTIVE_MAP
+  }
+
+  vStart <- paste0("union_start_cmc",  u)
+  vEnd   <- paste0("union_end_cmc",    u)
+  vMot   <- paste0("union_end_motive", u)
+  need   <- c(vStart, vEnd, vMot, "survey", "country", "surveyDate_cmc",
+              "indiv_dob_cmc", "yBirth", "weight", "popWeight")
+  miss   <- setdiff(need, names(df))
+  if (length(miss) > 0) {
+    stop("createUnionSep: union ", u, " is not available in this frame; missing: ",
+         paste(miss, collapse = ", "))
+  }
+
+  say <- function (...) if (!quiet) cat(...)
+
+  out <- data.frame(surveyName = df$survey, country = df$country,
+                    cmc_birth  = df$indiv_dob_cmc, yBirth = df$yBirth,
+                    cmc_survey = df$surveyDate_cmc,
+                    cmc_union  = df[[vStart]],
+                    cmc_end    = df[[vEnd]],
+                    motiveRaw  = as.character(df[[vMot]]),
+                    weight     = df$weight, popWeight = df$popWeight,
+                    stringsAsFactors = FALSE)
+  out$unionOrder <- u
+  out$ageSurvey  <- trunc((out$cmc_survey - out$cmc_birth) / 12)
+  out$sex        <- 2
+  df             <- compute_lastYear(df)
+  out$lastYear   <- df$lastYear
+
+  # ---- coverage, before anything is removed ---------------------------------
+  if (!quiet) {
+    cov <- data.frame(survey = out$surveyName,
+                      hasUnion = !is.na(out$cmc_union),
+                      hasEnd   = !is.na(out$cmc_end))
+    tab <- stats::aggregate(cbind(hasUnion, hasEnd) ~ survey, data = cov, FUN = sum)
+    tab$nWomen <- as.vector(table(cov$survey)[as.character(tab$survey)])
+    say("createUnionSep(u = ", u, "): coverage by survey\n")
+    print(tab[, c("survey", "nWomen", "hasUnion", "hasEnd")], row.names = FALSE)
+    empty <- tab$survey[tab$hasUnion == 0]
+    if (length(empty) > 0) {
+      say("  no union of order ", u, " in: ", paste(empty, collapse = ", "), "\n")
+    }
+  }
+
+  # ---- cleaning, in the order the previous version used ---------------------
+  n0 <- nrow(out)
+  out <- subset(out, !is.na(cmc_union))
+  drop1 <- function (keep, what) {
+    n <- nrow(out); o <- out[keep, , drop = FALSE]
+    if (nrow(o) < n) say("Excluded ", n - nrow(o), " observations ", what, "\n")
+    o
+  }
+  out <- drop1(is.na(out$cmc_end) | (out$cmc_end >= out$cmc_union), "with an end before the union start")
+  out <- drop1(!is.na(out$cmc_survey),                              "with NA as date of survey")
+  out <- drop1(out$cmc_union <= out$cmc_survey,                     "with the union starting after the survey")
+  out <- drop1(is.na(out$cmc_end) | (out$cmc_end <= out$cmc_survey), "with the union ending after the survey")
+
+  # ---- resolve the motive ---------------------------------------------------
+  key  <- tolower(trimws(out$motiveRaw))
+  what <- unname(motiveMap[key])
+  nUnmapped <- sum(!is.na(key) & is.na(what) & (key != "in union"))
+  unmapped  <- sort(unique(key[!is.na(key) & is.na(what) & (key != "in union")]))
+  what[is.na(what)] <- "unknown"
+
+  # A motive that names a real ending but carries no date: we know the union
+  # ended, we do not know when. Keeping her makes her a false non-separation
+  # with full exposure, which is the bias this rewrite exists to remove, so she
+  # is dropped. filterDateQuality() (flag 10) normally takes these out first.
+  endedByMotive <- (what %in% c("separation", "widowed"))
+  noDate <- endedByMotive & is.na(out$cmc_end)
+  if (any(noDate)) {
+    say("Excluded ", sum(noDate), " ending(s) with a known motive but no date",
+        " (filterDateQuality flag 10 should already have removed these)\n")
+    out <- out[!noDate, ]; what <- what[!noDate]; key <- key[!noDate]
+  }
+
+  ended <- !is.na(out$cmc_end)          # the DATE says whether it ended
+  inUnionLabel <- !is.na(key) & (key == "in union")
+
+  nInUnionDated <- sum(ended & inUnionLabel)
+  if (inUnionWithDate == "in union") {
+    ended[inUnionLabel] <- FALSE        # trust the motive: no ending
+  } else if (inUnionWithDate == "drop") {
+    keep <- !(ended & inUnionLabel)
+    out <- out[keep, ]; what <- what[keep]; ended <- ended[keep]; inUnionLabel <- inUnionLabel[keep]
+  }                                     # "unknown": trust the date, motive stays "unknown"
+
+  nUnknownEnd <- sum(ended & (what == "unknown"))
+  if (unknownEndAs == "separation") {
+    what[ended & (what == "unknown")] <- "separation"
+  } else if (unknownEndAs == "drop") {
+    keep <- !(ended & (what == "unknown"))
+    out <- out[keep, ]; what <- what[keep]; ended <- ended[keep]
+  }                                     # "censor" and "ignore" handled below
+
+  out$endType <- ifelse(!ended, "in union", what)
+
+  if (!quiet) {
+    say("createUnionSep(u = ", u, "): endings resolved\n")
+    print(table(survey = out$surveyName, ending = out$endType), zero.print = ".")
+    if (nUnmapped > 0) {
+      say("  ", nUnmapped, " ending(s) carry a motive absent from the map: ",
+          paste(unmapped, collapse = ", "), " (handled as '", unknownEndAs, "')\n")
+    }
+    if (nInUnionDated > 0) {
+      say("  ", nInUnionDated, " ending(s) labelled 'in union' but carrying an end date",
+          " (handled as '", inUnionWithDate, "')\n")
+    }
+    if (nUnknownEnd > 0) {
+      say("  ", nUnknownEnd, " ending(s) with no usable motive (handled as '", unknownEndAs, "')\n")
+    }
+  }
+
+  # ---- widowhood, and any ending we censor rather than count ----------------
+  # The woman leaves the risk set at the end date. This is what makes the
+  # result a NET probability.
+  out$yWid <- ifelse(out$endType == "widowed", yearFrom_cmc(out$cmc_end), NA)
+  censorHere <- (out$endType == "widowed") |
+                ((unknownEndAs == "censor") & (out$endType == "unknown"))
+  out$cmc_survey[censorHere] <- out$cmc_end[censorHere]
+
+  out <- drop1(!is.na(out$cmc_survey), "with NA as the censoring date")
+
+  # ---- the separation event -------------------------------------------------
+  isSep <- (out$endType == "separation")
+  out$cmc_sep <- ifelse(isSep, out$cmc_end, NA)
+
+  # ---- derived columns ------------------------------------------------------
+  out$yUnion        <- yearFrom_cmc(out$cmc_union)
+  out$ageAtRisk     <- (out$cmc_union - out$cmc_birth) / 12
+  out <- drop1(!is.na(out$yUnion), "with NA as the year of union")
+  out$ySep          <- yearFrom_cmc(out$cmc_sep)
+  out$ageEvent      <- (out$cmc_sep   - out$cmc_birth) / 12
+  out$ageEvent2     <- (out$cmc_end   - out$cmc_birth) / 12
+  out$ageEvent2[out$endType != "widowed"] <- NA
+  out$durationEvent <- out$cmc_sep - out$cmc_union
+  out$surveyName    <- factor(out$surveyName)
+  out$motiveRaw     <- NULL
+  rownames(out)     <- NULL
+
+  say("createUnionSep(u = ", u, "): ", nrow(out), " women kept of ", n0,
+      ", ", sum(!is.na(out$ySep)), " separations, ",
+      sum(!is.na(out$yWid)), " widowhoods\n")
+  return (out)
 }
+# <<< Claude 2026-09-22
 
 createBirthBirths <- function (df) {
   birth_births <- data.frame(surveyName=df$survey, country=df$country, cmc_birth=df$indiv_dob_cmc,

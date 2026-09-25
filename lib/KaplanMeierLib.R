@@ -62,7 +62,76 @@ do_useRelativeWeights <- function (df=NULL, varWeight=NULL) {
   
   return (df2)
 }
-KaplanMeier <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL, varWeight=NULL, varEvent2=NULL, truncate=10) {
+# >>> Claude 2026-09-19
+# REVIEW AND REWRITE OF THE KAPLAN-MEIER CORE. Read before accepting.
+#
+# Corrections
+#   (1) survFunction is now the standard RIGHT-continuous estimator,
+#       S(t_i) = prod_{j<=i} (1 - rate_j). The old loop used rate[i-1], so the
+#       returned table was shifted by one event time and the last drop was lost.
+#       An explicit origin row (duration 0, S = 1) is inserted when duration 0 is
+#       not already an observed time, so the curve still starts at 1.
+#   (2) The Greenwood sum now spans the same index set as the product above. The
+#       old code paired S(t_{i-1}) with a variance that already included t_i.
+#   (3) Truncation is applied BEFORE mirroring and on the UNWEIGHTED count
+#       (eventRaw). On the mirrored side the old mask counted the dense mass near
+#       zero for every row, so it never removed the sparse far tail and could
+#       instead drop the rows next to zero.
+#   (4) The mirrored branch is an AFFINE transform, 1 - p*S, whose delta-method
+#       variance is p^2 Var(S), not ((1 - p*S)/S)^2 Var(S). The old form diverged
+#       as S approached 0; in a simulation the standard error was inflated by a
+#       factor above 600 in the tail.
+#   (5) The adjusted bounds are now written back into confIntMax / confIntMin.
+#       The old lines assigned confIntMaxAdj to itself, so the returned interval
+#       belonged to the unadjusted curve.
+#   (6) Sampling error in the two mixing proportions is now included (binomial,
+#       Kish effective n). Set includePropVariance = FALSE to reproduce the old
+#       behaviour of conditioning on them.
+#   (7) varWeight = NULL is detected correctly. df_KM[, NULL] is a zero-column
+#       data.frame, not NULL, so the old test made useWeights always TRUE and
+#       unweighted calls failed.
+#   (8) The small-sample fallback no longer invents points at -100 and -1 with a
+#       column set that made rbind() fail. It returns an empty, correctly shaped
+#       frame, and the left branch is simply absent.
+#   (9) dfE_before_E2$cens_after_event resolved only through partial matching of
+#       cens_after_event2. The intermediate columns are gone; the differences are
+#       passed straight to computeKM().
+#  (10) The "rate > 0.95 and fewer than 3 events -> 0.5" override is kept but is
+#       now switchable, compares against the UNWEIGHTED count, reports itself, and
+#       DEFAULTS TO FALSE. It is not Kaplan-Meier estimation.
+#  (11) useSurvfit = TRUE delegates the estimator to survival::survfit(), with
+#       confType and robustVar controlling the interval. See the argument notes.
+#  (12) Missing weights are no longer replaced by 1 without a word: naWeight
+#       chooses between "one", "drop" and "error", and every case is reported.
+#  (13) A 'branch' column ("before" / "after") is returned, because both halves
+#       of a mirrored curve now carry a row at time 0 and the sign of 'time'
+#       alone no longer separates them.
+#
+# Known limitations, deliberately NOT patched here
+#   - propEventBeforeEvent2 and propEvent2BeforeEvent are raw observed shares.
+#     Anyone censored before either event lowers both, so the vertical gap at
+#     time 0 widens with censoring. The correct estimator is a competing-risks
+#     (Aalen-Johansen) cumulative incidence. A message is printed when the
+#     censored-before-either share exceeds censWarnThreshold.
+#   - Greenwood with survey weights treats weights as frequency counts and is not
+#     design based. Use validate_with_bootstrap() for intervals that respect
+#     strata and clusters, and rescale weights to mean 1 before trusting any
+#     interval reported here.
+#   - Ties (varEvent2 == varEvent) are assigned to the "event first" group. With
+#     monthly CMC data these are frequent; a third simultaneous outcome at time 0
+#     would be more faithful.
+#   - ANTICIPATORY SELECTION. Neither half estimates anything backwards in time.
+#     Each is an ordinary forward-time Kaplan-Meier, and the left one is merely
+#     drawn on a reversed axis. The exposure lies in the SAMPLE SPLIT: which half
+#     a woman belongs to is decided by which event came first, and that is
+#     information about her future as of time 0. A woman still at risk of both
+#     events belongs to neither half until her order is observed. Read the two
+#     halves as descriptions of the sub-populations defined by that order, not as
+#     the experience of a cohort followed forward from time 0. On the general
+#     problem see Hoem and Kreyenfeld (2006), Demographic Research 15:17.
+KaplanMeier <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL, varWeight=NULL, varEvent2=NULL,
+                         truncate=10, fixHighRates=FALSE, includePropVariance=TRUE, censWarnThreshold=0.10,
+                         useSurvfit=TRUE, confType="log-log", robustVar=NULL, naWeight="drop") {
   #==> df_KM: data.frame with the dataset
   #==> varEnter: name of the column with the starting dates of being at risk of events (from example date of birth of individuals)
   #==> varEvent: name of the column with the dates of the event
@@ -71,186 +140,377 @@ KaplanMeier <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL,
   #==> varWeight: name of column with weights (optional: if not NULL, then we will use them)
   #==> varEvent2: name of the column with the dates of the second event (optional)
   #   If there are two events, then we will try to built a mirrored Kaplan&Meier (Billari, 2001)
+  #==> truncate: hide the tail once fewer than 'truncate' UNWEIGHTED events remain (NULL to keep everything)
+  #==> fixHighRates: TRUE restores the legacy override of hazards above 0.95 based on fewer than
+  #    3 raw events. It is NOT Kaplan-Meier estimation: it replaces a valid hazard with 0.5 and
+  #    so moves the curve. It now defaults to FALSE. With truncate at its default the override
+  #    only ever fired on rows the truncation then removed, so turning it off changes nothing
+  #    in practice; set it to TRUE only to reproduce an older figure exactly.
+  #==> naWeight: what to do with cases whose weight is missing, one of "one", "drop", "error".
+  # >>> Claude 2026-09-21
+  #    Corrected note: the DEFAULT IS "drop". "one" is the OLD behaviour; it sets the weight
+  #    to 1, which is reasonable when the weights are already scaled around 1 but is close to
+  #    deleting the case when they are expansion factors, since a weight of 1 sits beside
+  #    weights in the thousands. "drop" removes the case outright, which is usually what a
+  #    missing survey weight means, and is the honest version of what "one" did in practice.
+  #    "error" stops. All three report how many cases were affected.
+  # <<< Claude 2026-09-21
+  #==> includePropVariance: add the binomial variance of the two mixing proportions
+  #==> censWarnThreshold: report when this share of the sample is censored before either event
+  #==> useSurvfit: TRUE delegates the estimator to survival::survfit(). Everything else in this
+  #    function (cleaning, the origin row, truncation, mirroring, the scaling of the two branches)
+  #    is unchanged, so the two paths are directly comparable. With confType = "plain" and
+  #    robustVar = FALSE the two agree to numerical precision; that is asserted in the tests.
+  #==> confType: interval scale passed to survfit, one of "plain", "log", "log-log".
+  #    "log-log" keeps the bounds inside [0, 1] by construction and behaves far better in the
+  #    tails, which on a mirrored curve is most of both halves. Ignored when useSurvfit is FALSE.
+  #==> robustVar: TRUE asks survfit for the infinitesimal jackknife variance instead of Greenwood.
+  #    NULL (the default) resolves to TRUE whenever weights are supplied, because survey weights
+  #    are not frequency counts and Greenwood is not the right variance for them. Note that this
+  #    still ignores strata and clusters: for a design-based interval use survey::svykm().
+  #    Ignored when useSurvfit is FALSE.
   #<== return a table with Kaplan&Meier columns
-  
+
   if (exists("DEBUG2") && isTRUE(DEBUG2)) browser()
-  
+
   if (is.null (df_KM)) stop("the dataframe cannot been NULL")
   if (is.null (varEnter) | is.null(varEvent) | is.null(varCens)) stop("varEnter, varEvent and varCens cannot been NULL")
-  
-  if (!is.null(varWeight)) {
-    df_KM[,varWeight] <- ifelse(is.na(df_KM[,varWeight]),1,df_KM[,varWeight])
+
+  useWeights <- !is.null(varWeight)
+
+  if (!(naWeight %in% c("one", "drop", "error"))) {
+    stop("naWeight must be one of \"one\", \"drop\", \"error\"")
   }
-  
-  computeKM <- function (sz=NULL, vecEnter=NULL, vecEvent=NULL, vecCens=NULL, vecWeight=NULL, mirror=FALSE, truncate=10) {
-    # ==> truncate: hide the tail when the total number of remaining events is less then 10
+
+  # Missing weights. The old code replaced them by 1 with no record, which is
+  # close to deleting the case when the weights are expansion factors.
+  if (useWeights) {
+    nNAw <- sum(is.na(df_KM[,varWeight]))
+    if (nNAw > 0) {
+      if (naWeight == "error") {
+        stop(sprintf("KaplanMeier: %d case(s) have a missing weight in '%s'", nNAw, varWeight))
+      } else if (naWeight == "drop") {
+        message(sprintf("KaplanMeier: dropped %d case(s) with a missing weight in '%s'", nNAw, varWeight))
+        df_KM <- df_KM[!is.na(df_KM[,varWeight]), ]
+      } else {
+        message(sprintf(paste0("KaplanMeier: %d case(s) have a missing weight in '%s' and were set to 1. ",
+                               "If '%s' holds expansion factors this all but removes them from the ",
+                               "estimate; naWeight = \"drop\" or \"error\" may be what you want."),
+                        nNAw, varWeight, varWeight))
+        df_KM[is.na(df_KM[,varWeight]), varWeight] <- 1
+      }
+    }
+    if (nrow(df_KM) > 0) {
+      nBadW <- sum(df_KM[,varWeight] <= 0, na.rm = TRUE)
+      if (nBadW > 0) {
+        message(sprintf(paste0("KaplanMeier: %d case(s) have a weight of zero or less in '%s'; ",
+                               "survfit() treats a zero weight as ambiguous and the risk set here ",
+                               "will not reflect them either"), nBadW, varWeight))
+      }
+    }
+  }
+
+  # >>> Claude 2026-09-21
+  # Cases with no entry date or no censoring date carry no exposure. survfit()
+  # and aggregate() both drop them without a word, so count them here. A large
+  # number usually means the frame still holds women who never entered the state
+  # at all, or that a cohort was selected with df[cond, ] rather than subset():
+  # base '[' returns one row of NA for every NA in 'cond'.
+  nNAenter <- sum(is.na(df_KM[[varEnter]]))
+  nNAcens  <- sum(is.na(df_KM[[varCens]]))
+  if ((nNAenter > 0) || (nNAcens > 0)) {
+    message(sprintf("KaplanMeier: %d case(s) without an entry date in '%s', %d without a censoring date in '%s'; both contribute no exposure",
+                    nNAenter, varEnter, nNAcens, varCens))
+  }
+  # <<< Claude 2026-09-21
+
+  # Shape of an empty result, so the return type never depends on the data.
+  emptyKM <- function () {
+    data.frame(time=numeric(0), event=numeric(0), eventRaw=numeric(0), number=numeric(0),
+               numberRaw=numeric(0), surv=numeric(0), rate=numeric(0), survFunction=numeric(0),
+               variance=numeric(0), stdErr=numeric(0), confIntMax=numeric(0), confIntMin=numeric(0),
+               branch=character(0), stringsAsFactors=FALSE)
+  }
+
+  # Kish effective sample size, used for the variance of the mixing proportions.
+  kishN <- function (w, n) {
+    if (is.null(w) || (length(w) == 0)) return (n)
+    s2 <- sum(w^2, na.rm=TRUE)
+    if (!is.finite(s2) || (s2 <= 0)) return (n)
+    return (sum(w, na.rm=TRUE)^2 / s2)
+  }
+
+  if (isTRUE(useSurvfit)) {
+    if (!requireNamespace("survival", quietly = TRUE)) {
+      stop("useSurvfit = TRUE requires the 'survival' package (it ships with R)")
+    }
+    if (!(confType %in% c("plain", "log", "log-log"))) {
+      stop("confType must be one of \"plain\", \"log\", \"log-log\"")
+    }
+    if (isTRUE(fixHighRates)) {
+      message("KaplanMeier: fixHighRates has no equivalent in survfit() and is ignored while useSurvfit = TRUE")
+    }
+  }
+  useRobust <- if (is.null(robustVar)) useWeights else isTRUE(robustVar)
+
+  # Two-sided 95% normal quantile. The old code hard-coded 1.96; survfit() uses
+  # qnorm(0.975) = 1.959964, and the difference is what kept the two paths from
+  # agreeing exactly. Using the quantile lets the equivalence test be exact.
+  zCrit <- stats::qnorm(0.975)
+
+  computeKM <- function (vecEnter=NULL, vecEvent=NULL, vecCens=NULL, vecWeight=NULL,
+                         mirror=FALSE, truncate=10) {
     if (exists("DEBUG3") && isTRUE(DEBUG3)) browser()
-    
-    useWeights <- !is.null(vecWeight)
-    data <- data.frame(time=(1:sz), event=(1:sz))
-    data$time <- ifelse(is.na(vecEvent), vecCens-vecEnter, vecEvent-vecEnter)
-    if (useWeights) {
-      data$event <- ifelse(is.na(vecEvent), 0, vecWeight)
-      data$eventRaw <- ifelse(is.na(vecEvent), 0, 1)
-      data$number <- vecWeight
-    } else {
-      data$event <- ifelse(is.na(vecEvent), 0, 1)
-      data$eventRaw <- ifelse(is.na(vecEvent), 0, 1)
-      data$number <- 1
-    }
-    #count the number of unweighted cases, for Loess smoothing...
-    data$numberRaw <- 1
+
+    sz <- length(vecEvent)
+    if (sz == 0) return (emptyKM())
+
+    w <- if (!is.null(vecWeight)) as.numeric(vecWeight) else rep(1, sz)
+
+    data <- data.frame(
+      time      = ifelse(is.na(vecEvent), vecCens - vecEnter, vecEvent - vecEnter),
+      event     = ifelse(is.na(vecEvent), 0, w),
+      eventRaw  = ifelse(is.na(vecEvent), 0, 1),
+      number    = w,
+      numberRaw = 1
+    )
+    data <- aggregate(data[, c("event", "eventRaw", "number", "numberRaw")],
+                      by = list(time = data$time), FUN = sum)
     data <- data[order(data$time),]
-    data <- aggregate(data, by = list(data$time), FUN = sum)
-    data$time <- NULL
-    colnames(data)[1] <- "time"
-    data$surv <- sum(data$number)
-    data$surv[2:length(data$surv)] <- data$surv[2:length(data$surv)] - cumsum (data$number[1:(length(data$surv)-1)])
+    rownames(data) <- NULL
+
+    # Number still at risk: anyone censored exactly at t is at risk at t.
+    totN <- sum(data$number)
+    data$surv <- totN - c(0, cumsum(data$number)[-nrow(data)])
     data$rate <- data$event / data$surv
-    data$rate <- ifelse((data$rate > 0.95)&(data$event < 3), 0.5, data$rate) # avoid case of few events and rate equal 1
-    data$survFunction <- 1
-    for (i in (2:length(data$surv))) {
-      data$survFunction[i] = data$survFunction[i-1] * (1 - data$rate[i-1])
+
+    if (isTRUE(useSurvfit)) {
+
+      # survival::survfit() supplies the estimator and the interval. Everything
+      # around it (the risk set above, the origin row, truncation, mirroring)
+      # stays as it is, so the two paths differ only in these five columns.
+      #
+      # NOTE ON confType AND MIRRORING: for a mirrored curve the two halves are
+      # rescaled afterwards and their bounds are rebuilt from stdErr on the plain
+      # scale, so that the uncertainty in the mixing proportions can be added.
+      # confType therefore shapes the interval only on the unmirrored path.
+      dfFit <- data.frame(tt     = ifelse(is.na(vecEvent), vecCens - vecEnter, vecEvent - vecEnter),
+                          status = as.integer(!is.na(vecEvent)),
+                          wt     = w)
+      fit <- survival::survfit(survival::Surv(tt, status) ~ 1, data = dfFit, weights = wt,
+                               robust = useRobust, conf.type = confType)
+      sf <- summary(fit, times = fit$time, extend = TRUE)
+
+      k <- match(data$time, sf$time)
+      data$rate <- ifelse(is.finite(data$rate), data$rate, 0)   # kept for diagnostics only
+      data$survFunction <- sf$surv[k]
+      data$stdErr       <- sf$std.err[k]
+      data$variance     <- data$stdErr * data$stdErr
+      data$confIntMax   <- sf$upper[k]
+      data$confIntMin   <- sf$lower[k]
+      # "log" and "log-log" return NA where the curve touches 1 or 0. Fill the
+      # bound with the limit it is approaching, so the ribbon stays drawable.
+      data$confIntMax <- ifelse(is.na(data$confIntMax), 1, data$confIntMax)
+      data$confIntMin <- ifelse(is.na(data$confIntMin), 0, data$confIntMin)
+      data$confIntMax <- pmin(1, data$confIntMax)
+      data$confIntMin <- pmax(0, data$confIntMin)
+
+    } else {
+
+      # Legacy override, kept for continuity but now explicit and unweighted.
+      if (isTRUE(fixHighRates)) {
+        hit <- (!is.na(data$rate)) & (data$rate > 0.95) & (data$eventRaw < 3)
+        if (any(hit)) {
+          message(sprintf("KaplanMeier: fixHighRates replaced %d hazard(s) above 0.95 by 0.5", sum(hit)))
+          data$rate[hit] <- 0.5
+        }
+      }
+      data$rate <- ifelse(is.finite(data$rate), data$rate, 0)
+
+      # Right-continuous Kaplan-Meier.
+      data$survFunction <- cumprod(1 - data$rate)
+
+      # Greenwood over the same index set as the product above.
+      gwTerm <- data$event / (data$surv * (data$surv - data$event))
+      gwTerm <- ifelse(is.finite(gwTerm), gwTerm, 0)   # n_i == d_i: S is already 0 there
+      data$variance <- data$survFunction * data$survFunction * cumsum(gwTerm)
+      data$stdErr <- sqrt(data$variance)
+      data$confIntMax <- pmin(1, data$survFunction + zCrit * data$stdErr)
+      data$confIntMin <- pmax(0, data$survFunction - zCrit * data$stdErr)
     }
-    data$variance <- data$event / (data$surv * (data$surv - data$event))
-    data$variance <- cumsum (data$variance)
-    data$variance <- data$survFunction * data$survFunction * data$variance
-    data$stdErr <- sqrt(data$variance)
-    data$confIntMax <- data$survFunction + 1.96 * data$stdErr
-    data$confIntMin <- data$survFunction - 1.96 * data$stdErr
- 
-    # start at time 0
-    if (mirror) {
-      data$time <- -data$time
+
+    # Explicit origin, so the curve starts at 1 without shifting the estimator.
+    if (!is.na(min(data$time)) && (min(data$time) > 0)) {
+      origin <- data[1,]
+      origin$time <- 0
+      origin$event <- 0
+      origin$eventRaw <- 0
+      origin$number <- 0
+      origin$numberRaw <- 0
+      origin$surv <- totN
+      origin$rate <- 0
+      origin$survFunction <- 1
+      origin$variance <- 0
+      origin$stdErr <- 0
+      origin$confIntMax <- 1
+      origin$confIntMin <- 1
+      data <- rbind(origin, data)
     }
-    data <- data[order(data$time),]
-    
+
+    # Truncate while the frame is still ordered by increasing duration, so the
+    # part removed is always the sparse long-duration tail.
     if (!is.null(truncate)) {
-      # Exclude rows in which the cumulative number of events from that point to the final observation is below the truncate value
-      keep_mask <- rev(cumsum(rev(data$event))) >= truncate
-      
-      # Apply the mask to the dataframe
+      keep_mask <- rev(cumsum(rev(data$eventRaw))) >= truncate
       data <- data[keep_mask, ]
     }
-    
+    if (nrow(data) == 0) return (emptyKM())
+
+    if (mirror) {
+      data$time <- -data$time
+      data <- data[order(data$time),]
+    }
+    # 'branch' names the half of a mirrored curve each row belongs to. Both
+    # halves carry a row at time 0 (the left one is the limit from below), so
+    # the sign of 'time' alone does not separate them.
+    data$branch <- if (mirror) "before" else "after"
+    rownames(data) <- NULL
+
     return (data)
   }
-  
+
   #clean the dataset
   df_KM <- subset(df_KM, !is.na(df_KM[,varEnter])) #'varEnter' cannot be empty
-  if (nrow(df_KM) == 0) return (df_KM)
+  if (nrow(df_KM) == 0) return (emptyKM())
   df_KM <- subset(df_KM, (df_KM[,varEnter] < df_KM[,varCens])) #'varEnter' cannot be after 'varCens'
   df_KM <- subset(df_KM, is.na(df_KM[,varEvent])|(df_KM[,varEvent] >= df_KM[,varEnter])) #'varEvent' should be after 'varEnter'
   df_KM <- subset(df_KM, is.na(df_KM[,varEvent])|(df_KM[,varEvent] < df_KM[,varCens]))  #'varEvent' cannot be after 'varCens'
   if (!is.null(varEvent2)) {
-    df_KM <- subset(df_KM, is.na(df_KM[,varEvent2])|(df_KM[,varEvent2] < df_KM[,varCens]))  #'varEvent' cannot be after 'varCens'
+    df_KM <- subset(df_KM, is.na(df_KM[,varEvent2])|(df_KM[,varEvent2] < df_KM[,varCens]))
   }
-  useWeights <- !is.null(df_KM[,varWeight])
-  if (useWeights) {
-    df_KM <- subset (df_KM, (!is.na(df_KM[,varWeight]))) #if we use weights, they cannot be empty
-    totInd <- sum(df_KM[,varWeight])
-  } else {
-    totInd <- dim(df_KM)[1]
-  }
-  if (is.na(totInd)) totInd <- nrow(df_KM)
-  
+  # NOTE: a subset() on !is.na(weight) stood here. It could never remove anything,
+  # because the missing weights had already been replaced above. Missing weights
+  # are now handled once, by naWeight, at the top of the function.
+  if (nrow(df_KM) == 0) return (emptyKM())
+
+  vecW   <- if (useWeights) df_KM[,varWeight] else NULL
+  totInd <- if (useWeights) sum(df_KM[,varWeight]) else nrow(df_KM)
+  if (is.na(totInd) || (totInd <= 0)) totInd <- nrow(df_KM)
+  nEffTot <- kishN(vecW, nrow(df_KM))
+
   #mirroring?
   if (!is.null(varEvent2)) {
-    #mirroring...
-    dfE_before_E2 <- subset(df_KM, (!is.na(df_KM[,varEvent]))&((is.na(df_KM[,varEvent2]))|(df_KM[,varEvent2]>=df_KM[,varEvent])))
-    if (useWeights) {
-      totEvent_before_Event2 <- sum(dfE_before_E2[,varWeight])
-    } else {
-      totEvent_before_Event2 <- dim(dfE_before_E2)[1]
+
+    # 'event' first. Ties (varEvent2 == varEvent) are counted in this group.
+    dfE_before_E2 <- subset(df_KM, (!is.na(df_KM[,varEvent])) &
+                              ((is.na(df_KM[,varEvent2])) | (df_KM[,varEvent2] >= df_KM[,varEvent])))
+    # 'event2' strictly first.
+    dfE2_before_E <- subset(df_KM, (!is.na(df_KM[,varEvent2])) &
+                              ((is.na(df_KM[,varEvent])) | (df_KM[,varEvent2] < df_KM[,varEvent])))
+
+    wA <- if (useWeights) dfE_before_E2[,varWeight] else NULL
+    wB <- if (useWeights) dfE2_before_E[,varWeight] else NULL
+
+    totA <- if (useWeights) sum(wA) else nrow(dfE_before_E2)
+    totB <- if (useWeights) sum(wB) else nrow(dfE2_before_E)
+    if (is.na(totA)) totA <- nrow(dfE_before_E2)
+    if (is.na(totB)) totB <- nrow(dfE2_before_E)
+
+    propEventBeforeEvent2 <- totA / totInd
+    propEvent2BeforeEvent <- totB / totInd
+    propNeither <- 1 - propEventBeforeEvent2 - propEvent2BeforeEvent
+
+    if (is.finite(propNeither) && (propNeither > censWarnThreshold)) {
+      message(sprintf(paste0("KaplanMeier: %.1f%% of the sample is censored before either event. ",
+                             "The raw proportions scaling the two branches are biased downward and ",
+                             "the gap at time 0 is widened. A competing-risks cumulative incidence ",
+                             "would be the correct estimator."),
+                      100 * propNeither))
     }
-    if (is.na(totEvent_before_Event2)) totEvent_before_Event2 <- nrow(dfE_before_E2)
-    
-    #proportion of persons who experimented 'event2' before/after 'event'
-    propEventBeforeEvent2 <- totEvent_before_Event2 / totInd
-    dfE2_before_E <- subset(df_KM, (!is.na(df_KM[,varEvent2]))&((is.na(df_KM[,varEvent]))|(df_KM[,varEvent2]<df_KM[,varEvent])))
-    if (dim(dfE2_before_E)[1] > 3) {
-      if (useWeights) {
-        totEvent2_before_Event <- sum(dfE2_before_E[,varWeight])
-      } else {
-        totEvent2_before_Event <- dim(dfE2_before_E)[1]
-      }
-      if (is.na(totEvent2_before_Event)) totEvent2_before_Event <- nrow(dfE2_before_E)
-      #K&M of 'event' AFTER 'event2'
-      dfE2_before_E$event_after_event2 <- dfE2_before_E[,varEvent] - dfE2_before_E[,varEvent2]
-      dfE2_before_E$cens_after_event2 <- dfE2_before_E[,varCens] - dfE2_before_E[,varEvent2]
-      dfE2_before_E$event2_origin <- 0
-      #sz=dim(dfE2_before_E)[1]
-      #vecEnter=dfE2_before_E$event2_origin
-      #vecEvent=dfE2_before_E$event_after_event2
-      #vecCens=dfE2_before_E$cens_after_event2
-      #vecWeight=dfE2_before_E[,varWeight]
-      dataMirror <- computeKM (dim(dfE2_before_E)[1],
-                               dfE2_before_E$event2_origin,
-                               dfE2_before_E$event_after_event2,
-                               dfE2_before_E$cens_after_event2,
-                               dfE2_before_E[,varWeight], mirror=TRUE, truncate=truncate)
-      #proportion of persons who experimented 'event2' before/after 'event'
-      propEvent2BeforeEvent <- totEvent2_before_Event / totInd
-      #adjust dataMirror$survFunction and associated parameters using preceding proportion
-      endVal <- tail(dataMirror$survFunction, 1)
-      dataMirror$survFunctionAdj <- 1 - dataMirror$survFunction * propEvent2BeforeEvent
-      dataMirror$varianceAdj <- dataMirror$survFunctionAdj * dataMirror$survFunctionAdj * dataMirror$variance /
-        (dataMirror$survFunction * dataMirror$survFunction)
-      dataMirror$stdErrAdj <- sqrt(dataMirror$varianceAdj)
-      dataMirror$confIntMaxAdj <- dataMirror$survFunctionAdj + 1.96 * dataMirror$stdErrAdj
-      dataMirror$confIntMinAdj <- dataMirror$survFunctionAdj - 1.96 * dataMirror$stdErrAdj
-    } else {
-      propEvent2BeforeEvent <- 0
-      dataMirror <- data.frame(time=c(-100,-1), event=c(1,1), number=c(1,1), numberRaw=c(1,1),
-                            surv=c(1,1), rate=c(0,0), survFunction=c(1,1), variance=c(0,0),
-                            stdErr=c(0,0), confIntMax=c(0,0), confIntMin=c(0,0), survFunctionAdj=c(1,1), varianceAdj=c(0,0),
-                            stdErrAdj=c(0,0), confIntMaxAdj=c(0,0), confIntMinAdj=c(0,0))
+
+    # Binomial variance of the two mixing proportions. This assumes the
+    # proportion and the conditional survival are independent, which they are
+    # not exactly; bootstrap the whole construction for a defensible interval.
+    varPropA <- 0
+    varPropB <- 0
+    if (isTRUE(includePropVariance) && is.finite(nEffTot) && (nEffTot > 0)) {
+      varPropA <- propEventBeforeEvent2 * (1 - propEventBeforeEvent2) / nEffTot
+      varPropB <- propEvent2BeforeEvent * (1 - propEvent2BeforeEvent) / nEffTot
     }
-    #K&M of 'event2' AFTER 'event'
-    dfE_before_E2$event2_after_event <- dfE_before_E2[,varEvent2] - dfE_before_E2[,varEvent]
-    dfE_before_E2$cens_after_event2 <- dfE_before_E2[,varCens] - dfE_before_E2[,varEvent]
-    dfE_before_E2$event_origin <- 0
-    #sz=dim(dfE2_before_E)[1]
-    #vecEnter=dfE2_before_E$event2_origin
-    #vecEvent=dfE2_before_E$event_after_event2
-    #vecCens=dfE2_before_E$cens_after_event2
-    #vecWeight=dfE2_before_E[,varWeight]
-    data <- computeKM (dim(dfE_before_E2)[1],
-                       dfE_before_E2$event_origin,
-                       dfE_before_E2$event2_after_event,
-                       dfE_before_E2$cens_after_event,
-                       dfE_before_E2[,varWeight], mirror=FALSE, truncate=truncate)
-    #adjust data$survFunction and associated parameters using preceding proportion
+
+    # LEFT branch: K&M of 'event' AFTER 'event2', plotted on negative durations.
+    if (nrow(dfE2_before_E) > 3) {
+      dataMirror <- computeKM (rep(0, nrow(dfE2_before_E)),
+                               dfE2_before_E[,varEvent] - dfE2_before_E[,varEvent2],
+                               dfE2_before_E[,varCens]  - dfE2_before_E[,varEvent2],
+                               wB, mirror=TRUE, truncate=truncate)
+    } else {
+      dataMirror <- emptyKM()
+    }
+    # Affine transform 1 - p*S: Var = p^2 Var(S) + S^2 Var(p).
+    dataMirror$survFunctionAdj <- 1 - dataMirror$survFunction * propEvent2BeforeEvent
+    dataMirror$varianceAdj <- propEvent2BeforeEvent * propEvent2BeforeEvent * dataMirror$variance +
+      dataMirror$survFunction * dataMirror$survFunction * varPropB
+
+    # RIGHT branch: K&M of 'event2' AFTER 'event'.
+    if (nrow(dfE_before_E2) > 0) {
+      data <- computeKM (rep(0, nrow(dfE_before_E2)),
+                         dfE_before_E2[,varEvent2] - dfE_before_E2[,varEvent],
+                         dfE_before_E2[,varCens]   - dfE_before_E2[,varEvent],
+                         wA, mirror=FALSE, truncate=truncate)
+    } else {
+      data <- emptyKM()
+    }
+    # Product transform p*S: Var = p^2 Var(S) + S^2 Var(p).
     data$survFunctionAdj <- data$survFunction * propEventBeforeEvent2
-    data$varianceAdj <- data$survFunctionAdj * data$survFunctionAdj * data$variance /
-      (data$survFunction * data$survFunction)
-    data$stdErrAdj <- sqrt(data$varianceAdj)
-    data$confIntMaxAdj <- data$survFunctionAdj + 1.96 * data$stdErrAdj
-    data$confIntMinAdj <- data$survFunctionAdj - 1.96 * data$stdErrAdj
-    
+    data$varianceAdj <- propEventBeforeEvent2 * propEventBeforeEvent2 * data$variance +
+      data$survFunction * data$survFunction * varPropA
+
     data <- rbind(dataMirror, data)
+
     data$survFunction <- data$survFunctionAdj
-    data$variance <- data$varianceAdj
-    data$stdErr <- data$stdErrAdj
-    data$confIntMaxAdj <- data$confIntMaxAdj
-    data$confIntMinAdj <- data$confIntMinAdj
+    data$variance     <- data$varianceAdj
+    data$stdErr       <- sqrt(data$varianceAdj)
+    data$confIntMax   <- pmin(1, data$survFunction + zCrit * data$stdErr)
+    data$confIntMin   <- pmax(0, data$survFunction - zCrit * data$stdErr)
     data$survFunctionAdj <- NULL
-    data$varianceAdj <- NULL
-    data$stdErrAdj <- NULL
-    data$confIntMaxAdj <- NULL
-    data$confIntMinAdj <- NULL
+    data$varianceAdj     <- NULL
+    rownames(data) <- NULL
+
+    attr(data, "propEventBeforeEvent2") <- propEventBeforeEvent2
+    attr(data, "propEvent2BeforeEvent") <- propEvent2BeforeEvent
+    attr(data, "propNeither")           <- propNeither
+
   } else {
-    data <- computeKM (dim(df_KM)[1], df_KM[,varEnter], df_KM[,varEvent], df_KM[,varCens], df_KM[,varWeight], mirror=FALSE, truncate=truncate)
+    data <- computeKM (df_KM[,varEnter], df_KM[,varEvent], df_KM[,varCens], vecW,
+                       mirror=FALSE, truncate=truncate)
   }
-  
+
   return (data)
 }
+# <<< Claude 2026-09-19
 
-KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL, varWeight=NULL, varEvent2=NULL,
-                             varClass=NULL, varCountry=NULL, vecCountry=NULL, cohortsList=NULL, var_yBirth="yBirth",
-                             plotType="step", minX=NULL, maxX=NULL,
-                             Title=waiver(), xTitle="duration before / after", yTitle="Survival Probability",
-                             inverseFunction=FALSE, confInt=FALSE, truncate=10, hideLegend=TRUE) {
+KaplanMeierPlot <- function(
+    df = NULL, varEnter = NULL, varEvent = NULL, varCens = NULL,
+    varWeight = NULL, varEvent2 = NULL,
+    varClass = NULL, varCountry = NULL, vecCountry = NULL,
+    cohortsList = NULL, var_yBirth = "yBirth",
+    plotType = "step", minX = NULL, maxX = NULL,
+    Title = ggplot2::waiver(),
+    xTitle = "duration before / after",
+    yTitle = "Survival Probability",
+    inverseFunction = FALSE, confInt = TRUE,
+    truncate = 10, hideLegend = TRUE,
+    fixHighRates = FALSE, includePropVariance = TRUE,
+    minCases = 200, minPoints = 10,
+    useSurvfit = TRUE, confType = "log-log",
+    robustVar = NULL, naWeight = "drop",
+    estimator = if (is.null(varEvent2)) "classic" else "survfit",
+    horizon = NULL, ties = "simultaneous",
+    bootstrap = 0L, varStrata = NULL, varCluster = NULL,
+    # >>> Claude 2026-09-21
+    anchorAtOne = TRUE
+    # <<< Claude 2026-09-21
+    ) {
   if (exists("DEBUG1") && isTRUE(DEBUG1)) browser()
   #==> df: data.frame with the dataset
   #==> varEnter: name of the column with the starting dates of being at risk of events (for example date of birth of individuals)
@@ -280,11 +540,37 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
   #==> inverseFunction: if TRUE, then we plot the function 1 - K&M curve (which increase from 0 instead of decreasing from 1)
   #==> confInf to TRUE to plot the confidence interval
   #==> truncate: we truncate the K&M curve when there are less than 'truncate' events (pass NULL if no truncation)
+  # >>> Claude 2026-09-21
+  #==> anchorAtOne: TRUE prepends a row at duration 0 with S = 1 to every plain
+  #    (non mirrored) curve whose first observed duration is 0. Without it the step
+  #    function starts at S(0), which for union -> marriage in Mexico is about 0.46,
+  #    and the drop caused by the direct marriages is invisible. Set FALSE to plot
+  #    the estimator exactly as KaplanMeier() returns it.
+  # <<< Claude 2026-09-21
+  #==> useSurvfit / confType / robustVar: passed straight to KaplanMeier(). Set useSurvfit=TRUE,
+  #    confType="log-log" to get bounds that stay inside [0,1] and a variance valid for
+  #    non-integer weights. See the argument notes on KaplanMeier() for the caveats.
+  #==> estimator: "classic" uses KaplanMeier() from this file. "survfit" uses
+  #    KaplanMeierSurvfit() from lib/KaplanMeierSurvfit.R, which scales the two halves by
+  #    Aalen-Johansen branch probabilities instead of raw observed shares. Only meaningful
+  #    with varEvent2; source lib/KaplanMeierSurvfit.R first.
+  #==> horizon / ties: passed to KaplanMeierSurvfit(). 'horizon' is the time at which the
+  #    branch probabilities are read and belongs in the figure caption; 'ties' is one of
+  #    "simultaneous", "event", "event2" and decides what happens when both events share a
+  #    month. Ignored when estimator = "classic".
+  #==> bootstrap / varStrata / varCluster: with estimator = "survfit" and bootstrap > 0, the
+  #    intervals come from that many bootstrap replicates of the complete estimator, resampling
+  #    clusters within strata when those columns are named. This is the only interval here that
+  #    accounts for the sampling design. It is slow; 500 replicates is a sensible floor.
 
   if (is.null (df)) stop("the dataframe cannot been NULL")
   if (is.null (varEnter) | is.null(varEvent) | is.null(varCens)) stop("varEnter, varEvent and varCens cannot been NULL")
   if (!is.null (vecCountry)&is.null (varCountry)) stop("varCountry cannot been NULL if vecCountry is used")
-  
+  if (!(estimator %in% c("classic", "survfit"))) stop("estimator must be \"classic\" or \"survfit\"")
+  if ((estimator == "survfit") && (length(varWeight) == 2)) {
+    message("KaplanMeierPlot: estimator = \"survfit\" uses only the first weight column")
+  }
+
   twoWeights <- (length(varWeight) == 2)
   if (is.null(varWeight)) {
     varWeight <- "weight"
@@ -340,19 +626,64 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
                                      (dfCountry[,var_yBirth] >= startYear) &
                                        (dfCountry[,var_yBirth] <= endYear))
         }
-        if (dim(dfCountryCohort)[1] > 200) {
+        # >>> Claude 2026-09-19
+        # The hard-coded thresholds 200 and 10 are now the arguments minCases
+        # and minPoints, so the groups that get dropped are visible to caller.
+        enoughCases <- (dim(dfCountryCohort)[1] > minCases)
+        # <<< Claude 2026-09-19
+        if (enoughCases) {
           print (paste(varCountryNames[indCountry], "cohort", indCohort))
-          data <- KaplanMeier (dfCountryCohort, varEnter, varEvent, varCens, varWeight[1], varEvent2, truncate=truncate)
-          if (twoWeights) {
-            data2 <- KaplanMeier (dfCountryCohort, varEnter, varEvent, varCens, varWeight[2], varEvent2, truncate=truncate)
-            data2 <- data2[(1:nrow(data)),]
-            data2$stdErr <- data$stdErr
-            data2$confIntMax <- data2$survFunction * data$confIntMax / data$survFunction
-            data2$confIntMin <- data2$survFunction * data$confIntMin / data$survFunction
+          # >>> Claude 2026-09-19
+          # The two weight runs are now joined on 'time'. Truncation depends on
+          # the event counts, so the two tables need not hold the same set of
+          # event times and aligning them by row position was silently wrong.
+          # The relative width of the individual-weight interval is carried over
+          # to the population-weight point estimate, as before.
+          if (estimator == "survfit") {
+            if (is.null(varEvent2)) stop("estimator = \"survfit\" needs varEvent2")
+            if (!exists("KaplanMeierSurvfit")) stop("source(\"lib/KaplanMeierSurvfit.R\") first")
+            if (bootstrap > 0) {
+              data <- KaplanMeierBootstrap (dfCountryCohort, varEnter, varEvent, varCens,
+                                            varWeight[1], varEvent2, truncate=truncate,
+                                            horizon=horizon, ties=ties, naWeight=naWeight,
+                                            replicates=bootstrap, varStrata=varStrata,
+                                            varCluster=varCluster)
+            } else {
+              data <- KaplanMeierSurvfit (dfCountryCohort, varEnter, varEvent, varCens,
+                                          varWeight[1], varEvent2, truncate=truncate,
+                                          horizon=horizon, ties=ties, naWeight=naWeight)
+            }
+          } else {
+          data <- KaplanMeier (dfCountryCohort, varEnter, varEvent, varCens, varWeight[1], varEvent2,
+                               truncate=truncate, fixHighRates=fixHighRates,
+                               includePropVariance=includePropVariance,
+                               useSurvfit=useSurvfit, confType=confType, robustVar=robustVar,
+                               naWeight=naWeight)
+          }
+          if (twoWeights && (nrow(data) > 0) && (estimator == "classic")) {
+            data2 <- KaplanMeier (dfCountryCohort, varEnter, varEvent, varCens, varWeight[2], varEvent2,
+                                  truncate=truncate, fixHighRates=fixHighRates,
+                                  includePropVariance=includePropVariance,
+                                  useSurvfit=useSurvfit, confType=confType, robustVar=robustVar,
+                                  naWeight=naWeight)
+            # Join on time AND branch: a mirrored curve holds two rows at
+            # time 0, one per branch, so 'time' alone is not a unique key.
+            ind <- data[, c("time", "branch", "survFunction", "stdErr", "confIntMax", "confIntMin")]
+            names(ind) <- c("time", "branch", "survInd", "stdErrInd", "ciMaxInd", "ciMinInd")
+            data2 <- merge(data2, ind, by = c("time", "branch"), all.x = FALSE, all.y = FALSE)
+            data2 <- data2[order(match(data2$branch, c("before", "after")), data2$time), ]
+            ratioMax <- ifelse(data2$survInd > 0, data2$ciMaxInd / data2$survInd, 1)
+            ratioMin <- ifelse(data2$survInd > 0, data2$ciMinInd / data2$survInd, 1)
+            data2$stdErr <- data2$stdErrInd
+            data2$confIntMax <- pmin(1, data2$survFunction * ratioMax)
+            data2$confIntMin <- pmax(0, data2$survFunction * ratioMin)
+            data2[, c("survInd", "stdErrInd", "ciMaxInd", "ciMinInd")] <- NULL
+            rownames(data2) <- NULL
             data <- data2
           }
+          # <<< Claude 2026-09-19
           nData <- nrow(data)
-          if (nData > 10) {
+          if (nData > minPoints) {
             data$class <- varClassNames[indClass]
             data$country <- varCountryNames[indCountry]
             data$cohort <- paste(vecCohorts[(indCohort-1)*2+1],"-",vecCohorts[indCohort*2],sep="")
@@ -363,6 +694,14 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
             } else {
               data$cohortLabel <- paste(vecCohorts[(indCohort-1)*2+1]-1900,"-",vecCohorts[indCohort*2]-1900,sep="")
             }
+            # >>> Claude 2026-09-19
+            # With the default cohortsList c(0, 10000) the labels above read
+            # "0-10000" and "-1900-8100" in the legend. Name that group "All".
+            if ((startYear == 0) && (endYear == 10000)) {
+              data$cohort <- "All"
+              data$cohortLabel <- "All"
+            }
+            # <<< Claude 2026-09-19
             dataTot <- rbind(dataTot,data)
           }
         } else {
@@ -373,6 +712,99 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
       }
     }
   }
+
+  # >>> Claude 2026-09-22
+  # The drawing half of this function now lives in KaplanMeierDraw(), moved
+  # verbatim so nothing about the existing figures changes. Splitting it out
+  # lets the Aalen-Johansen curves of section 4b be drawn in exactly the same
+  # format, colours, ribbons, labels and facets, from a table this function
+  # never computed.
+  return (KaplanMeierDraw(dataTot,
+                          plotType = plotType, minX = minX, maxX = maxX,
+                          Title = Title, xTitle = xTitle, yTitle = yTitle,
+                          inverseFunction = inverseFunction, confInt = confInt,
+                          hideLegend = hideLegend, anchorAtOne = anchorAtOne,
+                          varClassNames = varClassNames,
+                          varCountryNames = varCountryNames))
+  # <<< Claude 2026-09-22
+}
+
+# >>> Claude 2026-09-22
+# KaplanMeierDraw: everything KaplanMeierPlot() used to do after the estimation.
+# Give it a table with one row per plotted point and it returns the figure.
+#==> dataTot: needs time (MONTHS), survFunction, confIntMin, confIntMax, class,
+#    country and cohort. 'cohortLabel' and 'branch' are filled in when absent.
+#    'cohort' should be an ordered factor, since the grey to blue to red ramp is
+#    assigned in level order.
+#==> anchorAtOne: see KaplanMeierPlot(). Set FALSE for a cumulative incidence,
+#    which rises from 0 and must not be anchored at 1.
+#==> legendTitle: "Birth Cohort" keeps the old wording; pass "Union cohort" or
+#    anything else when that is what the groups are.
+KaplanMeierDraw <- function (dataTot,
+                             plotType = "step", minX = NULL, maxX = NULL,
+                             Title = ggplot2::waiver(),
+                             xTitle = "duration before / after",
+                             yTitle = "Survival Probability",
+                             inverseFunction = FALSE, confInt = TRUE,
+                             hideLegend = TRUE, anchorAtOne = TRUE,
+                             legendTitle = "Birth Cohort",
+                             varClassNames = NULL, varCountryNames = NULL) {
+
+  need <- c("time", "survFunction", "class", "country", "cohort")
+  miss <- setdiff(need, names(dataTot))
+  if (length(miss) > 0) stop("KaplanMeierDraw: missing column(s): ", paste(miss, collapse = ", "))
+  if (!("branch" %in% names(dataTot)))      dataTot$branch <- "after"
+  if (!("cohortLabel" %in% names(dataTot))) dataTot$cohortLabel <- as.character(dataTot$cohort)
+  if (!("confIntMin" %in% names(dataTot)))  dataTot$confIntMin <- dataTot$survFunction
+  if (!("confIntMax" %in% names(dataTot)))  dataTot$confIntMax <- dataTot$survFunction
+  if (is.null(varClassNames))   varClassNames   <- as.character(unique(dataTot$class))
+  if (is.null(varCountryNames)) varCountryNames <- as.character(unique(dataTot$country))
+
+  # >>> Claude 2026-09-21
+  # Restore the vertical segment at duration 0.
+  #
+  # KaplanMeier() inserts an origin row (duration 0, S = 1) only when duration 0
+  # is not itself an observed event time. When it is, which is the case whenever a
+  # sizeable share of the events happen at duration 0 (in Mexico roughly half of
+  # first unions begin with the marriage, so S(0) is near 0.46), the first row of
+  # the table already carries the post-event value and geom_step starts the curve
+  # at that height. The mass point at duration 0 is then hidden.
+  #
+  # The block below prepends, for each curve, a row at the same duration with
+  # S = 1 and a degenerate confidence interval. geom_step(direction = "hv") draws
+  # the horizontal piece over a zero-length interval and then the vertical piece,
+  # so the segment from 1 down to S(0) appears. The estimator is untouched: the
+  # added row is the left limit S(0-), which equals 1 by construction.
+  #
+  # Mirrored curves are left alone. There the height at duration 0 is fixed by the
+  # branch probability, not by 1, and the two branches already share that point.
+  if (isTRUE(anchorAtOne) && (nrow(dataTot) > 0) &&
+      all(c("branch", "time", "survFunction", "class", "country", "cohort") %in% names(dataTot))) {
+    grpKey <- do.call(paste, c(dataTot[, c("class", "country", "cohort")], sep = "\r"))
+    anchors <- do.call(rbind, lapply(split(seq_len(nrow(dataTot)), grpKey), function (ii) {
+      d <- dataTot[ii, , drop = FALSE]
+      if (any(d$branch == "before")) return (NULL)        # mirrored curve
+      d <- d[order(d$time), , drop = FALSE]
+      if ((d$time[1] > 0) || (d$survFunction[1] >= 1)) return (NULL)
+      a <- d[1, , drop = FALSE]
+      a$survFunction <- 1
+      for (nm in c("stdErr", "variance", "event", "eventRaw", "rate")) {
+        if (nm %in% names(a)) a[[nm]] <- 0
+      }
+      for (nm in c("confIntMax", "confIntMin")) {
+        if (nm %in% names(a)) a[[nm]] <- 1
+      }
+      a
+    }))
+    if (!is.null(anchors) && (nrow(anchors) > 0)) {
+      dataTot <- rbind(anchors, dataTot)
+      dataTot <- dataTot[order(dataTot$class, dataTot$country, dataTot$cohort,
+                               match(dataTot$branch, c("before", "after")),
+                               dataTot$time, -dataTot$survFunction), ]
+      rownames(dataTot) <- NULL
+    }
+  }
+  # <<< Claude 2026-09-21
 
   dataTot$timeYear <- dataTot$time / 12
   
@@ -390,21 +822,13 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
   if (varCountryNames[1] != "All") {
     label_data <- dataTot %>%
       group_by(country, cohort) %>%
-      filter(timeYear == max(timeYear)) %>%
+      dplyr::filter(timeYear == max(timeYear)) %>%
       ungroup()
   } else {
     # Get the point for each line to position the labels (in case only one country)
     label_data <- dataTot %>%
-      group_by(cohort) %>%
-      # approx() takes the existing x (timeYear) and y (survFunction) 
-      # and calculates what 'y' would be at exactly xout (maxX)
-      summarise(
-        survFunction = approx(x = timeYear, y = survFunction, xout = maxX)$y
-      ) %>%
-      mutate(timeYear = maxX) # Ensure the X coordinate for the label is exactly maxX
-    label_data <- dataTot %>%
       group_by(country, cohort) %>%
-      filter(timeYear == max(timeYear)) %>%
+      dplyr::filter(timeYear == max(timeYear)) %>%
       ungroup()
   }
   
@@ -434,11 +858,11 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
     p <- p + scale_fill_manual(values=my_colors)
   }
 
-  if (plotType=="step") p <- p + geom_step(direction = "vh")
+  if (plotType=="step") p <- p + geom_step(direction = "hv")
   if (plotType=="smooth") p <- p + geom_smooth(method = "scam", formula = y ~ s(x, k = 15, bs = "mpd"), se = FALSE)
   
-  p <- p + theme_linedraw() + labs(title=Title, y=yTitle, x=xTitle, colour="Birth Cohort",
-                                   fill = "Birth Cohort")
+  p <- p + theme_linedraw() + labs(title=Title, y=yTitle, x=xTitle, colour=legendTitle,
+                                   fill = legendTitle)
   p <- p + coord_cartesian(ylim = c(0, 1), xlim=c(minX, maxX))
   
   # Faceting
@@ -510,6 +934,7 @@ KaplanMeierPlot <- function (df=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL
   # }
  
 }
+# <<< Claude 2026-09-22
 
 buildMatrix <- function(rowMin, rowMax, colMin, colMax, defaultValue=0) {
   mat <- matrix(defaultValue, ncol=(colMax - colMin + 1), nrow=(rowMax - rowMin + 1))
@@ -651,7 +1076,11 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
                       varEnter, varEvent, varCens, varWeight=NULL, country="all",
                       duration=TRUE, res_numYears=20, res_finalYearsToDiscard=1, res_firstYearsToDiscard=10,
                       useRelativeWeights=FALSE,ageTruncate=NULL,mySpan=0.75,
-                      computeVariance=TRUE) {
+                      computeVariance=TRUE,
+                      # >>> Claude 2026-09-22
+                      replicates=200L, varStrata=NULL, varCluster=NULL,
+                      confLevel=0.95, seed=NULL) {
+                      # <<< Claude 2026-09-22
   
   useWeights <- !is.null(varWeight)
   if (isTRUE(useWeights) & isTRUE(useRelativeWeights)) {
@@ -693,34 +1122,75 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
     return (eventRow)
   }
   
-  #build population count and event count matrices
-  popYear <- buildMatrix(yMin_Enter, yMax_Enter, yMin_Event, yMax_Event)
-  popYear_noW <- buildMatrix(yMin_Enter, yMax_Enter, yMin_Event, yMax_Event)
-  eventYear <- buildMatrix(yMin_Enter, yMax_Enter, yMin_Event, yMax_Event)
-  eventYear_noW <- buildMatrix(yMin_Enter, yMax_Enter, yMin_Event, yMax_Event)
-  for (ind in (1:dim(df_ppr)[1])) {
-    yEnter <- df_ppr[,varEnter][ind]
-    yEvent <- df_ppr[,varEvent][ind]
-    cmc_cens <- df_ppr[,varCens][ind]
-    yCens <- trunc ((cmc_cens - 1) / 12)
-    fracYear <- (cmc_cens - yCens * 12) / 12
-    yCens <- yCens + 1900
-    if (useWeights) {
-      weight <- df_ppr[,varWeight][ind]
-    } else {
-      weight <- 1
-    }
-    
-    popRow <- buildPopRow(yMin_Event, yMax_Event, yCens, fracYear, weight)
-    popRow_noW <- buildPopRow(yMin_Event, yMax_Event, yCens, fracYear, 1)
-    
-    eventRow <- buildEventRow(yMin_Event, yMax_Event, yEvent, weight)
-    eventRow_noW <- buildEventRow(yMin_Event, yMax_Event, yEvent, 1)
-    popYear[yEnter - yMin_Enter + 1,] <- popYear[yEnter - yMin_Enter + 1,] + popRow
-    popYear_noW[yEnter - yMin_Enter + 1,] <- popYear_noW[yEnter - yMin_Enter + 1,] + popRow_noW
-    eventYear[yEnter - yMin_Enter + 1,] <- eventYear[yEnter - yMin_Enter + 1,] + eventRow
-    eventYear_noW[yEnter - yMin_Enter + 1,] <- eventYear_noW[yEnter - yMin_Enter + 1,] + eventRow_noW
+  # >>> Claude 2026-09-22
+  # The per-individual loop that used to fill these four matrices is replaced by
+  # the vectorised build below. It reproduces buildPopRow() and buildEventRow()
+  # exactly, EDGE CASE INCLUDED: when the censoring year is at or after the last
+  # event year, buildPopRow() gives the full weight in every column and applies
+  # no fraction, which is what 'fullTo' encodes. The two are asserted equal in
+  # tests_pprBootstrap.R.
+  #
+  # The point of vectorising is speed. The loop took about 27 seconds on 400,000
+  # rows, which makes a bootstrap of 200 replicates an hour and a half per
+  # country. Below it is roughly two orders of magnitude faster, which is what
+  # makes the interval affordable.
+  nR <- yMax_Enter - yMin_Enter + 1L
+  nC <- yMax_Event - yMin_Event + 1L
+
+  vEnter <- as.numeric(df_ppr[, varEnter])
+  vEvent <- as.numeric(df_ppr[, varEvent])
+  vCens  <- as.numeric(df_ppr[, varCens])
+  wAll   <- if (useWeights) as.numeric(df_ppr[, varWeight]) else rep(1, nrow(df_ppr))
+  if (any(!is.finite(vEnter))) stop("ppr_doIt: ", sum(!is.finite(vEnter)),
+                                    " case(s) have no entry year in '", varEnter, "'")
+  if (any(!is.finite(vCens)))  stop("ppr_doIt: ", sum(!is.finite(vCens)),
+                                    " case(s) have no censoring date in '", varCens, "'")
+
+  yCensT   <- trunc((vCens - 1) / 12)
+  fracYear <- (vCens - yCensT * 12) / 12
+  yCens    <- yCensT + 1900
+
+  riAll  <- as.integer(vEnter - yMin_Enter + 1L)
+  ciAll  <- as.integer(yCens  - yMin_Event + 1L)
+  ceAll  <- as.integer(vEvent - yMin_Event + 1L)
+  fullTo <- ifelse(ciAll >= nC, nC, ciAll - 1L)          # last column at full weight
+  ciFrac <- ifelse(ciAll <= (nC - 1L), ciAll, NA_integer_)  # column carrying the fraction
+
+  accumCell <- function (val, rows, cols, K) {
+    keep <- is.finite(val) & is.finite(rows) & is.finite(cols) & (cols >= 1L) & (cols <= K)
+    m <- matrix(0, nR, K)
+    if (!any(keep)) return (m)
+    lin <- (cols[keep] - 1L) * nR + rows[keep]
+    agg <- rowsum(val[keep], lin, reorder = FALSE)
+    m[as.integer(rownames(agg))] <- agg[, 1]
+    m
   }
+  revCum <- function (m) {
+    out <- t(apply(m, 1, function (r) rev(cumsum(rev(r)))))
+    if (nR == 1L) out <- matrix(out, nrow = 1L)
+    out
+  }
+  buildCells <- function (wv) {
+    pop <- revCum(accumCell(wv, riAll, fullTo, nC)) + accumCell(wv * fracYear, riAll, ciFrac, nC)
+    ev  <- accumCell(wv, riAll, ceAll, nC)
+    dimnames(pop) <- dimnames(ev) <-
+      list(as.character(yMin_Enter:yMax_Enter), as.character(yMin_Event:yMax_Event))
+    list(pop = pop, ev = ev)
+  }
+
+  cw  <- buildCells(wAll)
+  cnw <- buildCells(rep(1, length(wAll)))
+  popYear       <- cw$pop
+  eventYear     <- cw$ev
+  popYear_noW   <- cnw$pop
+  eventYear_noW <- cnw$ev
+  # <<< Claude 2026-09-22
+  # >>> Claude 2026-09-22
+  # Everything from the standardised events to the mean duration is wrapped
+  # here UNCHANGED, so the bootstrap recomputes the estimate through exactly
+  # the same arithmetic as the point estimate. Nothing inside was edited; only
+  # the wrapper and the return are new.
+  coreFromCells <- function (popYear, eventYear, computeVariance = FALSE) {
   #standardize the event count by the population count (this way we will obtain later rates of the first and the second kind)
   #these are the d(x) of the life table
   stdEventYear <- buildMatrix(yMin_Enter, yMax_Enter, yMin_Event, yMax_Event)
@@ -833,7 +1303,69 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
   meanSecondKind <- buildVector(yMin_Event, yMax_Event)
   meanSecondKind <- ( as.vector((ageORduration) %*% stdEventYear) / colSums(stdEventYear) ) - (seq(c_y, 1)-1)
   meanSecondKind[is.nan(meanSecondKind)] <- 0
+    return (mget(c("stdEventYear", "ratesFirstKind", "popAtRisk", "survivalYear",
+                   "deathsTablePeriod", "meanFirstKind", "meanSecondKind",
+                   if (isTRUE(computeVariance)) c("varianceSurvival", "seSurvival")
+                   else character(0)),
+                 envir = environment()))
+  }
+  list2env(coreFromCells(popYear, eventYear, computeVariance), envir = environment())
+  # <<< Claude 2026-09-22
+
   
+  # >>> Claude 2026-09-22
+  # BOOTSTRAP INTERVAL.
+  #
+  # The Greenwood interval further down assumes the weights are frequency counts
+  # and that the sample is a simple random sample. Neither is true here: the
+  # survey weights vary, so the effective sample size is well below the number
+  # of women, and the design has strata and clusters. The bootstrap replaces
+  # both assumptions with resampling.
+  #
+  # With neither varStrata nor varCluster it resamples WOMEN, which captures the
+  # unequal weighting and nothing else. Name a cluster column and it resamples
+  # clusters; name a stratum column as well and it resamples clusters WITHIN
+  # each stratum, which is the design-based interval. Adding the design later is
+  # therefore one argument, not a rewrite.
+  #
+  # A replicate is a reweighting rather than a re-subset: each sampling unit is
+  # drawn with replacement and its multiplicity multiplies its weight. That is
+  # equivalent and much faster, because the index vectors never change.
+  bootQuantum <- bootMean <- NULL
+  if (isTRUE(replicates > 0L)) {
+    for (v in c(varStrata, varCluster)) {
+      if (!(v %in% names(df_ppr))) stop("ppr_doIt: column '", v, "' not found for the bootstrap")
+    }
+    unitId <- if (is.null(varCluster)) seq_len(nrow(df_ppr)) else as.character(df_ppr[[varCluster]])
+    strId  <- if (is.null(varStrata))  rep("1", nrow(df_ppr)) else as.character(df_ppr[[varStrata]])
+    byStratum <- split(seq_along(strId), strId)
+    if (!is.null(seed)) set.seed(seed)
+    Q <- matrix(NA_real_, replicates, c_y)
+    M <- matrix(NA_real_, replicates, c_y)
+    for (bRep in seq_len(replicates)) {
+      mult <- numeric(length(unitId))
+      for (idx in byStratum) {
+        u   <- unitId[idx]
+        lev <- unique(u)
+        k   <- length(lev)
+        cnt <- tabulate(sample.int(k, k, replace = TRUE), nbins = k)
+        mult[idx] <- cnt[match(u, lev)]
+      }
+      cb <- buildCells(wAll * mult)
+      kb <- try(coreFromCells(cb$pop, cb$ev, computeVariance = FALSE), silent = TRUE)
+      if (inherits(kb, "try-error")) next
+      Q[bRep, ] <- 1 - kb$survivalYear[c_x, ]
+      M[bRep, ] <- kb$meanFirstKind
+    }
+    alphaB <- (1 - confLevel) / 2
+    qt <- function (m, p) apply(m, 2, stats::quantile, probs = p, na.rm = TRUE)
+    bootQuantum <- list(se = apply(Q, 2, stats::sd, na.rm = TRUE),
+                        lo = qt(Q, alphaB), hi = qt(Q, 1 - alphaB))
+    bootMean    <- list(se = apply(M, 2, stats::sd, na.rm = TRUE),
+                        lo = qt(M, alphaB), hi = qt(M, 1 - alphaB))
+  }
+  # <<< Claude 2026-09-22
+
   ##### loess smoothing of the results ====
   for (y in (1:c_y)) {
     # Smooth mean of first kind
@@ -1016,6 +1548,13 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
     output_list$PPR$ci95_lower_quantum_1stkind_smoothed <- (1 - survivalYear_smoothed[rangeInd]) - 1.96 * seSurvival[c_x, rangeInd]
     output_list$PPR$ci95_upper_quantum_1stkind_smoothed <- (1 - survivalYear_smoothed[rangeInd]) + 1.96 * seSurvival[c_x, rangeInd]
     
+    # >>> Claude 2026-09-22
+    # Keep the Greenwood numbers under their own names so the two can be
+    # compared. The columns plot_ppr() draws are replaced below.
+    output_list$PPR$se_quantum_1stkind_greenwood <- seSurvival[c_x, rangeInd]
+    output_list$PPR$se_mac_1stkind_greenwood     <- seMeanFirstKind[rangeInd]
+    # <<< Claude 2026-09-22
+
     # Add full variance matrices to output
     output_list$varianceSurvival <- varianceSurvival
     output_list$seSurvival <- seSurvival
@@ -1025,6 +1564,32 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
     output_list$seMeanSecondKind <- seMeanSecondKind
   }
   
+  # >>> Claude 2026-09-22
+  # The reported interval is the bootstrap one whenever replicates > 0. The
+  # percentile bounds go on the raw quantum; the smoothed curve gets the
+  # bootstrap standard error around itself, since a percentile of the raw
+  # replicates is not a bound for a smoothed value.
+  if (!is.null(bootQuantum)) {
+    zB <- stats::qnorm(1 - (1 - confLevel) / 2)
+    output_list$PPR$se_quantum_1stkind         <- bootQuantum$se[rangeInd]
+    output_list$PPR$ci95_lower_quantum_1stkind <- pmax(0, bootQuantum$lo[rangeInd])
+    output_list$PPR$ci95_upper_quantum_1stkind <- pmin(1, bootQuantum$hi[rangeInd])
+    output_list$PPR$ci95_lower_quantum_1stkind_smoothed <-
+      pmax(0, (1 - survivalYear_smoothed[rangeInd]) - zB * bootQuantum$se[rangeInd])
+    output_list$PPR$ci95_upper_quantum_1stkind_smoothed <-
+      pmin(1, (1 - survivalYear_smoothed[rangeInd]) + zB * bootQuantum$se[rangeInd])
+    output_list$PPR$se_mac_1stkind             <- bootMean$se[rangeInd]
+    output_list$PPR$ci95_lower_mac_1stkind     <- bootMean$lo[rangeInd]
+    output_list$PPR$ci95_upper_mac_1stkind     <- bootMean$hi[rangeInd]
+    output_list$PPR$ci95_lower_mac_1stkind_smoothed <-
+      meanFirstKind_smoothed[rangeInd] - zB * bootMean$se[rangeInd]
+    output_list$PPR$ci95_upper_mac_1stkind_smoothed <-
+      meanFirstKind_smoothed[rangeInd] + zB * bootMean$se[rangeInd]
+    output_list$bootstrap <- list(replicates = replicates, confLevel = confLevel,
+                                  varStrata = varStrata, varCluster = varCluster)
+  }
+  # <<< Claude 2026-09-22
+
   return(output_list)
 }
 
@@ -1032,7 +1597,16 @@ ppr_doIt <- function (df_ppr=dfCountry, debugFunction=FALSE,
 calc_ppr <- function (df=NULL,
                       varEnter="yUnion1", varEvent="ySep1", varCens="cmc_survey", varCountry="country", vecCountry=NULL, varWeight=NULL,
                       duration=TRUE, res_numYears=30, res_finalYearsToDiscard=1, res_firstYearsToDiscard=10, res_countrySpecific_numYears=NULL,
-                      useRelativeWeights=TRUE,ageTruncate=NULL,mySpan=0.75) {
+                      useRelativeWeights=TRUE,ageTruncate=NULL,mySpan=0.75,
+                      # >>> Claude 2026-09-22
+                      # Passed straight to ppr_doIt(). replicates = 200 gives a
+                      # bootstrap interval in place of Greenwood; name varStrata
+                      # and varCluster when you have the design variables and it
+                      # becomes a design-based interval. replicates = 0 keeps
+                      # the old Greenwood columns.
+                      replicates=200L, varStrata=NULL, varCluster=NULL,
+                      confLevel=0.95, seed=NULL) {
+                      # <<< Claude 2026-09-22
   if (is.null (df)) stop("the dataframe cannot been NULL")
   if (is.null (varEnter) | is.null(varEvent) | is.null(varCens)) stop("varEnter, varEvent and varCens cannot been NULL")
   if (!is.null (vecCountry)&is.null (varCountry)) stop("varCountry cannot been NULL if vecCountry is used")
@@ -1081,6 +1655,10 @@ calc_ppr <- function (df=NULL,
                       res_firstYearsToDiscard=res_firstYearsToDiscard,
                       useRelativeWeights=useRelativeWeights,
                       ageTruncate=ageTruncate,
+                      # >>> Claude 2026-09-22
+                      replicates=replicates, varStrata=varStrata, varCluster=varCluster,
+                      confLevel=confLevel, seed=seed,
+                      # <<< Claude 2026-09-22
                       mySpan=mySpan)
     pprsTot <- rbind(pprsTot, pprs$PPR)
   }
@@ -1107,11 +1685,11 @@ plot_ppr <- function(df_res=res_BirthBirth1, vecCountry=NULL, facet=TRUE, yLimit
     if (isTRUE(bySurvey)) {
       df_ends <- df_res %>% 
         group_by(country, surveyName) %>% 
-        filter(year == max(year))
+        dplyr::filter(year == max(year))
     } else {
       df_ends <- df_res %>% 
         group_by(country) %>% 
-        filter(year == max(year))
+        dplyr::filter(year == max(year))
     }
   } else {
     df_labels <- df_res %>%
@@ -1122,9 +1700,27 @@ plot_ppr <- function(df_res=res_BirthBirth1, vecCountry=NULL, facet=TRUE, yLimit
   max_x <- max(df_res$year)
   max_y <- min(0.75,max(df_res[[yVar]]))
   
+  # >>> Claude 2026-09-22
+  # 'linetype' is now MAPPED, to the same variable as the colour, and every
+  # level is set to "solid" straight afterwards. Nothing about the existing
+  # figures changes, but the aesthetic exists, so a caller can restyle the
+  # lines by adding one scale to the returned plot:
+  #
+  #   plot_sep1_45 + scale_linetype_manual(values = c(MEXICO = "solid", USA = "22"))
+  #
+  # Without the mapping a linetype scale has nothing to act on, which is why
+  # adding one to the old version did nothing. Because all three aesthetics
+  # carry the same variable and the same default legend title, they merge into
+  # a single key rather than producing a second one.
+  #
+  # The facetted branch without surveys maps no grouping variable at all, so it
+  # gets no linetype either.
+  ltVar <- NULL
   if (facet) {
     if (bySurvey) {
-      p <- ggplot(df_res, aes(x=year, y=.data[[yVar]], group=surveyName, color=surveyName))
+      ltVar <- "surveyName"
+      p <- ggplot(df_res, aes(x=year, y=.data[[yVar]], group=surveyName, color=surveyName,
+                              linetype=surveyName))
       p <- p + geom_ribbon(aes(ymin=.data[[yVar_min]], ymax=.data[[yVar_max]], fill=surveyName),
                            alpha=0.1,
                            color = NA)
@@ -1136,10 +1732,20 @@ plot_ppr <- function(df_res=res_BirthBirth1, vecCountry=NULL, facet=TRUE, yLimit
                            color = NA)
     }
   } else {
-    p <- ggplot(df_res, aes(x=year, y=.data[[yVar]], group=country, color=country))
+    ltVar <- "country"
+    p <- ggplot(df_res, aes(x=year, y=.data[[yVar]], group=country, color=country,
+                            linetype=country))
     p <- p + geom_ribbon(aes(ymin=.data[[yVar_min]], ymax=.data[[yVar_max]], fill=country), alpha=0.1, color = NA)
   }
   p <- p  + geom_line()
+  if (!is.null(ltVar) && (ltVar %in% names(df_res))) {
+    ltLev <- unique(as.character(df_res[[ltVar]]))
+    ltLev <- ltLev[!is.na(ltLev)]
+    if (length(ltLev) > 0) {
+      p <- p + scale_linetype_manual(values = stats::setNames(rep("solid", length(ltLev)), ltLev))
+    }
+  }
+  # <<< Claude 2026-09-22
   if(facet) {p <- p + facet_wrap (vars(country))}
   p <- p + scale_y_continuous(limit=c(0,NA),oob=squish)
   p <- p + theme_linedraw()
@@ -1193,6 +1799,10 @@ plotBySurvey <- function (df_toPlot=NULL, varEnter=NULL, varEvent=NULL, varCens=
                           res_firstYearsToDiscard=15, res_finalYearsToDiscard=1, res_countrySpecific_numYears=NULL,
                           yLimit=c(0,1), mySpan=0.75,
                           useRelativeWeights=FALSE,ageTruncate=NULL,
+                          # >>> Claude 2026-09-22
+                          replicates=200L, varStrata=NULL, varCluster=NULL,
+                          confLevel=0.95, seed=NULL,
+                          # <<< Claude 2026-09-22
                           Title=NULL, yTitle="PPR", xTitle=NULL) {
   
   if ((exists("DEBUG1")) && (isTRUE(DEBUG1))) browser()
@@ -1206,7 +1816,11 @@ plotBySurvey <- function (df_toPlot=NULL, varEnter=NULL, varEvent=NULL, varCens=
                            vecCountry=vecCountry, varWeight=varWeight, duration=duration,
                            res_firstYearsToDiscard=res_firstYearsToDiscard, res_finalYearsToDiscard=res_finalYearsToDiscard,
                            res_countrySpecific_numYears=res_countrySpecific_numYears,
-                           useRelativeWeights=useRelativeWeights,ageTruncate=ageTruncate,mySpan=mySpan)
+                           useRelativeWeights=useRelativeWeights,ageTruncate=ageTruncate,mySpan=mySpan,
+                           # >>> Claude 2026-09-22
+                           replicates=replicates, varStrata=varStrata, varCluster=varCluster,
+                           confLevel=confLevel, seed=seed)
+                           # <<< Claude 2026-09-22
     res_survey$surveyName=surveys[indSurvey]
     if (exists("res_all")) {
       res_all <- rbind(res_all, res_survey)

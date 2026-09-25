@@ -389,22 +389,46 @@ library(tidyr)
 # --- How to use it ---
 # my_list <- list(df2017, df2019, df2022)
 # check_bind_conflicts(my_list)
+# >>> Claude 2026-09-21
+# Two fixes.
+#
+# (1) The dplyr verbs are namespaced. Called with a stray 'filter' object in
+#     .GlobalEnv, this function failed with "object 'type' not found", because
+#     stats::filter evaluates n_distinct(type) in the calling environment
+#     instead of inside the data frame. Reproduced exactly; dplyr:: makes it
+#     immune. Run find("filter") if you see that message again.
+#
+# (2) substitute(list(...)) cannot recover argument names under do.call(). The
+#     call in "NSFG import.R" is do.call(check_bind_conflicts, surveys_list),
+#     and with an unnamed list the dataframe_name column came out holding the
+#     DEPARSED CONTENTS of each data frame rather than its name, which defeats
+#     the purpose of the function. It now prefers the list's own names when
+#     they exist, so naming surveys_list is all that is needed.
 check_bind_conflicts <- function(...) {
   # 1. Capture the names of the dataframes passed as arguments
   arg_list <- list(...)
-  names(arg_list) <- as.character(substitute(list(...)))[-1]
-  
+  nm <- names(arg_list)
+  if (is.null(nm) || any(!nzchar(nm))) {
+    guess <- as.character(substitute(list(...)))[-1]
+    # Under do.call() the "names" are deparsed objects, not symbols. Anything
+    # that is not a plain name is replaced by a positional label.
+    okName <- (length(guess) == length(arg_list)) & grepl("^[A-Za-z._][A-Za-z0-9._]*$", guess)
+    if (length(okName) != length(arg_list)) okName <- rep(FALSE, length(arg_list))
+    nm <- ifelse(okName, guess, paste0("arg", seq_along(arg_list)))
+  }
+  names(arg_list) <- nm
+
   # 2. Extract types for all columns
-  type_summary <- map_df(arg_list, function(df) {
-    summarise(df, across(everything(), ~class(.x)[1]))
+  type_summary <- purrr::map_df(arg_list, function(df) {
+    dplyr::summarise(df, dplyr::across(dplyr::everything(), ~class(.x)[1]))
   }, .id = "dataframe_name") %>%
-    pivot_longer(-dataframe_name, names_to = "column_name", values_to = "type")
-  
+    tidyr::pivot_longer(-dataframe_name, names_to = "column_name", values_to = "type")
+
   # 3. Identify columns with inconsistent types
   conflicts <- type_summary %>%
-    group_by(column_name) %>%
-    filter(n_distinct(type) > 1) %>%
-    ungroup()
+    dplyr::group_by(column_name) %>%
+    dplyr::filter(dplyr::n_distinct(type) > 1) %>%
+    dplyr::ungroup()
   
   if (nrow(conflicts) == 0) {
     message("✅ No type conflicts found. bind_rows() should be safe.")
@@ -414,14 +438,14 @@ check_bind_conflicts <- function(...) {
   # 4. CRITICAL CHECK: Look for Factor vs. Non-Factor mixtures
   # bind_rows() fails specifically when factors meet numeric/integer/character
   factor_clashes <- conflicts %>%
-    group_by(column_name) %>%
-    summarise(
+    dplyr::group_by(column_name) %>%
+    dplyr::summarise(
       has_factor = any(type == "factor"),
       has_non_factor = any(type != "factor"),
       types_present = paste(unique(type), collapse = ", "),
       .groups = "drop"
     ) %>%
-    filter(has_factor & has_non_factor)
+    dplyr::filter(has_factor & has_non_factor)
   
   # 5. Output Warnings
   if (nrow(factor_clashes) > 0) {
@@ -432,8 +456,9 @@ check_bind_conflicts <- function(...) {
             call. = FALSE)
   }
   
-  return(conflicts %>% arrange(column_name, type))
+  return(conflicts %>% dplyr::arrange(column_name, type))
 }
+# <<< Claude 2026-09-21
 
 #### Utilities ####
 sum_mismatched_tables <- function(..., colName = "Survey") {

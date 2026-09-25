@@ -94,24 +94,40 @@ rm(dup_mujer)
 keys_only_in_uniones <- setdiff(uniones$llave_muj, mujeres1997$llave_muj)
 if (!(length(keys_only_in_uniones) == 0 )) stop(paste("FAILURE: mujeres1997 is missing", length(keys_only_in_uniones), "keys"))
 # check mujeres with previous unions have the adequate number of rows in uniones
+# >>> Claude 2026-09-21
+# The verbs are namespaced because this function was failing with
+#   Error: object 'is_complete' not found
+#   Called from: filter(., !is_complete)
+# That message means 'filter' had resolved to stats::filter, which evaluates its
+# arguments normally instead of inside the data frame, so it looked for a
+# variable called is_complete and found none. The column was created correctly
+# one line above.
+#
+# The cause is an object named 'filter' in .GlobalEnv, which beats every
+# package on the search path. None of the packages this project attaches
+# (tidyverse, haven, foreign, janitor, bit64, data.table) masks filter: checked.
+# So it came from the console or from a restored .RData. Diagnose with
+# find("filter"); if .GlobalEnv is listed first, rm(filter) clears it.
+# dplyr:: makes this function immune either way.
 checkCountUnions <- function (women=mujeres1997, unions=uniones, fieldName="P14_8") {
   # 1. Count how many unions actually exist for each woman in the 'uniones' table
   uniones_counts <- unions %>%
-    count(llave_muj, name = "actual_count")
+    dplyr::count(llave_muj, name = "actual_count")
   # 2. Join this back to the 'mujeres1997' table
   comparison <- women %>%
-    left_join(uniones_counts, by = "llave_muj") %>%
+    dplyr::left_join(uniones_counts, by = "llave_muj") %>%
     # Replace NA with 0 for women who have no records in the 'uniones' table
-    mutate(actual_count = coalesce(actual_count, 0)) %>%
+    dplyr::mutate(actual_count = dplyr::coalesce(actual_count, 0)) %>%
     # Create a check field: TRUE if the counts match
-    mutate(is_complete = (.data[[fieldName]] == actual_count))
+    dplyr::mutate(is_complete = (.data[[fieldName]] == actual_count))
   # 3. View only the discrepancies
   discrepancies <- comparison %>%
-    filter(!is_complete)
+    dplyr::filter(!is_complete)
   if (nrow(discrepancies)>0) cat ("missing unions in uniones\n")
   rm(comparison)
   rm(discrepancies)
 }
+# <<< Claude 2026-09-21
 
 checkCountUnions(mujeres1997, uniones, "P14_8")
 
@@ -123,7 +139,9 @@ if (!(length(keys_only_in_mujeres) == 0)) stop(paste("FAILURE: general is missin
 
 # add marital status from general to mujeres (but we have P14_1 anyway)
 mujeres1997 <- mujeres1997 %>%
-  dplyr::left_join(general %>% select(llave_muj, P6_1), by = "llave_muj")
+  # >>> Claude 2026-09-21  (bare select() is masked by MASS and others)
+  dplyr::left_join(general %>% dplyr::select(llave_muj, P6_1), by = "llave_muj")
+  # <<< Claude 2026-09-21
 
 getDatos1997 <- function (mujeres) {
   datos <- data.frame(llave_muj=mujeres$llave_muj, region=mujeres$ENT)

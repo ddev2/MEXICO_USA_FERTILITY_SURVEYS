@@ -88,7 +88,13 @@ MEXICO_ENADID <- EDER_ENADID25 %>%
 MEXICO_ENADID$survey <- factor (MEXICO_ENADID$survey)
 
 #### harmonize fields ####
-#MEXICO_ENADID <- harm_union_type (MEXICO_ENADID, 7)
+# >>> Claude 2026-09-21
+# Restored. 7 = the number of union slots, matching the 1:7 loop below.
+# strict = TRUE by default, so the first run STOPS and names any label that
+# is not yet in UNION_TYPE_ALIASES. That is the point: add it there rather
+# than letting it become NA.
+MEXICO_ENADID <- harm_union_type (MEXICO_ENADID, 7)
+# <<< Claude 2026-09-21
 
 #### clean and reorder dataframe: keep only necessary columns ####
 selColumns <- c(
@@ -274,5 +280,7 @@ rm(EDER_ENADID)
 rm(ENADID2018_full)
 rm(ENADID2023_full)
 rm(EDER_ENADID25)
+rm(chk)
+rm(EDER_one)
 
 print (summarizeDateQuality(MEXICO_ENADID))

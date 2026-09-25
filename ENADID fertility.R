@@ -3,7 +3,6 @@ source ("enadid_lib.r")
 library (tidyverse)
 library (haven)
 library (purrr)
-source("lib/KaplanMeierLib.R")
 path_output_plots <- paste0(outputPath, "/")
 
 pathColDHS <- dhsRoot
@@ -350,20 +349,22 @@ tfrSmoothPlot
 # tfrSmoothPlot <- plotTFR_mean (dfPlot, x="year", y="tfr_smooth", ymin="tfr_min", ymax="tfr_max", xTitle="year", yTitle="TFR", yLim=c(1.5,2.5))
 # tfrSmoothPlot
 
-s#### union1 ==> sep1 ####
+#### union1 ==> sep1 ####
 # Mexico
 union1_sep1_Mex <- createUnionSep (df=subset(MEXICO_ENADID,!(survey %in% c("ENADID1992","ENADID2006"))))
-rangeAge_Mex <- agesByYear (df=union1_sep1_Mex, varEvent="ySep1")
+rangeAge_Mex <- agesByYear (df=union1_sep1_Mex, varEvent="ySep")
 
-df_specificNumYears <-  buildSpecificYears(union1_sep1_Mex, "separation1", varEvent="ySep1")
+df_specificNumYears <-  buildSpecificYears(union1_sep1_Mex, "separation1", varEvent="ySep")
 
-plot_sep1_all_Mex <- plotBySurvey (df_toPlot=union1_sep1_Mex, varEnter="yUnion1", varEvent="ySep1", varWeight="weight",
-                               res_countrySpecific_numYears=df_specificNumYears, ageTruncate = 40, mySpan=0.5, yTitle="probability of separation")
+plot_sep1_all_Mex <- plotBySurvey (df_toPlot=union1_sep1_Mex, varEnter="yUnion", varEvent="ySep", varWeight="weight",
+                                   res_countrySpecific_numYears=df_specificNumYears, ageTruncate = 40, mySpan=0.5, yTitle="probability of separation")
 plot_sep1_all_Mex$plot
 
 # Europe GGS & similar
 # union1_sep1 <- createUnionSep (df=subset (GGS_ENADID, survey!="ENCoR"))
-# rangeAge_GGS <- agesByYear (df=union1_sep1, varEvent="ySep1")
+# >>> Claude 2026-09-22
+# rangeAge_GGS <- agesByYear (df=union1_sep1, varEvent="ySep")
+# <<< Claude 2026-09-22
 
 # merge NSFG surveys from GGS_ENADID
 # us <- subset(GGS_ENADID, survey %in% c("NSFG1995", "NSFG2007"))
@@ -371,11 +372,17 @@ plot_sep1_all_Mex$plot
 
 # USA
 union1_sep1_USA <- createUnionSep (df=subset (NSFG_ENADID,!(survey %in% c("NSFG2017_19"))))
-rangeAge_USA <- agesByYear (df=union1_sep1_USA, varEvent="ySep1")
+# >>> Claude 2026-09-22
+rangeAge_USA <- agesByYear (df=union1_sep1_USA, varEvent="ySep")
+# <<< Claude 2026-09-22
 
-df_specificNumYears <-  buildSpecificYears(union1_sep1_USA, "separation1", varEvent="ySep1")
+# >>> Claude 2026-09-22
+df_specificNumYears <-  buildSpecificYears(union1_sep1_USA, "separation1", varEvent="ySep")
+# <<< Claude 2026-09-22
 
-plot_sep1_all_USA <- plotBySurvey (df_toPlot=union1_sep1_USA, varEnter="yUnion1", varEvent="ySep1", varWeight="weight",
+# >>> Claude 2026-09-22
+plot_sep1_all_USA <- plotBySurvey (df_toPlot=union1_sep1_USA, varEnter="yUnion", varEvent="ySep", varWeight="weight",
+# <<< Claude 2026-09-22
                                res_countrySpecific_numYears=df_specificNumYears, ageTruncate = 40, mySpan=0.5, yTitle="probability of separation")
 plot_sep1_all_USA$plot
 
@@ -385,7 +392,9 @@ union1_sep1 <- rbind (union1_sep1, createUnionSep (df=subset (NSFG_ENADID,!(surv
 
 # compute probability of the event (PPR)
 res_Union1Sep1 <- calc_ppr(df=union1_sep1,
-                           varEnter="yUnion1", varEvent="ySep1", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
+# >>> Claude 2026-09-22
+                           varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
+# <<< Claude 2026-09-22
                            varWeight="weight", res_numYears=68, ageTruncate = 40, mySpan=0.25)
 # reduce the time span
 res_Union1Sep1 <- subset(res_Union1Sep1, ((country=="MEXICO")&(year <= 2022))|((country=="USA")&(year <= 2016)))
@@ -405,15 +414,26 @@ plot_mean_sep1 <- plot_mean(df_res=res_Union1Sep1, vecCountry=NULL, yLimit=c(0, 
 
 #ageTruncate 45, for testing...
 res_Union1Sep1_45 <- calc_ppr(df=union1_sep1,
-                           varEnter="yUnion1", varEvent="ySep1", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
+# >>> Claude 2026-09-22
+                           varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
+# <<< Claude 2026-09-22
                            varWeight="weight", res_numYears=20, ageTruncate = 45, mySpan=0.25)
 # reduce the time span
 res_Union1Sep1_45 <- subset(res_Union1Sep1_45, ((country=="MEXICO")&(year <= 2022))|((country=="USA")&(year <= 2016)))
 res_Union1Sep1_45$country <- ifelse(res_Union1Sep1_45$country=="MEXICO","MEXICO 45","USA 45")
 res_Union1Sep1_45 <- rbind(res_Union1Sep1_45,res_Union1Sep1)
 
+cols <- c("MEXICO" = "#F8766D", "MEXICO 45" = "#F8766D",
+          "USA"    = "#00BFC4", "USA 45"    = "#00BFC4")
+ltys <- c("MEXICO" = "solid",   "MEXICO 45" = "dotted",
+          "USA"    = "solid",   "USA 45"    = "dotted")
 plot_sep1_45 <- plot_ppr(df_res=res_Union1Sep1_45, vecCountry=NULL, yLimit=c(0, 1), yTitle="probability of separation", facet=FALSE)
-plot_sep1_45 + theme(
+plot_sep1_45 +
+  scale_colour_manual  (values = cols) +
+  scale_fill_manual    (values = cols) +
+  scale_linetype_manual(values = ltys) +
+  scale_x_continuous(breaks = seq(1960, 2020, by = 10)) +
+  theme(
   plot.title = element_text(size = 20, hjust=0.5),
   axis.title = element_text(size = 14),
   axis.text = element_text(size = 12),
@@ -456,7 +476,9 @@ pRange
 
 # validate
 df <- subset (union1_sep1, surveyName=="NSFG2006_10")
-comparison_df <- validate_with_bootstrap (df, varEnter="yUnion1", varEvent="ySep1", varCens="cmc_survey", 
+# >>> Claude 2026-09-22
+comparison_df <- validate_with_bootstrap (df, varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", 
+# <<< Claude 2026-09-22
                                     varWeight = "weight", n_bootstrap = 200)
   
 #### birth ego -> first birth ####
@@ -1179,3 +1201,118 @@ rm(Mex_firstBirthStatus_union1)
 rm(Mex_firstBirthStatus_union1_4)
 rm(fBirthStatus_USA_union)
 
+
+
+# >>> Claude 2026-09-23
+# ==== Child union context: diagnostics and stratified Aalen-Johansen ====
+#
+# Functions in lib/childUnionContext.R, tests in tests_childUnionContext.R.
+# Uses fBirthStatus_Both_union built above (Mexico without WFS, ENADID1992 and
+# ENADID2006; USA without NSFG2017_19).
+#
+# The question: is the US recovery for children born after 1990 real, or is it
+# produced by pooling surveys whose upper age truncates the mothers differently
+# for each child cohort? Steps 1 to 3 diagnose, the stratified AJ corrects.
+#
+# Every estimate comes with a bootstrap interval (women resampled within each
+# survey). CHILD_REPS = 20 gives a quick look; use 200 for the final figures.
+
+source("lib/childUnionContext.R")
+CHILD_REPS <- 200L
+
+ch_Both <- childPrepare(fBirthStatus_Both_union)
+
+# --- Step 1: mother's age at first birth, by child cohort and survey ---
+# "Complete 10-year window" is the sample the current figures use. "All first
+# births, surveys close to the birth" is the composition of first births when
+# every mother up to 35 is observable. A gap between the two lines is the
+# truncation; a gap that narrows at the end of the series is the recovery.
+prof_Both <- childAgeProfile(ch_Both)
+print(as.data.frame(prof_Both$both), digits = 3)
+print(as.data.frame(prof_Both$bySurvey), digits = 3)   # surveyShare: weight of each survey in its cohort
+print(plotChildAgeProfile(prof_Both))
+
+# --- Step 2: current definition against the common support ---
+# Current definition: complete windows, all mothers up to 35, pooled. Common
+# support: mothers aged 28 or less at the birth, each survey contributing only
+# the cohorts in which it observes all of them. If the recovery vanishes on the
+# common support, it came from the survey calendar.
+res_child_current <- childDirect(ch_Both, replicates = CHILD_REPS, seed = 1)
+res_child_cs28    <- childDirect(childCommonSupport(ch_Both, maxAgeBirth = 28),
+                                 replicates = CHILD_REPS, seed = 1)
+step2 <- list("Current definition"            = res_child_current,
+              "Mothers 28 or less, full support" = res_child_cs28)
+print(plotChildCompare(step2, var = "joint",
+                       yLab = "Born in the first union, union intact at age 10"))
+print(plotChildCompare(step2, var = "bornU1",   yLab = "Born in the mother's first union"))
+print(plotChildCompare(step2, var = "intactU1", yLab = "First union intact at 10, if born in it"))
+
+# --- Step 3: the same cohorts survey by survey, on the common support ---
+# A level difference between two surveys for the same cohort is a survey effect
+# (for NSFG2022_23: web mode, 26.8 per cent response, year-only dates).
+res_child_bySurvey <- childBySurvey(ch_Both, maxAgeBirth = 28, replicates = CHILD_REPS, seed = 1)
+print(as.data.frame(res_child_bySurvey[, c("country", "cohortLabel", "surveyName", "n",
+                                           "joint", "joint_lower", "joint_upper")]), digits = 3)
+print(plotChildBySurvey(res_child_bySurvey, var = "joint",
+                        yLab = "Born in the first union, union intact at age 10"))
+
+# --- Stratified Aalen-Johansen, standardised on the mother's age at the birth ---
+# All first children, complete or censored, within groups of the mother's age
+# (<20, 20-24, 25-29, 30-35), then weighted by the observed composition of first
+# births of each cohort. Cohorts with an age group never followed to age 10 come
+# out NA: the data cannot say, and the function lists those cells.
+res_child_AJ <- childStratifiedAJ(ch_Both, target = "observed", replicates = CHILD_REPS %/% 2, seed = 1)
+print(plotChildCompare(list("Current definition"         = res_child_current,
+                            "AJ, not standardised"       = res_child_AJ$crude,
+                            "AJ, standardised on age"    = res_child_AJ$std),
+                       var = "joint", yLab = "Born in the first union, union intact at age 10"))
+print(plotChildShares(res_child_AJ$std,
+                      title = "First ten years by the mother's union state, standardised"))
+# <<< Claude 2026-09-23
+
+
+# >>> Claude 2026-09-23
+# ==== Figures 8 and 9 of the paper, corrected ====
+#
+# Uses res_child_AJ from the block above. If you have not run that block (it
+# takes about 7 minutes), the saved results are loaded instead.
+#
+# Figure 8 replaces MEX_USA_lifeChildren_plot (plot10Years_child).
+# Figure 9 replaces the plotFullUnion_child line plot.
+# Both show five-year birth cohorts 1975-2010; earlier cohorts cannot be
+# corrected because children of older mothers were never followed to age 10.
+
+if (!exists("plotFigure8")) source("lib/childUnionContext.R")
+if (!exists("res_child_AJ")) {
+  load(file.path(outputPath, "childUnionContext", "childResults_200.Rdat"))
+}
+
+fig8_corrected <- plotFigure8(res_child_AJ)
+fig9_corrected <- plotFigure9(res_child_AJ)
+print(fig8_corrected)
+print(fig9_corrected)
+
+ggsave(filename = paste0(path_output_plots, "MEX_USA_lifeChildren_plot_corrected.pdf"),
+       plot = fig8_corrected, width = 29.7, height = 21, units = "cm", dpi = 300)
+ggsave(filename = paste0(path_output_plots, "MEX_USA_childIntact_corrected.pdf"),
+       plot = fig9_corrected, width = 29.7, height = 21, units = "cm", dpi = 300)
+# <<< Claude 2026-09-23
+
+
+# >>> Claude 2026-09-23
+# ==== Annex figure: Lexis diagram of the selection by the survey age limit ====
+#
+# Panel A: one survey (2012, women 15-44) and five women with a first birth in
+# 1990 at ages 18 to 34; only those still 44 or younger in 2012 are interviewed.
+# Panel B: for every survey, the oldest mother at the birth it can include,
+# min(35, upper age - years since the birth), for children at least 10 years
+# old at the survey. Needs no data: it is drawn from the survey calendar.
+
+if (!exists("plotLexisSelection")) source("lib/childUnionContext.R")
+library(patchwork)
+lexisPanels <- plotLexisSelection()
+figA_lexis  <- lexisPanels$A / lexisPanels$B + plot_layout(heights = c(1, 1.35))
+print(figA_lexis)
+ggsave(filename = paste0(path_output_plots, "FigureA_Lexis_selection.pdf"),
+       plot = figA_lexis, width = 10, height = 14)
+# <<< Claude 2026-09-23
