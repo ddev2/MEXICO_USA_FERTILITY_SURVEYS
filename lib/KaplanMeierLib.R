@@ -1,5 +1,9 @@
 library(tidyverse)
-library2 ("scam")
+# >>> Claude 2026-09-25
+# library2("scam") removed from the top of this file. library2() is defined in
+# lib/lib.R, which enadid_lib.R sources AFTER this file, so a fresh clone failed
+# here; and scam is needed only for plotType = "smooth", where it is now loaded.
+# <<< Claude 2026-09-25
 library(ggrepel)
 library(scales)
 library(haven)
@@ -551,10 +555,10 @@ KaplanMeierPlot <- function(
   #    confType="log-log" to get bounds that stay inside [0,1] and a variance valid for
   #    non-integer weights. See the argument notes on KaplanMeier() for the caveats.
   #==> estimator: "classic" uses KaplanMeier() from this file. "survfit" uses
-  #    KaplanMeierSurvfit() from lib/KaplanMeierSurvfit.R, which scales the two halves by
+  #    mirroredCurve() from lib/mirroredCurve.R (formerly KaplanMeierSurvfit()), which scales the two halves by
   #    Aalen-Johansen branch probabilities instead of raw observed shares. Only meaningful
-  #    with varEvent2; source lib/KaplanMeierSurvfit.R first.
-  #==> horizon / ties: passed to KaplanMeierSurvfit(). 'horizon' is the time at which the
+  #    with varEvent2; enadid_lib.R loads lib/mirroredCurve.R.
+  #==> horizon / ties: passed to mirroredCurve(). 'horizon' is the time at which the
   #    branch probabilities are read and belongs in the figure caption; 'ties' is one of
   #    "simultaneous", "event", "event2" and decides what happens when both events share a
   #    month. Ignored when estimator = "classic".
@@ -641,15 +645,17 @@ KaplanMeierPlot <- function(
           # to the population-weight point estimate, as before.
           if (estimator == "survfit") {
             if (is.null(varEvent2)) stop("estimator = \"survfit\" needs varEvent2")
-            if (!exists("KaplanMeierSurvfit")) stop("source(\"lib/KaplanMeierSurvfit.R\") first")
+            # >>> Claude 2026-09-25
+            if (!exists("mirroredCurve")) stop("source(\"lib/mirroredCurve.R\") first")
+            # <<< Claude 2026-09-25
             if (bootstrap > 0) {
-              data <- KaplanMeierBootstrap (dfCountryCohort, varEnter, varEvent, varCens,
+              data <- mirroredCurveBootstrap (dfCountryCohort, varEnter, varEvent, varCens,
                                             varWeight[1], varEvent2, truncate=truncate,
                                             horizon=horizon, ties=ties, naWeight=naWeight,
                                             replicates=bootstrap, varStrata=varStrata,
                                             varCluster=varCluster)
             } else {
-              data <- KaplanMeierSurvfit (dfCountryCohort, varEnter, varEvent, varCens,
+              data <- mirroredCurve (dfCountryCohort, varEnter, varEvent, varCens,
                                           varWeight[1], varEvent2, truncate=truncate,
                                           horizon=horizon, ties=ties, naWeight=naWeight)
             }
@@ -859,7 +865,12 @@ KaplanMeierDraw <- function (dataTot,
   }
 
   if (plotType=="step") p <- p + geom_step(direction = "hv")
-  if (plotType=="smooth") p <- p + geom_smooth(method = "scam", formula = y ~ s(x, k = 15, bs = "mpd"), se = FALSE)
+  # >>> Claude 2026-09-25
+  if (plotType=="smooth") {
+    if (!requireNamespace("scam", quietly = TRUE)) stop("plotType = \"smooth\" needs the scam package: install.packages(\"scam\")")
+    p <- p + geom_smooth(method = scam::scam, formula = y ~ s(x, k = 15, bs = "mpd"), se = FALSE)
+  }
+  # <<< Claude 2026-09-25
   
   p <- p + theme_linedraw() + labs(title=Title, y=yTitle, x=xTitle, colour=legendTitle,
                                    fill = legendTitle)

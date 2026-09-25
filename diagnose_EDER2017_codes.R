@@ -1,5 +1,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source("enadid_lib.r")
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source("enadid_lib.R")
+# <<< Claude 2026-09-25
 # Diagnostic: EDER 2017 union code sequence validation
 # Run this after loading EDER (the historiavida data.frame) to check
 # for incoherence in the succession of edo_civil codes before attempting

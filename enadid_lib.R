@@ -1,6 +1,9 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source("lib/KaplanMeierLib.R")
-source("lib/unionType_lib.R")
+# >>> Claude 2026-09-25
+# The two libraries below are now loaded after scriptDir is known (next
+# section), so that a script in a subfolder (tests/, archive/) can source this
+# file too. The working directory is then set to scriptDir, the repository root.
+# <<< Claude 2026-09-25
 
 # ==== Project paths ====
 #
@@ -29,6 +32,11 @@ if (!file.exists(file.path(scriptDir, "enadid_lib.R"))) {
   }
 }
 projectRoot <- dirname(scriptDir)
+# >>> Claude 2026-09-25
+setwd(scriptDir)
+source(file.path(scriptDir, "lib", "KaplanMeierLib.R"))
+source(file.path(scriptDir, "lib", "unionType_lib.R"))
+# <<< Claude 2026-09-25
 
 .cfgEnv <- new.env()
 if (file.exists(file.path(scriptDir, "config_local.R"))) {
@@ -71,6 +79,13 @@ source(file.path(scriptDir, "lib", "unionType_lib.R"))
 # instead of comparing it to the literal string "separation".
 source(file.path(scriptDir, "lib", "unionEpisodes.R"))
 # <<< Claude 2026-09-22
+# >>> Claude 2026-09-25
+# mirroredCurve() and mirroredCurvePlot(), the two-event "mirrored" figure,
+# and the survey selections and helpers shared by the Mexico-USA figure
+# scripts (MEX_USA_figures_cohort.R, MEX_USA_figures_period.R, KaplanMeier.R).
+source(file.path(scriptDir, "lib", "mirroredCurve.R"))
+source(file.path(scriptDir, "lib", "mexUsaFigures.R"))
+# <<< Claude 2026-09-25
 
 library (tidyverse)
 library (haven)

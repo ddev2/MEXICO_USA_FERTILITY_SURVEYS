@@ -1,5 +1,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source ("enadid_lib.r")
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source("enadid_lib.R")
+# <<< Claude 2026-09-25
 # Read harmonized GGS (and others) files
 library (tidyverse)
 library (haven)

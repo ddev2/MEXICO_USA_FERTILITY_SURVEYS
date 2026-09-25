@@ -1,5 +1,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source ("enadid_lib.r")
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source ("enadid_lib.R")
+# <<< Claude 2026-09-25
 library (tidyverse)
 library (haven)
 library (purrr)
@@ -349,172 +351,13 @@ tfrSmoothPlot
 # tfrSmoothPlot <- plotTFR_mean (dfPlot, x="year", y="tfr_smooth", ymin="tfr_min", ymax="tfr_max", xTitle="year", yTitle="TFR", yLim=c(1.5,2.5))
 # tfrSmoothPlot
 
-#### union1 ==> sep1 ####
-# Mexico
-union1_sep1_Mex <- createUnionSep (df=subset(MEXICO_ENADID,!(survey %in% c("ENADID1992","ENADID2006"))))
-rangeAge_Mex <- agesByYear (df=union1_sep1_Mex, varEvent="ySep")
-
-df_specificNumYears <-  buildSpecificYears(union1_sep1_Mex, "separation1", varEvent="ySep")
-
-plot_sep1_all_Mex <- plotBySurvey (df_toPlot=union1_sep1_Mex, varEnter="yUnion", varEvent="ySep", varWeight="weight",
-                                   res_countrySpecific_numYears=df_specificNumYears, ageTruncate = 40, mySpan=0.5, yTitle="probability of separation")
-plot_sep1_all_Mex$plot
-
-# Europe GGS & similar
-# union1_sep1 <- createUnionSep (df=subset (GGS_ENADID, survey!="ENCoR"))
-# >>> Claude 2026-09-22
-# rangeAge_GGS <- agesByYear (df=union1_sep1, varEvent="ySep")
-# <<< Claude 2026-09-22
-
-# merge NSFG surveys from GGS_ENADID
-# us <- subset(GGS_ENADID, survey %in% c("NSFG1995", "NSFG2007"))
-# NSFG_ENADID <- dplyr::bind_rows (us, NSFG_ENADID)
-
-# USA
-union1_sep1_USA <- createUnionSep (df=subset (NSFG_ENADID,!(survey %in% c("NSFG2017_19"))))
-# >>> Claude 2026-09-22
-rangeAge_USA <- agesByYear (df=union1_sep1_USA, varEvent="ySep")
-# <<< Claude 2026-09-22
-
-# >>> Claude 2026-09-22
-df_specificNumYears <-  buildSpecificYears(union1_sep1_USA, "separation1", varEvent="ySep")
-# <<< Claude 2026-09-22
-
-# >>> Claude 2026-09-22
-plot_sep1_all_USA <- plotBySurvey (df_toPlot=union1_sep1_USA, varEnter="yUnion", varEvent="ySep", varWeight="weight",
-# <<< Claude 2026-09-22
-                               res_countrySpecific_numYears=df_specificNumYears, ageTruncate = 40, mySpan=0.5, yTitle="probability of separation")
-plot_sep1_all_USA$plot
-
-# join Mexico and USA
-union1_sep1 <- createUnionSep (df=subset(MEXICO_ENADID,!(survey %in% c("ENADID1992","ENADID2006"))))
-union1_sep1 <- rbind (union1_sep1, createUnionSep (df=subset (NSFG_ENADID,!(survey %in% c("NSFG2017_19","NSFG2022_23")))))
-
-# compute probability of the event (PPR)
-res_Union1Sep1 <- calc_ppr(df=union1_sep1,
-# >>> Claude 2026-09-22
-                           varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
-# <<< Claude 2026-09-22
-                           varWeight="weight", res_numYears=68, ageTruncate = 40, mySpan=0.25)
-# reduce the time span
-res_Union1Sep1 <- subset(res_Union1Sep1, ((country=="MEXICO")&(year <= 2022))|((country=="USA")&(year <= 2016)))
-res_Union1Sep1 <- subset(res_Union1Sep1, ((country=="MEXICO")&(year >= 1965))|((country=="USA")&(year >= 1968)))
-
-plot_sep1 <- plot_ppr(df_res=res_Union1Sep1, vecCountry=NULL, yLimit=c(0, 1), yTitle="probability of separation", facet=FALSE)
-plot_sep1 + theme(
-  plot.title = element_text(size = 20, hjust=0.5),
-  axis.title = element_text(size = 14),
-  axis.text = element_text(size = 12),
-  legend.text = element_text(size = 12),
-  legend.title = element_text(size = 13),
-  plot.caption = element_text(size = 10, face = "italic")
-) + scale_x_continuous(breaks = seq(1960, 2020, by = 10))
-
-plot_mean_sep1 <- plot_mean(df_res=res_Union1Sep1, vecCountry=NULL, yLimit=c(0, 15), yTitle="mean duration of union until separation", facet=FALSE)
-
-#ageTruncate 45, for testing...
-res_Union1Sep1_45 <- calc_ppr(df=union1_sep1,
-# >>> Claude 2026-09-22
-                           varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
-# <<< Claude 2026-09-22
-                           varWeight="weight", res_numYears=20, ageTruncate = 45, mySpan=0.25)
-# reduce the time span
-res_Union1Sep1_45 <- subset(res_Union1Sep1_45, ((country=="MEXICO")&(year <= 2022))|((country=="USA")&(year <= 2016)))
-res_Union1Sep1_45$country <- ifelse(res_Union1Sep1_45$country=="MEXICO","MEXICO 45","USA 45")
-res_Union1Sep1_45 <- rbind(res_Union1Sep1_45,res_Union1Sep1)
-
-cols <- c("MEXICO" = "#F8766D", "MEXICO 45" = "#F8766D",
-          "USA"    = "#00BFC4", "USA 45"    = "#00BFC4")
-ltys <- c("MEXICO" = "solid",   "MEXICO 45" = "dotted",
-          "USA"    = "solid",   "USA 45"    = "dotted")
-plot_sep1_45 <- plot_ppr(df_res=res_Union1Sep1_45, vecCountry=NULL, yLimit=c(0, 1), yTitle="probability of separation", facet=FALSE)
-plot_sep1_45 +
-  scale_colour_manual  (values = cols) +
-  scale_fill_manual    (values = cols) +
-  scale_linetype_manual(values = ltys) +
-  scale_x_continuous(breaks = seq(1960, 2020, by = 10)) +
-  theme(
-  plot.title = element_text(size = 20, hjust=0.5),
-  axis.title = element_text(size = 14),
-  axis.text = element_text(size = 12),
-  legend.text = element_text(size = 12),
-  legend.title = element_text(size = 13),
-  plot.caption = element_text(size = 10, face = "italic")
-) + scale_x_continuous(breaks = seq(1960, 2020, by = 10))
-
-#### plot max age USA & Mexico ####
-rangeAge <- rbind (rangeAge_Mex, rangeAge_USA)
-
-# Calculate midpoint positions for labels
-ageMaxMex <- rangeAge[(rangeAge$country == "MEXICO")&(rangeAge$year==1990), ]$ageMax
-ageMaxUSA <- rangeAge[(rangeAge$country == "USA")&(rangeAge$year==1990), ]$ageMax
-label_data <- data.frame(country=c("MEXICO", "USA"),year=c(1990,1990), ageMax=c(ageMaxMex, ageMaxUSA))
-
-library(ggrepel)
-
-pRange <- ggplot(rangeAge, aes(x=year, y=ageMax, color=country)) +
-  geom_line() +
-  geom_text_repel(data = label_data, 
-                  aes(label = country),
-                  size = 4,
-                  direction = "y") +
-  theme_bw() +
-  xlab("year") + ylab("maximum age in dataset") +
-  scale_color_manual(values=c("red","blue")) +
-  theme(legend.position = "none") +
-  theme(
-    plot.title = element_text(size = 20, hjust=0.5),
-    axis.title = element_text(size = 14),
-    axis.text = element_text(size = 12),
-    legend.text = element_text(size = 12),
-    legend.title = element_text(size = 13),
-    plot.caption = element_text(size = 10, face = "italic")
-  ) +
-  geom_hline(yintercept = 40, linetype = "dashed", color = "gray40", linewidth = 0.7)
-
-pRange
-
-# validate
-df <- subset (union1_sep1, surveyName=="NSFG2006_10")
-# >>> Claude 2026-09-22
-comparison_df <- validate_with_bootstrap (df, varEnter="yUnion", varEvent="ySep", varCens="cmc_survey", 
-# <<< Claude 2026-09-22
-                                    varWeight = "weight", n_bootstrap = 200)
-  
-#### birth ego -> first birth ####
-# Mexico
-birth_births_Mex <- createBirthBirths(MEXICO_ENADID)
-
-df_specificNumYears <-  buildSpecificYears(birth_births_Mex, "fertility")
-
-res_birth1_Mex <- plotBySurvey (df_toPlot=birth_births_Mex, varEnter="yBirth", varEvent="yBirth1", varWeight="weight",
-                                res_countrySpecific_numYears=df_specificNumYears, res_finalYearsToDiscard=1, mySpan=0.5, yTitle="probability of birth", yLimit=c(0.6,1))
-res_birth1_Mex$plot
-view (res_birth1_Mex$results)
-
-# USA
-# first two surveys have no childless single women, so we exclude them
-birth_births_USA <- createBirthBirths(subset(NSFG_ENADID, !(survey %in% c("NSFG1973", "NSFG1976"))))
-
-df_specificNumYears <-  buildSpecificYears(birth_births_USA, "fertility")
-
-res_birth1_USA <- plotBySurvey (df_toPlot=birth_births_USA, varEnter="yBirth", varEvent="yBirth1", varWeight="weight",
-                                res_countrySpecific_numYears=df_specificNumYears, res_finalYearsToDiscard=1, mySpan=0.5, yTitle="probability of birth", yLimit=c(0.6,1))
-res_birth1_USA$plot
-view (res_birth1_USA$results)
-
-# join Mexico and USA
-birth_births_Mex_USA <- createBirthBirths(MEXICO_ENADID)
-birth_births_Mex_USA <- rbind (birth_births, createBirthBirths(NSFG_ENADID))
-
-res_BirthBirth1_Mex_USA <- calc_ppr(df=birth_births_Mex_USA,
-                           varEnter="yBirth", varEvent="yBirth1", varCens="cmc_survey", varCountry="country", vecCountry=NULL,
-                           varWeight="weight", res_finalYearsToDiscard=5, res_numYears=50, mySpan=0.25, duration=FALSE)
-
-res_BirthBirth1_Mex_USA <- subset(res_BirthBirth1_Mex_USA, ((country=="MEXICO")&(year <= 2016))|((country=="USA")&(year <= 2016)))
-
-plot_birth1 <- plot_ppr(df_res=res_BirthBirth1_Mex_USA, vecCountry=NULL, yLimit=c(0, 1), yTitle="probability of first birth", facet=FALSE)
-plot_mean_birth1 <- plot_mean(df_res=res_BirthBirth1_Mex_USA, vecCountry=NULL, yLimit=c(15, 30), yTitle="mean age at first birth", facet=FALSE)
+#### Period indicators: separation, first birth ####
+# >>> Claude 2026-09-25
+# The period probability of separation of the first union (Figures 5, 15, 16
+# and 17), the maximum age by year (Figure 10) and the first-birth period PPR
+# and mean age (Figure 19) moved to MEX_USA_figures_period.R, blocks P1 to P5,
+# with the new period transitions (block P6).
+# <<< Claude 2026-09-25
 
 
 #### 10 first years of first children ####
@@ -1206,7 +1049,7 @@ rm(fBirthStatus_USA_union)
 # >>> Claude 2026-09-23
 # ==== Child union context: diagnostics and stratified Aalen-Johansen ====
 #
-# Functions in lib/childUnionContext.R, tests in tests_childUnionContext.R.
+# Functions in lib/childUnionContext.R, tests in tests/tests_childUnionContext.R.
 # Uses fBirthStatus_Both_union built above (Mexico without WFS, ENADID1992 and
 # ENADID2006; USA without NSFG2017_19).
 #

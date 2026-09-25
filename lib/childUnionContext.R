@@ -46,7 +46,7 @@
 #   lengths of time, which is why childStratifiedAJ() estimates within groups of
 #   mother's age at first birth and then standardises.
 #
-# TESTS in tests_childUnionContext.R (simulated data, no survey needed):
+# TESTS in tests/tests_childUnionContext.R (simulated data, no survey needed):
 #   1. complete windows: equal to the direct overlap calculation (1e-16)
 #   2. censored, weighted data: equal to survival::survfit multistate (2e-16)
 #   3. a population with no trend on the NSFG calendar: the current method

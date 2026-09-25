@@ -1,7 +1,28 @@
+# >>> Claude 2026-09-25
+# lib/mirroredCurve.R  (was lib/KaplanMeierSurvfit.R)
+#
+# THE NAME. This figure has long been called a "mirrored Kaplan-Meier curve"
+# (Billari 2001). The name no longer fits what is computed. The two halves are
+# scaled by Aalen-Johansen cumulative incidences of the FIRST event, and only
+# the time from the first to the second event is an ordinary Kaplan-Meier
+# curve. The functions are therefore renamed:
+#
+#   mirroredCurve()           was KaplanMeierSurvfit()
+#   mirroredCurveBootstrap()  was KaplanMeierBootstrap()
+#   mirroredCurvePlot()       new: the figure, a wrapper of KaplanMeierPlot()
+#
+# The old names still work (aliases at the end of this file), and so does
+# KaplanMeierPlot(..., varEvent2 = ...), so no existing script breaks. The
+# older estimator that scales the halves by RAW observed shares is still
+# available as KaplanMeierPlot(..., varEvent2 = ..., estimator = "classic");
+# it is biased whenever women are censored before either event and is kept
+# only to reproduce old figures. docs/05_methods.md explains the construction.
+# <<< Claude 2026-09-25
+
 # >>> Claude 2026-09-20
 # Mirrored event-order curve estimated with survival:: alone.
 #
-# This replaces lib/KaplanMeierMstate.R as the production implementation of the
+# This replaces archive/KaplanMeierMstate.R (formerly lib/) as the production implementation of the
 # mirrored figure. It keeps that prototype's structure and its two good ideas
 # (Aalen-Johansen branch probabilities, and transforming the interval bounds
 # rather than rebuilding them from a standard error), and drops mstate.
@@ -39,7 +60,7 @@
 #
 # INFERENCE. The analytic intervals returned here are CONDITIONAL on the two
 # Aalen-Johansen probabilities and ignore strata and clusters. For an interval
-# that is defensible in a paper, use KaplanMeierBootstrap(), which resamples the
+# that is defensible in a paper, use mirroredCurveBootstrap(), which resamples the
 # whole construction, PSUs within strata when you supply them.
 
 library2 <- if (exists("library2")) library2 else function (pkg) library(pkg, character.only = TRUE)
@@ -149,12 +170,12 @@ library2 <- if (exists("library2")) library2 else function (pkg) library(pkg, ch
     nNAw <- sum(is.na(d$weight))
     if (nNAw > 0) {
       if (naWeight == "error") {
-        stop(sprintf("KaplanMeierSurvfit: %d case(s) have a missing weight in '%s'", nNAw, varWeight))
+        stop(sprintf("mirroredCurve: %d case(s) have a missing weight in '%s'", nNAw, varWeight))
       } else if (naWeight == "drop") {
-        message(sprintf("KaplanMeierSurvfit: dropped %d case(s) with a missing weight in '%s'", nNAw, varWeight))
+        message(sprintf("mirroredCurve: dropped %d case(s) with a missing weight in '%s'", nNAw, varWeight))
         d <- d[!is.na(d$weight), ]
       } else {
-        message(sprintf(paste0("KaplanMeierSurvfit: %d case(s) have a missing weight in '%s' and were ",
+        message(sprintf(paste0("mirroredCurve: %d case(s) have a missing weight in '%s' and were ",
                                "set to 1; naWeight = \"drop\" or \"error\" may be what you want"), nNAw, varWeight))
         d$weight[is.na(d$weight)] <- 1
       }
@@ -215,7 +236,7 @@ library2 <- if (exists("library2")) library2 else function (pkg) library(pkg, ch
 
 # ==== 2. The estimator ====
 
-KaplanMeierSurvfit <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL,
+mirroredCurve <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL,
                                 varWeight=NULL, varEvent2=NULL, truncate=10,
                                 horizon=NULL, confLevel=0.95, confType="log-log",
                                 ties=c("simultaneous", "event", "event2"),
@@ -234,7 +255,7 @@ KaplanMeierSurvfit <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCen
 
   ties <- match.arg(ties)
   if (!requireNamespace("survival", quietly = TRUE)) {
-    stop("KaplanMeierSurvfit requires the 'survival' package (it ships with R)")
+    stop("mirroredCurve requires the 'survival' package (it ships with R)")
   }
   if (is.null(df_KM)) stop("df_KM cannot be NULL")
   if (is.null(varEnter) || is.null(varEvent) || is.null(varCens) || is.null(varEvent2)) {
@@ -297,14 +318,14 @@ KaplanMeierSurvfit <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCen
   attr(res, "ciMethod") <- paste0(
     "conditional ", confType, " intervals from survfit(), scaled by the ",
     "Aalen-Johansen branch probabilities. Uncertainty in those probabilities, ",
-    "and the sampling design, are NOT included. Use KaplanMeierBootstrap().")
+    "and the sampling design, are NOT included. Use mirroredCurveBootstrap().")
   return (res)
 }
 
 
 # ==== 3. Bootstrap inference for the complete curve ====
 
-KaplanMeierBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL,
+mirroredCurveBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NULL,
                                   varWeight=NULL, varEvent2=NULL, truncate=10,
                                   horizon=NULL, confLevel=0.95,
                                   ties=c("simultaneous", "event", "event2"),
@@ -326,7 +347,7 @@ KaplanMeierBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varC
   ties <- match.arg(ties)
   if (!is.null(seed)) set.seed(seed)
 
-  point <- KaplanMeierSurvfit(df_KM, varEnter, varEvent, varCens, varWeight, varEvent2,
+  point <- mirroredCurve(df_KM, varEnter, varEvent, varCens, varWeight, varEvent2,
                               truncate = truncate, horizon = horizon,
                               confLevel = confLevel, ties = ties, naWeight = naWeight)
   if (nrow(point) == 0) return (point)
@@ -366,7 +387,7 @@ KaplanMeierBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varC
       idx <- sample.int(nrow(df_KM), nrow(df_KM), replace = TRUE)
     }
     rep_b <- try(suppressMessages(suppressWarnings(
-      KaplanMeierSurvfit(df_KM[idx, , drop = FALSE], varEnter, varEvent, varCens,
+      mirroredCurve(df_KM[idx, , drop = FALSE], varEnter, varEvent, varCens,
                          varWeight, varEvent2, truncate = NULL, horizon = horizon,
                          confLevel = confLevel, ties = ties, naWeight = naWeight))),
       silent = TRUE)
@@ -401,3 +422,24 @@ KaplanMeierBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varC
   return (out)
 }
 # <<< Claude 2026-09-20
+
+
+# >>> Claude 2026-09-25
+# ==== 4. The figure, and the old names ====
+
+mirroredCurvePlot <- function (df = NULL, varEnter = NULL, varEvent = NULL, varEvent2 = NULL,
+                               varCens = NULL, varWeight = NULL, ...) {
+  #==> as KaplanMeierPlot(); varEvent2 is required. The right half follows the
+  #    women whose 'varEvent' came first and shows the time until 'varEvent2';
+  #    the left half follows those whose 'varEvent2' came first, drawn on a
+  #    reversed axis. Any other KaplanMeierPlot() argument (cohortsList,
+  #    horizon, ties, bootstrap, ...) is passed through.
+  if (is.null(varEvent2)) stop("mirroredCurvePlot: varEvent2 is required")
+  KaplanMeierPlot(df = df, varEnter = varEnter, varEvent = varEvent, varCens = varCens,
+                  varWeight = varWeight, varEvent2 = varEvent2, estimator = "survfit", ...)
+}
+
+# old names, kept so existing scripts run unchanged
+KaplanMeierSurvfit   <- mirroredCurve
+KaplanMeierBootstrap <- mirroredCurveBootstrap
+# <<< Claude 2026-09-25

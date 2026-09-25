@@ -14,8 +14,7 @@ R.Rproj
 push.sh
 apply_gitignore.sh
 
-# superseded / scratch scripts
-ReadEDER2017_old.R
+# superseded / scratch scripts (retired code is kept in archive/ instead)
 nsfg_childfree.R
 PTAT.pdf
 

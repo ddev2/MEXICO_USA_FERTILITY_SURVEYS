@@ -1,5 +1,7 @@
 setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source("enadid_lib.r")
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source("enadid_lib.R")
+# <<< Claude 2026-09-25
 library(tidyverse)
 
 # Prototype: state-occupancy "life expectancy" (years lived in each union /

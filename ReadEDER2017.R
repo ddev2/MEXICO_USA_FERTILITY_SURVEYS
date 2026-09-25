@@ -2,7 +2,9 @@ scriptDir <- dirname(rstudioapi::getActiveDocumentContext()$path)
 if (scriptDir != getwd()) {
   setwd(scriptDir)
 }
-source("enadid_lib.r")
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source("enadid_lib.R")
+# <<< Claude 2026-09-25
 # Read EDER 2017 file
 # imputed_month_capped() is defined in enadid_lib.r
 library(tidyverse)

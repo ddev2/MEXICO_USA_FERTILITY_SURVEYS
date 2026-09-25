@@ -14,7 +14,9 @@
 if (nzchar(Sys.getenv("KM_LIB_PATH"))) {
   source(Sys.getenv("KM_LIB_PATH"))
 } else {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  # >>> Claude 2026-09-25: tests now live in tests/; work from the repository root
+setwd(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))
+# <<< Claude 2026-09-25
   source("enadid_lib.R")
   source("lib/KaplanMeierLib.R")
 }
@@ -143,10 +145,21 @@ stopifnot(approxEq(resU$stdErr, resW$stdErr))
 # DOES move the Greenwood interval. That is the documented limitation, asserted
 # here so it cannot change unnoticed. Section 10 shows how useSurvfit fixes it.
 dfW10  <- makeDf(dur, status, weight = rep(10, n), censAt = 35)
+# >>> Claude 2026-09-25
+# useSurvfit = FALSE: this checks the GREENWOOD path. Since useSurvfit became
+# TRUE by default, the interval is the infinitesimal jackknife one, which does
+# not depend on the scale of the weights, and the assertion below failed.
+resWg  <- KaplanMeier(dfW, "enter", "event", "cens", varWeight = "w",
+                      truncate = NULL, fixHighRates = FALSE, useSurvfit = FALSE)
 resW10 <- KaplanMeier(dfW10, "enter", "event", "cens", varWeight = "w",
-                      truncate = NULL, fixHighRates = FALSE)
+                      truncate = NULL, fixHighRates = FALSE, useSurvfit = FALSE)
 stopifnot(approxEq(resW$survFunction, resW10$survFunction))
-stopifnot(max(resW10$stdErr) < max(resW$stdErr))
+stopifnot(max(resW10$stdErr) < max(resWg$stdErr))
+# and the survfit path is scale-free, as it should be
+resW10s <- KaplanMeier(dfW10, "enter", "event", "cens", varWeight = "w",
+                       truncate = NULL, fixHighRates = FALSE)
+stopifnot(approxEq(resW$stdErr, resW10s$stdErr))
+# <<< Claude 2026-09-25
 cat("5. weighted and unweighted paths agree; weight scale affects only the CI\n")
 
 
@@ -264,10 +277,14 @@ cat("8. tiny and empty mirrored groups no longer break rbind()\n")
 dur    <- c(1, 2, 3, 3)
 status <- c(0, 0, 1, 1)     # both remaining cases fail at t = 3, so rate = 1
 df     <- makeDf(dur, status, censAt = 20)
+# >>> Claude 2026-09-25
+# useSurvfit = FALSE: the override exists only on the hand-coded path, which
+# stopped being the default when useSurvfit became TRUE.
 resOn  <- KaplanMeier(df, "enter", "event", "cens", varWeight = NULL,
-                      truncate = NULL, fixHighRates = TRUE)
+                      truncate = NULL, fixHighRates = TRUE, useSurvfit = FALSE)
 resOff <- KaplanMeier(df, "enter", "event", "cens", varWeight = NULL,
-                      truncate = NULL, fixHighRates = FALSE)
+                      truncate = NULL, fixHighRates = FALSE, useSurvfit = FALSE)
+# <<< Claude 2026-09-25
 stopifnot(approxEq(min(resOff$survFunction), 0))     # the honest estimate
 stopifnot(min(resOn$survFunction) > 0)               # the legacy override
 stopifnot(all(is.finite(resOn$stdErr)), all(is.finite(resOff$stdErr)))
@@ -283,11 +300,14 @@ status <- as.integer(dur < 40)
 dur    <- pmin(dur, 40)
 df     <- makeDf(dur, status, censAt = 40)
 
+# >>> Claude 2026-09-25: own, ownW, own10 and m1 now name useSurvfit = FALSE, the
+# hand-written path, which is no longer the default.
+# <<< Claude 2026-09-25
 # 10a. With confType = "plain" and robustVar = FALSE the survfit path must
 #      reproduce the hand-written estimator exactly. This is the anchor: if it
 #      ever fails, one of the two paths has drifted.
 own <- KaplanMeier(df, "enter", "event", "cens", varWeight = NULL,
-                   truncate = NULL, fixHighRates = FALSE)
+                   truncate = NULL, fixHighRates = FALSE, useSurvfit = FALSE)
 sfv <- KaplanMeier(df, "enter", "event", "cens", varWeight = NULL,
                    truncate = NULL, fixHighRates = FALSE,
                    useSurvfit = TRUE, confType = "plain", robustVar = FALSE)
@@ -301,7 +321,7 @@ set.seed(3)
 w    <- runif(n, 0.5, 2)
 dfW  <- makeDf(dur, status, weight = w, censAt = 40)
 ownW <- KaplanMeier(dfW, "enter", "event", "cens", varWeight = "w",
-                    truncate = NULL, fixHighRates = FALSE)
+                    truncate = NULL, fixHighRates = FALSE, useSurvfit = FALSE)
 sfvW <- KaplanMeier(dfW, "enter", "event", "cens", varWeight = "w",
                     truncate = NULL, fixHighRates = FALSE,
                     useSurvfit = TRUE, confType = "plain", robustVar = FALSE)
@@ -316,7 +336,7 @@ rob   <- KaplanMeier(dfW,   "enter", "event", "cens", varWeight = "w", truncate 
 rob10 <- KaplanMeier(dfW10, "enter", "event", "cens", varWeight = "w", truncate = NULL,
                      fixHighRates = FALSE, useSurvfit = TRUE, robustVar = TRUE)
 own10 <- KaplanMeier(dfW10, "enter", "event", "cens", varWeight = "w", truncate = NULL,
-                     fixHighRates = FALSE)
+                     fixHighRates = FALSE, useSurvfit = FALSE)
 stopifnot(approxEq(max(rob$stdErr), max(rob10$stdErr), tol = 1e-6))   # invariant
 stopifnot(!approxEq(max(ownW$stdErr), max(own10$stdErr)))             # not invariant
 stopifnot(max(rob$stdErr) > max(ownW$stdErr))   # Greenwood understates here
@@ -332,7 +352,7 @@ stopifnot(!approxEq(ll$confIntMax - ll$survFunction, ll$survFunction - ll$confIn
 # 10d. The mirrored branch runs through survfit and gives the same point
 #      estimates (only the intervals may differ).
 m1 <- KaplanMeier(dfM, "enter", "event", "cens", varWeight = "w",
-                  varEvent2 = "event2", truncate = 10)
+                  varEvent2 = "event2", truncate = 10, useSurvfit = FALSE)
 m2 <- KaplanMeier(dfM, "enter", "event", "cens", varWeight = "w",
                   varEvent2 = "event2", truncate = 10, fixHighRates = FALSE,
                   useSurvfit = TRUE, confType = "log-log", robustVar = TRUE)
@@ -380,7 +400,10 @@ wNA   <- runif(n, 0.5, 2)
 wNA[c(5, 50, 120)] <- NA
 dfNA  <- makeDf(dur, stt, weight = wNA, censAt = 30)
 
-rOne  <- KaplanMeier(dfNA, "enter", "event", "cens", varWeight = "w", truncate = NULL)
+# >>> Claude 2026-09-25: the default became "drop", so "one" is now named explicitly
+rOne  <- KaplanMeier(dfNA, "enter", "event", "cens", varWeight = "w", truncate = NULL,
+                     naWeight = "one")
+# <<< Claude 2026-09-25
 rDrop <- KaplanMeier(dfNA, "enter", "event", "cens", varWeight = "w", truncate = NULL,
                      naWeight = "drop")
 stopifnot(nrow(rOne) > 0, nrow(rDrop) > 0)

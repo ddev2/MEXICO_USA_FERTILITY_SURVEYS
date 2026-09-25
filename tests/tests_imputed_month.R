@@ -1,5 +1,9 @@
-setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
-source("enadid_lib.r")
+# >>> Claude 2026-09-25: tests now live in tests/; work from the repository root
+setwd(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))
+# <<< Claude 2026-09-25
+# >>> Claude 2026-09-25: file name case fixed (enadid_lib.r fails on Linux)
+source("enadid_lib.R")
+# <<< Claude 2026-09-25
 
 # Quick validation of the unified month imputation (no survey data required).
 # Open in RStudio and Source. Confirms the 4 properties of imputed_month_capped()

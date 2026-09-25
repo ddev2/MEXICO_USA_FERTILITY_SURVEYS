@@ -6,7 +6,9 @@
 if (nzchar(Sys.getenv("EPI_LIB_PATH"))) {
   source(Sys.getenv("EPI_LIB_PATH"))
 } else {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  # >>> Claude 2026-09-25: tests now live in tests/; work from the repository root
+setwd(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))
+# <<< Claude 2026-09-25
   source("enadid_lib.R")
   source("lib/unionEpisodes.R")
 }

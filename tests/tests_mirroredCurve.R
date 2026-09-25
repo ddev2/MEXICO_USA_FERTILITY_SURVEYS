@@ -1,13 +1,15 @@
 # >>> Claude 2026-09-20
-# Tests for lib/KaplanMeierSurvfit.R. No survey data required.
+# Tests for lib/mirroredCurve.R (formerly lib/KaplanMeierSurvfit.R). No survey data required.
 # Open in RStudio and Source, or set KM_SURVFIT_PATH and run headless.
 
 if (nzchar(Sys.getenv("KM_SURVFIT_PATH"))) {
   source(Sys.getenv("KM_SURVFIT_PATH"))
 } else {
-  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+  # >>> Claude 2026-09-25: tests now live in tests/; work from the repository root
+setwd(dirname(dirname(rstudioapi::getActiveDocumentContext()$path)))
+# <<< Claude 2026-09-25
   source("enadid_lib.R")
-  source("lib/KaplanMeierSurvfit.R")
+  source("lib/mirroredCurve.R")
 }
 library(survival)
 
@@ -54,7 +56,7 @@ rawShare <- function (d, which) {
 # ==== 1. Output structure matches KaplanMeier() ====
 
 d <- makeTwo(3000, pE = 0.35, pE2 = 0.55, censRange = c(30, 400), seed = 11)
-r <- KaplanMeierSurvfit(d, "enter", "event", "cens", "w", "event2", truncate = 10)
+r <- mirroredCurve(d, "enter", "event", "cens", "w", "event2", truncate = 10)
 
 expected <- c("time", "event", "eventRaw", "number", "numberRaw", "surv", "rate",
               "survFunction", "variance", "stdErr", "confIntMax", "confIntMin", "branch")
@@ -70,7 +72,7 @@ cat("1. returns the same columns as KaplanMeier(), so the plot code is unchanged
 # and there is nothing for the competing-risks estimator to correct.
 dFull <- makeTwo(4000, pE = 0.45, pE2 = 0.55, censRange = c(1e5, 1e5), seed = 21)
 stopifnot(!any(is.na(dFull$event)), !any(is.na(dFull$event2)))   # nothing censored
-rFull <- KaplanMeierSurvfit(dFull, "enter", "event", "cens", "w", "event2",
+rFull <- mirroredCurve(dFull, "enter", "event", "cens", "w", "event2",
                             truncate = NULL, ties = "event")
 stopifnot(approxEq(attr(rFull, "propEventBeforeEvent2"), rawShare(dFull, "E"),  tol = 1e-6))
 stopifnot(approxEq(attr(rFull, "propEvent2BeforeEvent"), rawShare(dFull, "E2"), tol = 1e-6))
@@ -81,7 +83,7 @@ cat("2. with complete observation the branch probabilities equal the raw shares\
 # ==== 3. With censoring, Aalen-Johansen corrects the raw shares upward ====
 
 dCens <- makeTwo(4000, pE = 0.35, pE2 = 0.55, censRange = c(20, 150), seed = 31)
-rCens <- KaplanMeierSurvfit(dCens, "enter", "event", "cens", "w", "event2", truncate = 10)
+rCens <- mirroredCurve(dCens, "enter", "event", "cens", "w", "event2", truncate = 10)
 pE  <- attr(rCens, "propEventBeforeEvent2")
 pE2 <- attr(rCens, "propEvent2BeforeEvent")
 stopifnot(pE  > rawShare(dCens, "E"))
@@ -133,9 +135,9 @@ cat("5. the four state probabilities sum to 1 at the horizon\n")
 # ==== 6. Simultaneous events ====
 
 dTie <- makeTwo(3000, pE = 0.25, pE2 = 0.55, pTie = 0.12, censRange = c(60, 400), seed = 41)
-rSim <- KaplanMeierSurvfit(dTie, "enter", "event", "cens", "w", "event2",
+rSim <- mirroredCurve(dTie, "enter", "event", "cens", "w", "event2",
                            truncate = 10, ties = "simultaneous")
-rEv  <- KaplanMeierSurvfit(dTie, "enter", "event", "cens", "w", "event2",
+rEv  <- mirroredCurve(dTie, "enter", "event", "cens", "w", "event2",
                            truncate = 10, ties = "event")
 stopifnot(attr(rSim, "propSimultaneous") > 0.05)
 stopifnot(attr(rEv,  "propSimultaneous") == 0)
@@ -154,7 +156,7 @@ cat(sprintf("6. ties: %.3f simultaneous, gap at 0 is %.3f keeping them vs %.3f f
 # ==== 7. The horizon is explicit and it matters ====
 
 stopifnot(is.finite(attr(r, "horizon")))
-rShort <- KaplanMeierSurvfit(d, "enter", "event", "cens", "w", "event2",
+rShort <- mirroredCurve(d, "enter", "event", "cens", "w", "event2",
                              truncate = 10, horizon = 60)
 stopifnot(attr(rShort, "horizon") == 60)
 stopifnot(attr(rShort, "propEventBeforeEvent2") < attr(r, "propEventBeforeEvent2"))
@@ -165,8 +167,8 @@ cat("7. a shorter horizon lowers both branch probabilities, as it must\n")
 # ==== 8. Bootstrap: wider than the conditional interval ====
 
 dB <- makeTwo(1500, pE = 0.35, pE2 = 0.55, censRange = c(20, 150), seed = 51)
-cond <- KaplanMeierSurvfit(dB, "enter", "event", "cens", "w", "event2", truncate = 10)
-boot <- KaplanMeierBootstrap(dB, "enter", "event", "cens", "w", "event2", truncate = 10,
+cond <- mirroredCurve(dB, "enter", "event", "cens", "w", "event2", truncate = 10)
+boot <- mirroredCurveBootstrap(dB, "enter", "event", "cens", "w", "event2", truncate = 10,
                              replicates = 200, seed = 7, progress = FALSE)
 stopifnot(nrow(boot) == nrow(cond))
 stopifnot(approxEq(boot$survFunction, cond$survFunction))
@@ -193,9 +195,9 @@ rows <- do.call(rbind, lapply(seq_len(nPSU), function (k) {
   dk$stratum <- (k %% 5) + 1
   dk
 }))
-bRow <- KaplanMeierBootstrap(rows, "enter", "event", "cens", "w", "event2", truncate = 10,
+bRow <- mirroredCurveBootstrap(rows, "enter", "event", "cens", "w", "event2", truncate = 10,
                              replicates = 200, seed = 3, progress = FALSE)
-bClu <- KaplanMeierBootstrap(rows, "enter", "event", "cens", "w", "event2", truncate = 10,
+bClu <- mirroredCurveBootstrap(rows, "enter", "event", "cens", "w", "event2", truncate = 10,
                              replicates = 200, seed = 3, progress = FALSE,
                              varCluster = "psu", varStrata = "stratum")
 wRow <- mean(bRow$confIntMax - bRow$confIntMin)
@@ -209,20 +211,28 @@ cat(sprintf("9. clustered bootstrap is wider than the row bootstrap (%.4f vs %.4
 # ==== 10. Degenerate inputs ====
 
 dNo2 <- d; dNo2$event2 <- NA_real_
-r0 <- KaplanMeierSurvfit(dNo2, "enter", "event", "cens", "w", "event2", truncate = 10)
+r0 <- mirroredCurve(dNo2, "enter", "event", "cens", "w", "event2", truncate = 10)
 stopifnot(is.data.frame(r0), sum(r0$branch == "before") == 0)
 
 dEmpty <- data.frame(enter = c(ORIGIN, ORIGIN), event = c(NA, NA), event2 = c(NA, NA),
                      cens = c(ORIGIN - 5, ORIGIN - 9), w = c(1, 1))
-rE <- KaplanMeierSurvfit(dEmpty, "enter", "event", "cens", "w", "event2", truncate = 10)
+rE <- mirroredCurve(dEmpty, "enter", "event", "cens", "w", "event2", truncate = 10)
 stopifnot(nrow(rE) == 0, identical(names(rE), expected))
 
-stopifnot(inherits(try(KaplanMeierSurvfit(d, "enter", "event", "cens", "w", NULL),
+stopifnot(inherits(try(mirroredCurve(d, "enter", "event", "cens", "w", NULL),
                        silent = TRUE), "try-error"))
-stopifnot(inherits(try(KaplanMeierSurvfit(d, "enter", "nope", "cens", "w", "event2"),
+stopifnot(inherits(try(mirroredCurve(d, "enter", "nope", "cens", "w", "event2"),
                        silent = TRUE), "try-error"))
 cat("10. degenerate and malformed inputs behave\n")
 
 
-cat("\nALL KAPLAN-MEIER SURVFIT TESTS PASSED\n")
+cat("\nALL MIRRORED-CURVE TESTS PASSED\n")
 # <<< Claude 2026-09-20
+
+# >>> Claude 2026-09-25
+# The old names are aliases of the new ones.
+stopifnot(identical(KaplanMeierSurvfit, mirroredCurve),
+          identical(KaplanMeierBootstrap, mirroredCurveBootstrap),
+          is.function(mirroredCurvePlot))
+cat("old names KaplanMeierSurvfit / KaplanMeierBootstrap still work\n")
+# <<< Claude 2026-09-25

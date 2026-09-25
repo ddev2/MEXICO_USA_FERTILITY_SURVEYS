@@ -1,6 +1,6 @@
 # >>> Claude 2026-09-23
 # Tests for lib/childUnionContext.R on simulated data. Run from the R folder:
-#   source("tests_childUnionContext.R")
+#   source("tests/tests_childUnionContext.R")
 # No survey data needed.
 
 if (!exists("childPrepare")) source(file.path("lib", "childUnionContext.R"))
