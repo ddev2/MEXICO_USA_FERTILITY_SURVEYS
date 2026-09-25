@@ -1,344 +1,162 @@
 # MEXICO_USA_FERTILITY_SURVEYS
 
-R code that reads Mexican and United States fertility surveys and converts
-them into a single harmonised format, so that union histories and birth
-histories collected over fifty years by different questionnaires can be
-compared directly.
+R code that reads fifty years of Mexican and United States fertility surveys,
+converts them into one common format, and compares union formation,
+separation, re-partnering and the union setting of children in the two
+countries.
 
-The code produces two data frames:
+It produces two harmonised data frames, one row per woman, with her union
+history and her birth history dated in century-month code (CMC):
 
 | Data frame | Country | Surveys |
 |---|---|---|
 | `MEXICO_ENADID` | Mexico | WFS 1976-77, ENADID 1992, 1997, 2006, 2009, 2014, 2018, 2023, EDER 2017, EDER 2025 |
 | `NSFG_ENADID` | United States | NSFG 1973, 1976, 1982, 1988, 1995, 2002, 2006-10, 2011-13, 2013-15, 2015-17, 2017-19, 2022-23 |
 
-Both use the same column names and the same conventions, so
-`bind_rows(MEXICO_ENADID, NSFG_ENADID)` gives one pooled file of women with,
-for each of them, up to ten unions and up to seventeen live births, all dated
-in century-month code (CMC, month 1 = January 1900).
+The suffix `_ENADID` means "in the ENADID layout": the common format was
+designed around the information collected by the Mexican ENADID, and every
+other survey is converted into it. See `docs/02_common_format.md`.
 
-Converters for other survey families (WFS, GGS, DHS, the 2006 Spanish
-fertility survey) write into the same format and are included as well.
-
-
-## 1. What the code does
-
-The work has four stages.
-
-**Reading.** One script per survey reads the raw file published by the
-statistical agency, locates each variable by its position or its name in the
-codebook, and rebuilds the woman's union and birth history in the common
-column layout. Missing months and missing years are recoded and flagged
-rather than dropped.
-
-**Harmonising.** Factor levels, weights and identifiers are made consistent
-across surveys, the per-survey frames are stacked, and date quality is
-audited. Women whose dates cannot be repaired are flagged, and the caller
-decides whether to remove them.
-
-**Validating.** A second, independent reading was written from the published
-codebooks and compared row by row against the first one. Any difference points
-either to a mistake in the original reading or to a misreading of the
-codebook. All seven ENADID cycles have been done; three of the twelve NSFG
-cycles have, and the rest are stubs waiting to be written. See section 6.
-
-**Analysing.** Kaplan-Meier estimates of entry into first and second union,
-fertility rates and parity progression ratios, state-occupancy life
-expectancy by union and birth status, and the plots that go with them.
+The code accompanies the paper *Union Dynamics and the Union Context of Early
+Childhood in Mexico and the United States: A Half-Century Comparison*
+(Daniel Devolder, Centre d'Estudis Demogràfics, Universitat Autònoma de
+Barcelona).
 
 
-## 2. Requirements
+## Documentation
 
-R 4.x with the following packages:
+| Page | Content |
+|---|---|
+| [docs/01_build_data.md](docs/01_build_data.md) | downloading the survey files, where to put them, building the two data frames |
+| [docs/02_common_format.md](docs/02_common_format.md) | why "_ENADID", the columns, the weights, what each survey provides, the date-quality flags |
+| [docs/03_adding_variables.md](docs/03_adding_variables.md) | how to add a variable that is not yet in the data frames |
+| [docs/04_figures_and_tables.md](docs/04_figures_and_tables.md) | which script produces each figure and table of the paper and of the presentation |
+| [docs/05_methods.md](docs/05_methods.md) | Kaplan-Meier and Aalen-Johansen, net and crude measures, the mirrored curve, period indicators |
+| [archive/README.md](archive/README.md) | retired code, and why it was retired |
+| [NSFG_validation/README.md](NSFG_validation/README.md) | the independent re-reading of the NSFG cycles |
 
-```r
-install.packages(c("tidyverse", "haven", "foreign", "data.table", "bit64",
-                   "janitor", "survival", "patchwork", "ggrepel", "scales",
-                   "scam", "directlabels", "MASS", "rstudioapi"))
-```
 
-The scripts are written to be run from RStudio, which they use to locate
-themselves (`rstudioapi::getActiveDocumentContext()`). Open a script and use
-Source, rather than calling `Rscript` from a terminal.
+## Quick start
 
-Install the packages before the first run. `lib/KaplanMeierLib.R` calls
-`library2("scam")` as it loads, and `library2()` installs a package that is
-not yet present, so a missing package turns into a silent install.
+1. Install R 4.x, RStudio, and the packages listed in
+   `docs/01_build_data.md`, section 1.2.
+2. Download the survey files and put them in `data/` beside this folder, or
+   point `config_local.R` (copied from `config_local.R.example`) at the folders
+   where they already are.
+3. In RStudio, open `ReadENADID.R` and Source it, then `NSFG import.R`. This
+   writes `MEXICO_ENADID.Rdat` and `NSFG_ENADID.Rdat`.
+4. Open `MEX_USA_figures_cohort.R` or `MEX_USA_figures_period.R` and Source
+   it. The figures are written to `output/`.
 
-Four shared libraries that this code depends on are bundled in `lib/`, so no
-external folder is needed:
+Every script is meant to be opened in RStudio and run with **Source**: each
+one locates the other files from its own position through
+`rstudioapi::getActiveDocumentContext()`.
+
+
+## Repository layout
+
+### Building the data
+
+| File | Role |
+|---|---|
+| `enadid_lib.R` | shared library: data paths, CMC arithmetic, month imputation, cleaning, weights, date-quality filter; loads the libraries in `lib/` |
+| `config_local.R.example` | template for `config_local.R`, your own data locations (not in git) |
+| `ReadENADID.R` | builds `MEXICO_ENADID` (entry point) |
+| `ReadMujeres1992.R` ... `ReadMujeres2023.R` | one reader per ENADID round |
+| `ReadEDER2017.R`, `ReadEDER2025.R` | readers of the EDER life-history surveys |
+| `WFS_to_ENADID.R`, `mxsr02.Rdat` | Mexico World Fertility Survey 1976-77, and its prepared data file |
+| `NSFG import.R` | builds `NSFG_ENADID` (entry point) |
+| `NSFG_lib.R` | SPSS setup-file parser and NSFG helpers |
+| `NSFG_harmonize_types.R` | common factor levels across NSFG cycles |
+| `NSFG_impute_dissolution.R`, `NSFG_impute_dissolution_model.R` | repair of the missing union-end dates of NSFG 2002 |
+| `adjust WFS under 20.R` | one-off correction of the WFS women under 20, kept for the record |
+
+### Libraries (`lib/`)
 
 | File | Supplies |
 |---|---|
-| `lib/lib.R` | general helpers: `stripLabels`, `tabNA`, `library2`, ggplot themes |
-| `lib/KaplanMeierLib.R` | survival curve estimation and plotting, `yearFrom_cmc` |
-| `lib/DHS_lib.R` | fertility rate and parity progression code written for DHS files |
-| `lib/FFS_Lib.R` | older Fertility and Family Survey routines, loaded by `DHS_lib.R` |
+| `lib/lib.R` | general helpers: `stripLabels`, `tabNA`, `check_bind_conflicts`, `library2`, ggplot themes |
+| `lib/KaplanMeierLib.R` | `KaplanMeier()`, `KaplanMeierPlot()`, `KaplanMeierDraw()`, period life tables `ppr_doIt()`, `calc_ppr()`, `plot_ppr()`, `plotBySurvey()`, `yearFrom_cmc()` |
+| `lib/unionEpisodes.R` | union episodes and the Aalen-Johansen estimators: `buildUnionEpisodes()`, `unionStateOccupancy()`, `unionCompetingRisks()` |
+| `lib/mexUsaFigures.R` | survey selections, analysis samples and plotting helpers shared by the Mexico-USA figures |
+| `lib/mirroredCurve.R` | the two-event "mirrored" curve: `mirroredCurve()`, `mirroredCurveBootstrap()`, `mirroredCurvePlot()` |
+| `lib/pprCompetingRisks.R` | crude (competing-risk) version of the period indicators: `ppr_cr_doIt()` |
+| `lib/lifeCourseAJ_lib.R` | women from age 15 to 45 on the age scale, Aalen-Johansen |
+| `lib/childUnionContext.R` | union setting of firstborn children, stratified Aalen-Johansen |
+| `lib/adjustedSurv.R` | standardised survival curves after a Cox model |
+| `lib/unionType_lib.R` | harmonised union types: `harm_union_type()` |
+| `lib/DHS_lib.R`, `lib/FFS_Lib.R` | fertility rates and parity progression routines, written for DHS files |
 
-`enadid_lib.R` loads `lib/lib.R` for you. Until August 2026 these four files
-sat in personal Dropbox and Google Drive folders, one of them reachable only
-through a personal `.Rprofile`, so the repository could not run anywhere else.
+### Analyses and figures
 
-
-## 3. Repository layout
-
-```
-Mexico-USA/
-├── R/                          this repository
-│   ├── enadid_lib.R            shared library: CMC arithmetic, cleaning, weights
-│   ├── ReadENADID.R            builds MEXICO_ENADID  (entry point)
-│   ├── NSFG import.R           builds NSFG_ENADID    (entry point)
-│   ├── ReadMujeres*.R          one reader per ENADID cycle
-│   ├── ReadEDER2017.R          EDER life-history surveys
-│   ├── ReadEDER2025.R
-│   ├── WFS_to_ENADID.R         Mexico World Fertility Survey 1976-77
-│   ├── NSFG_lib.R              SPSS setup-file parser and NSFG helpers
-│   ├── NSFG_harmonize_types.R  common factor levels across NSFG cycles
-│   ├── NSFG_impute_dissolution*.R  repair of the 2002 union-end gap
-│   ├── KaplanMeier*.R          survival analysis and plots
-│   ├── ENADID fertility.R      fertility rates, parity progression, plots
-│   ├── union_birth_life_expectancy.R   state-occupancy life expectancy
-│   ├── NSFG_validation/        independent re-reading of the NSFG cycles
-│   ├── Mexico/ENADID_validation/  independent re-reading of the ENADID cycles
-│   ├── lib/                    bundled shared libraries
-│   └── config_local.R          your own data locations (not in git)
-├── data/                       survey files, see section 4
-└── output/                     plots written by the analysis scripts
-```
-
-### Where the data is looked for
-
-`enadid_lib.R` works out the project folder and derives every data path from
-it. It starts from the document open in the RStudio editor and walks up at
-most four levels looking for `enadid_lib.R`, so keep a script from this
-repository active when you Source. The default is a `data/` folder beside
-`R/`:
-
-```
-data/
-├── Mexico/          INEGI files; derived .Rdat files go in ENADID/,
-│                    except WFS_ENADID1977.Rdat which sits at this level
-│   ├── ENADID/
-│   └── EDER/
-├── USA/
-│   └── NSFG/        CDC files, one folder per cycle
-└── other/           optional GGS, DHS and Spanish files
-```
-
-If the surveys already live somewhere else on your disk, do not move them.
-Copy `config_local.R.example` to `config_local.R` and set the roots there:
-
-```r
-mexicoRoot <- "~/Surveys/Mexico"
-nsfgRoot   <- "~/Surveys/USA/NSFG"
-outputPath <- "~/Surveys/output"
-```
-
-`config_local.R` is ignored by git, so each machine keeps its own. Restart R
-after changing it. The variables it can set are `dataRoot`, `mexicoRoot`,
-`nsfgRoot`, `otherRoot`, `dhsRoot` and `outputPath`; anything left unset falls
-back to the layout above.
-
-
-## 4. Downloading the survey files
-
-### Mexico, from INEGI
-
-Each survey has a programme page with a "Microdatos" section. Download the
-database in the format named in the table and unpack it so that the folder
-names below appear under `data/Mexico/`.
-
-| Survey | Expected location under `data/Mexico/` |
+| File | Produces |
 |---|---|
-| ENADID 1992 | `ENADID/1992/base_datos_enadid92_dbf/BASESDBF/FECUNDIDAD_1.DBF`, `FECUNDIDAD_2.DBF` |
-| ENADID 1997 | `ENADID/1997/base_datos_enadid97_dbf/E97CMU.DBF`, `E97DGE.DBF`, `E97UNI.DBF`, `E97HEM.DBF` |
-| ENADID 2006 | `ENADID/2006/ENADID06_Mujer.csv`, `ENADID06_Fecundidad.csv` |
-| ENADID 2009 | `ENADID/2009/base_datos_enadid09_dbf/tr_cmu.dbf`, `tr_smi.DBF`, `tr_viv_hog.dbf`, `tr_fec_hemb.dbf` |
-| ENADID 2014 | `ENADID/2014/enadid_2014_csv/tmmujer1_enadid2014/conjunto_de_datos/tmmujer1.csv`, and the same pattern for `tmmujer2` and `tfec_hemb` |
-| ENADID 2018 | `ENADID/2018/conjunto_de_datos_enadid_2018_csv/conjunto_de_datos_tmujer1_enadid_2018/conjunto_de_datos/conjunto_de_datos_tmujer1_enadid_2018.csv`, and the same pattern for `tmujer2` and `tfechisemb` |
-| ENADID 2023 | `ENADID/2023/conjunto_de_datos_enadid_2023_csv/conjunto_de_datos_tmujer1_enadid_2023/conjunto_de_datos/conjunto_datos_tmujer1_enadid_2023.csv`, and the same for `tmujer2` and `tfechisemb`. Note that the CSV names drop the `de_` that 2018 has |
-| EDER 2017 | `EDER/2017/eder2017_bases_sav/historiavida.sav`, `antecedentes.sav` |
-| EDER 2025 | `EDER/2025/eder2025_bases_sav/historiavida.sav`, `informante.sav` |
+| `MEX_USA_figures_cohort.R` | the Mexico-USA figures by union cohort (paper Figures 1 to 4 and 7, and the Aalen-Johansen figures that replace Figure 6) |
+| `MEX_USA_figures_period.R` | the Mexico-USA figures by calendar period (Figures 5, 10, 15 to 17, 19) and the new period transitions |
+| `ENADID fertility.R` | total fertility rates (Figures 11 to 14) and the union setting of children (Figures 8 and 9, and their corrected versions) |
+| `MEX_USA_lifecourse_AJ.R` | women from age 15 to 45: single, in union, separated, widowed |
+| `presentation_KM_AJ.R` | Kaplan-Meier against Aalen-Johansen, Mexico (methods slides) |
+| `KaplanMeier.R` | the per-country curves, and further analyses of union transitions (Cox model, standardised curves, EDER and GGS comparisons) |
+| `KaplanMeier_compareSurveys.R` | the same curves for Mexico, one per survey (Figure 18) |
+| `union_birth_life_expectancy.R`, `union_birth_lifeexp_calc.R` | years lived between two ages in each union and birth state |
+| `women_births.R` | weighted counts of women and births by year and age |
 
-Programme pages: [ENADID](https://www.inegi.org.mx/programas/enadid/2023/) and
-[EDER](https://www.inegi.org.mx/programas/eder/2017/), changing the year in the
-address for the other rounds.
+See `docs/04_figures_and_tables.md` for the full mapping.
 
-The Mexico World Fertility Survey of 1976-77 is the one exception. Its
-prepared file `mxsr02.Rdat` is included in this repository, and
-`WFS_to_ENADID.R` asks for its location if it cannot find it in the working
-directory.
+### Other survey families
 
-### United States, from the CDC
-
-The National Survey of Family Growth publishes each cycle on its own page
-under [cdc.gov/nchs/nsfg](https://www.cdc.gov/nchs/nsfg/). Download the female
-respondent file, the pregnancy file, and for 2002 onwards the SPSS setup
-files, then place them in a folder named for the cycle under `data/USA/NSFG/`.
-
-| Cycle | Files expected in `USA/NSFG/<folder>/` |
+| File | Source |
 |---|---|
-| `1973` | `1973NSFGData.dat` |
-| `1976` | `1976NSFGData.dat` |
-| `1982` | `1982NSFGData.dat` |
-| `1988` | `1988FemRespData.dat`, `1988PregData.dat` |
-| `1995` | `1995FemRespData.dat`, `1995PregData.dat` |
-| `2002` | `2002FemResp.dat`, `2002FemRespSetup.sps`, `2002FemPreg.dat`, `2002PregSetup.sps` |
-| `2006-10` | `2006_2010_FemResp.dat`, `2006_2010_FemRespSetup.sps`, `2006_2010_FemPreg.dat`, `2006_2010_FemPregSetup.sps` |
-| `2011-13` | `2011_2013_FemRespData.dat`, `2011_2013_FemRespSetup.sps`, `2011_2013_FemPregData.dat`, `2011_2013_FemPregSetup.sps` |
-| `2013-15` | `2013_2015_...` , same four names with the year changed |
-| `2015-17` | `2015_2017_...` |
-| `2017-19` | `2017_2019_...` |
-| `2022-23` | `NSFG-2022-2023-FemRespPUFData.sas7bdat`, `NSFG-2022-2023-FemPregPUFData.sas7bdat` |
+| `GGS_to_ENADID.R`, `GGS_true_to_ENADID.R` | Generations and Gender Survey (Harmonized Histories; GGS II) |
+| `DHS_to_ENADID.R` | Colombia DHS 2015 |
+| `Spain_CIS2006_to_ENADID.R` | Spanish fertility survey of 2006 (reads the raw file only) |
 
-The first five cycles are read by byte position, taken from the printed
-codebooks. From 2002 the SPSS setup file supplies the positions, and
-`NSFG_lib.R` parses it. The 2022-23 cycle is distributed as SAS files and is
-read with `haven`.
+### Checks, validation and tests
+
+| File or folder | Role |
+|---|---|
+| `filterDateQuality_audit.R` | what the date filter removes |
+| `checkFlag.R` | tabulates any `_I` date-quality flag by survey (paper Tables 5 and 6) |
+| `diagnose_EDER2017_codes.R` | contradictions in the EDER 2017 union codes |
+| `NSFG document dissolution problems 2002.R` | the tabulations behind the 2002 repair (paper Table 3) |
+| `Mexico/ENADID_validation/`, `NSFG_validation/` | a second, independent reading of each survey from its codebook, compared row by row with the first |
+| `tests/` | tests on simulated data, no survey file needed: open one and Source it |
+| `archive/` | retired code |
 
 
-## 5. Building the two data frames
+## Validation
 
-### MEXICO_ENADID
-
-Open `ReadENADID.R` in RStudio and Source it. It sources `enadid_lib.R`, then
-each Mexican reader in turn, then stacks the results, harmonises the factor
-levels, computes the weights and saves the result:
-
-```
-data/Mexico/ENADID/MEXICO_ENADID.Rdat
-```
-
-Each reader also saves its own intermediate file (`ENADID1997.Rdat` and so on)
-in the same folder. These are written for inspection, not reused: every run
-re-reads the raw DBF and CSV files from the start.
-
-The switch at the top of `ReadENADID.R` controls month imputation:
-
-```r
-capMonth <- TRUE
-```
-
-With `TRUE`, an imputed month can never fall after the interview date, and
-dates within one union are kept in order, so a marriage cannot precede the
-start of the union that contains it. With `FALSE` the earlier behaviour is
-restored, a uniform draw with no constraint. Each reader sets its own default
-only when it is run on its own, so the value set in `ReadENADID.R` governs the
-whole run.
-
-### NSFG_ENADID
-
-Open `NSFG import.R` and Source it. It reads the twelve cycles, harmonises
-their types, then repairs the two gaps in the 2002 questionnaire described in
-`NSFG_impute_dissolution.R`: unions of women who had recently separated, and
-marriages to a husband who already had children, both of which the 2002
-interview skipped. A single dissolution-timing model estimated on the 2006-10
-cycle supplies the missing dates. The result is saved as:
-
-```
-data/Mexico/ENADID/NSFG_ENADID.Rdat
-```
-
-together with one file per cycle (`NSFG_ENADID_1995.Rdat` and so on). At the
-end the script prints `DATE_QUALITY_SUMMARY`, the output of
-`summarizeDateQuality()` described in the next section.
-
-### Loading them again
-
-Once both files exist:
-
-```r
-source("enadid_lib.R")
-loadENADID_data()          # loads MEXICO_ENADID and NSFG_ENADID
-pooled <- dplyr::bind_rows(MEXICO_ENADID, NSFG_ENADID)
-pooled <- filterDateQuality(pooled)
-```
-
-`filterDateQuality()` has three independent switches: `dropBadUnionDates`
-(on by default), `dropBackfilledEnd` and `dropBadBirthDates` (both off).
-Impossible ages are always removed. Note that `dropAllBad = TRUE` does not
-mean what its name suggests: it forces the first switch on and the other two
-off, which is the same as the default call.
-
-`summarizeDateQuality()` reports what each switch would remove without
-removing anything. It returns one row per survey plus a total, with columns
-`nWomen`, `removed_union`, `corrected_union`, `removed_birth` and
-`removed_bad_age`.
+Both reading pipelines are checked by a second, independent version of each
+cycle written straight from the published codebooks and compared row by row
+with the first. All seven ENADID rounds are done; for the NSFG, 1973, 1976 and
+2022-23 are done and the other cycles are stubs that stop with the name of the
+codebook to work from. See `NSFG_validation/README.md`. The 2002 dissolution
+problem was found this way: among remarried women, all 119 whose husband had
+children from a previous relationship have no end date for the marriage,
+against none of the 568 whose husband had none.
 
 
-## 6. Validation against the codebooks
+## Tests
 
-Both reading pipelines are checked by writing a second, independent version of
-each cycle straight from the published codebooks, without looking at the first
-version, and comparing the two row by row. This work is done with Claude, one
-cycle at a time.
+The files in `tests/` build small simulated data sets and check the
+estimators against `survival::survfit()` or against values computed by hand.
+They need no survey file. Open one in RStudio and Source it; each ends by
+printing that all its tests passed.
 
-| Folder | Cycles written | Still to write |
-|---|---|---|
-| `Mexico/ENADID_validation/` | 1992, 1997, 2006, 2009, 2014, 2018, 2023 | none |
-| `NSFG_validation/` | 1973, 1976, 2022-23 | 1982, 1988, 1995, 2002, 2006-10, 2011-13, 2013-15, 2015-17, 2017-19 |
-
-The cycles not yet written are present as stubs that call `stop()` with the
-name of the codebook to work from, so the gap is visible rather than silent.
-The workflow for filling one in is in `NSFG_validation/README.md`.
-
-Each folder has the same three files: `*_val_lib.R` with its own helpers,
-`*_val_import.R` with one `getDatos_..._val()` function per cycle, and
-`*_val_compare.R` with the comparison functions. The validation code borrows
-no reading or recoding function from `enadid_lib.R`, which is the point: an
-error common to both would otherwise go unseen. It takes only the data
-locations from it, so run it with the project library already loaded.
-
-`NSFG_validation/README.md` records the output schema every cycle must
-produce, the CMC conventions used by each questionnaire, and the coding rules
-the validation follows. `NSFG_validation/codebooks/` and
-`questionnaire/` hold the text of the codebooks and of the marital history
-sections, obtained by running OCR on the scanned PDFs
-(`codebooks/ocr_scanned_codebooks.sh`). The scans themselves are about 360 MB
-and are not in the repository; the `PDF/` subfolders are in `.gitignore`.
-
-The 2002 dissolution problem was found this way. `NSFG document dissolution
-problems 2002.R` holds the tabulations that establish it, and the result is
-recorded at the top of `NSFG_impute_dissolution.R`: among remarried women, all
-119 whose husband had children from a previous relationship have `MARENDHX`
-missing, against none of the 568 whose husband had not. The 2002 interview
-skipped the whole marriage-end module for those women, and the published
-universe statement does not mention it.
+| Test | Checks |
+|---|---|
+| `tests_kaplanMeier.R` | `KaplanMeier()`, weighted and unweighted, both variance paths, truncation |
+| `tests_mirroredCurve.R` | the mirrored curve and its bootstrap |
+| `tests_unionEpisodes.R` | union episodes and the Aalen-Johansen occupancy |
+| `tests_childUnionContext.R` | the child union-context estimator |
+| `tests_adjustedSurv.R` | standardised survival curves |
+| `tests_harmUnionType.R` | harmonisation of union types |
+| `tests_imputed_month.R` | month imputation under the `capMonth` constraints |
 
 
-## 7. Analysis and plots
+## Use of AI
 
-| Script | Produces | Needs the data frames loaded first |
-|---|---|---|
-| `KaplanMeier.R` | survival curves by country and cohort for entry into the first and second union, for separation from each, for separation from a cohabiting union, and for re-partnering after a first separation; saves six plots | yes |
-| `KaplanMeier_compareSurveys.R` | the same curves for Mexico only, faceted by survey; builds the plots on screen but saves none | yes |
-| `ENADID fertility.R` | total fertility rates, age-specific rates and parity progression ratios, using the DHS routines | yes |
-| `union_birth_life_expectancy.R` | defines the state-occupancy functions: years lived between two ages in each of fourteen union and birth states | yes |
-| `union_birth_lifeexp_calc.R` | runs those functions on the pooled file and prints the five-state summary | no, it calls `loadENADID_data()` itself |
-| `women_births.R` | weighted counts of women aged 15 to 49, and of births, by calendar year and age. Defines `women_by_age_year()` and `births_by_age_year()`, then runs both on `MEXICO_ENADID` | yes |
-
-Saved plots go to the folder given by `outputPath`, which is `output/` beside
-`R/` unless `config_local.R` says otherwise.
-
-Diagnostic scripts: `tests_imputed_month.R` checks the month imputation
-without needing any survey file, `filterDateQuality_audit.R` reports what the
-date filter removes, `checkFlag.R` tabulates any imputation flag by survey,
-and `diagnose_EDER2017_codes.R` checks the EDER 2017 union code sequences for
-contradictions.
-
-
-## 8. Other survey families
-
-These are not part of the two main pipelines. They read from `otherRoot` and
-`dhsRoot`.
-
-| Script | Source | State |
-|---|---|---|
-| `WFS_to_ENADID.R` | Mexico World Fertility Survey 1976-77 | converts, and is sourced by `ReadENADID.R` |
-| `GGS_to_ENADID.R` | Generations and Gender Survey, Harmonized Histories | converts |
-| `GGS_true_to_ENADID.R` | Generations and Gender Survey II, national files | converts |
-| `DHS_to_ENADID.R` | Colombia DHS 2015 | converts |
-| `Spain_CIS2006_to_ENADID.R` | Spanish fertility survey, CIS study 2639 of 2006 | six lines, reads the raw file only; no conversion written yet |
-
-`adjust WFS under 20.R` is a one-off correction applied to the WFS women aged
-under 20, kept for the record.
+Anthropic's Claude was used to check the coding of every survey against its
+codebook, to write the code that reads the Mexican EDER surveys, and to help
+with the analysis. The changes made with Claude are marked in the source with
+comments naming Claude and the date.
