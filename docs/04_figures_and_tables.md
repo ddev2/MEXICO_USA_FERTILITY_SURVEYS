@@ -41,21 +41,21 @@ once, in `lib/mexUsaFigures.R` (`SURVEY_SELECTION`, `sampleUnionMarriage()`,
 | 6 | Separation of cohabitation, marriage censored | **retired**: `archive/KaplanMeier_marriage_censored.R`. Replacement: `MEX_USA_figures_cohort.R`, C6 | `MEX_USA_union1_cohab_separate_AJ.pdf` (and `_remain_`, `_convert_`) | crude, Aalen-Johansen |
 | 7 | First re-partnering | `MEX_USA_figures_cohort.R`, C5 | `MEX_USA_sep1_union2.pdf` | net, Kaplan-Meier |
 | 8 | How firstborn children spend their first ten years | `ENADID fertility.R`, "status of first birth / combining Mexico and the USA"; corrected version in "Figures 8 and 9 of the paper, corrected" | `MEX_USA_lifeChildren_plot.pdf`; corrected `MEX_USA_lifeChildren_plot_corrected.pdf` | crude, multistate life table |
-| 9 | Firstborn children who spent their first ten years in the mother's first union | `ENADID fertility.R`, "Children born in mother's FIRST union ... / Mexico and USA" (drawn on screen); corrected version as for Figure 8 | corrected `MEX_USA_childIntact_corrected.pdf` | crude |
+| 9 | Firstborn children who spent their first ten years in the mother's first union | `ENADID fertility.R`, "Children born in mother's FIRST union ... / Mexico and USA"; corrected version as for Figure 8 | `MEX_USA_childIntact.pdf`; corrected `MEX_USA_childIntact_corrected.pdf` | crude |
 | 10 | Maximum age of women in each calendar year | `MEX_USA_figures_period.R`, P4 | `MEX_USA_maxAge.pdf` | |
-| 11 | TFR, Mexican surveys, pooled and UN series | `ENADID fertility.R`, "Total fertility / Mexico", `order <- 0` | drawn on screen (`tfrSmoothPlot_2w_P`) | |
-| 12 | TFR of first births, Mexico | same block, `order <- 1` | drawn on screen | |
-| 13 | TFR, US surveys | `ENADID fertility.R`, "Total fertility / USA", `order <- 0` | drawn on screen (`tfrSmoothPlot`) | |
-| 14 | TFR of first births, USA | same block, `order <- 1` | drawn on screen | |
+| 11 | TFR, Mexican surveys, pooled and UN series | `ENADID fertility.R`, "Total fertility / Mexico" | `MEX_TFR_bySurvey.pdf` | |
+| 12 | TFR of first births, Mexico | same block | `MEX_TFR1_bySurvey.pdf` | |
+| 13 | TFR, US surveys | `ENADID fertility.R`, "Total fertility / USA" | `USA_TFR_bySurvey.pdf` | |
+| 14 | TFR of first births, USA | same block | `USA_TFR1_bySurvey.pdf` | |
 | 15 | Period probability of separation, each Mexican survey | `MEX_USA_figures_period.R`, P3 | `MEX_period_sep1_bySurvey.pdf` | net |
 | 16 | Period probability of separation, each US survey | `MEX_USA_figures_period.R`, P3 | `USA_period_sep1_bySurvey.pdf` | net |
 | 17 | Period probability of separation before 45 | `MEX_USA_figures_period.R`, P2 | `MEX_USA_period_sep1_45.pdf` | net |
-| 18 | EDER 2025 against the neighbouring Mexican surveys | `KaplanMeier_compareSurveys.R` | drawn on screen | net |
+| 18 | EDER 2025 against the neighbouring Mexican surveys | `KaplanMeier_compareSurveys.R` | `MEX_union1_marriage_bySurvey.pdf` | net |
 | 19 | Mean age at first birth | `MEX_USA_figures_period.R`, P5 | `MEX_USA_mean_age_birth1.pdf` | period life table |
 | Annex | Lexis diagram of the selection by the survey age limit | `ENADID fertility.R`, "Annex figure: Lexis diagram" | `FigureA_Lexis_selection.pdf` | |
 
-To save a figure that is only drawn on screen, add a line with
-`saveFigure(<plot object>, "<file name>.pdf")` (in `lib/mexUsaFigures.R`).
+Every figure of the paper is now written to a file by `saveFigure()` (in
+`lib/mexUsaFigures.R`). Use the same function for any new figure.
 
 **Changes to note when the figures are rebuilt.** Figure 19 was computed from
 a data frame that, by an error in the old code, included NSFG 1973 and 1976,

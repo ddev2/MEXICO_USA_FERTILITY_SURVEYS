@@ -118,7 +118,7 @@ analysis uses its own list of surveys (`SURVEY_SELECTION` in
 | WFS 1976 | 7,310 | 15-49 | complete, but no cohabitation before marriage |
 | ENADID 1992 | 69,538 | 15-54 | none |
 | ENADID 1997 | 88,022 | 15-54 | complete |
-| ENADID 2006 | 38,923 | 15-54 | first union |
+| ENADID 2006 | 38,923 | 15-54 | first union, but too many first-union dates missing: not used in the union analyses |
 | ENADID 2009, 2014, 2018, 2023 | 98,711 to 108,439 | 15-54 | first and last union |
 | EDER 2017 | 13,082 | 20-54 | complete (life history) |
 | EDER 2025 | 14,094 | 18-64 | complete (life history) |

@@ -109,8 +109,8 @@ the first birth relative to the first union. Time 0 is the first of the two
 events. The right half follows the women whose first event was `varEvent` and
 shows how long they wait for `varEvent2`; the left half follows those whose
 first event was `varEvent2`, drawn on a reversed axis. The figure was
-introduced in the demographic literature as a "mirrored Kaplan-Meier" (the
-code cites Billari 2001).
+introduced in the demographic literature as a "mirrored Kaplan-Meier"
+(Billari 2001).
 
 **The name no longer describes the estimate**, which is why the functions were
 renamed in September 2026 (`mirroredCurve()`, `mirroredCurveBootstrap()`,
@@ -195,7 +195,9 @@ every analysis; missing months are imputed within the constraints set by
 - Aalen, O. O. and Johansen, S. (1978). An empirical transition matrix for
   non-homogeneous Markov chains based on censored observations. *Scandinavian
   Journal of Statistics* 5(3): 141-150.
-- Billari, F. C. (2001), cited in `lib/KaplanMeierLib.R` for the mirrored figure.
+- Billari, F. C. (2001). The analysis of early life courses: complex
+  descriptions of the transition to adulthood. *Journal of Population
+  Research* 18(2): 119-142.
 - Chiang, C. L. (1968). *Introduction to Stochastic Processes in Biostatistics.*
   New York: Wiley.
 - Feeney, G. and Yu, J. (1987). Period parity progression measures of

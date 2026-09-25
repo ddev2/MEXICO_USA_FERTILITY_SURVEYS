@@ -246,6 +246,19 @@ if (order == 0) {
 }
 tfrSmoothPlot_2w_P
 
+# >>> Claude 2026-09-25
+# Figures 11 (all births, order 0) and 12 (first births, order 1), saved to
+# outputPath. The block above only draws the order chosen in 'order'.
+for (ord in c(0, 1)) {
+  dfOrd <- prepareDataPlotGen(keeps = c("year", "tfr_smooth", "tfr_smooth_min", "tfr_smooth_max"),
+                              pattern = "MEX_TFR_2w_P_", order = ord)
+  pOrd <- plotTFR_mean(dfOrd, x = "year", y = "tfr_smooth", ymin = "tfr_smooth_min", ymax = "tfr_smooth_max",
+                       xTitle = "year", yTitle = if (ord == 0) "TFR" else "TFR, first births",
+                       dfObserved = if (ord == 0) TFR_Mex else NULL, country = "MEXICO")
+  saveFigure(pOrd, if (ord == 0) "MEX_TFR_bySurvey.pdf" else "MEX_TFR1_bySurvey.pdf", width = 29.7, height = 14)
+}
+# <<< Claude 2026-09-25
+
 # using population weights, non smooth
 # MEX_TFR_2w_ns_1992 <- computeTFR_2weights(df_fert_MEX[df_fert_MEX$survey=="ENADID1992",], orderPlus=5, smooth=FALSE, numLastYears=15, removeLastYear=TRUE)
 # MEX_TFR_2w_ns_1997 <- computeTFR_2weights(df_fert_MEX[df_fert_MEX$survey=="ENADID1997",], orderPlus=5, smooth=FALSE, numLastYears=15, removeLastYear=TRUE)
@@ -334,6 +347,18 @@ if (order == 0) {
                                       xTitle="year", yTitle="TFR", country="USA")
 }
 tfrSmoothPlot
+
+# >>> Claude 2026-09-25
+# Figures 13 (all births) and 14 (first births), saved to outputPath.
+for (ord in c(0, 1)) {
+  dfOrd <- prepareDataPlotGen(keeps = c("year", "tfr_smooth", "tfr_smooth_min", "tfr_smooth_max"),
+                              pattern = "USA_TFR", order = ord)
+  pOrd <- plotTFR_mean(dfOrd, x = "year", y = "tfr_smooth", ymin = "tfr_smooth_min", ymax = "tfr_smooth_max",
+                       xTitle = "year", yTitle = if (ord == 0) "TFR" else "TFR, first births",
+                       dfObserved = if (ord == 0) TFR_USA else NULL, country = "USA")
+  saveFigure(pOrd, if (ord == 0) "USA_TFR_bySurvey.pdf" else "USA_TFR1_bySurvey.pdf", width = 29.7, height = 14)
+}
+# <<< Claude 2026-09-25
 
 # USA2_TFR1982 <- computeTFR_cohort(df_fert_USA[df_fert_USA$survey=="NSFG1982",], maxOrder=5, numYear=6, loessSpan=0.95)
 # USA2_TFR1988 <- computeTFR_cohort(df_fert_USA[df_fert_USA$survey=="NSFG1988",], maxOrder=5, numYear=6, loessSpan=0.95)
@@ -1037,8 +1062,15 @@ plotFullUnion_reasons_child <- function(df,
 
 ##### Mexico and USA #####
 fBirthStatus_Both_union <- rbind(fBirthStatus_Mex_union1, fBirthStatus_USA_union)
-(ggplot_fill_panel(plotFullUnion_child(fBirthStatus_Both_union, colours = c("MEXICO" = "red", "USA" = "blue")), top=0.1) +
-  theme_text() + theme_noGrid()) %>% ggplot_set_scale(breaks=seq(0,1,0.1))
+# >>> Claude 2026-09-25
+# Figure 9 (first version, complete ten-year windows), now kept and saved.
+MEX_USA_childIntact_plot <- (ggplot_fill_panel(plotFullUnion_child(fBirthStatus_Both_union,
+                                                                   colours = c("MEXICO" = "red", "USA" = "blue")),
+                                               top = 0.1) +
+                               theme_text() + theme_noGrid()) %>% ggplot_set_scale(breaks = seq(0, 1, 0.1))
+MEX_USA_childIntact_plot
+saveFigure(MEX_USA_childIntact_plot, "MEX_USA_childIntact.pdf")
+# <<< Claude 2026-09-25
 
 rm(Mex_firstBirthStatus_union1)
 rm(Mex_firstBirthStatus_union1_4)

@@ -45,7 +45,7 @@ NSFG_ENADID   <- filterDateQuality(NSFG_ENADID)
 # >>> Claude 2026-09-25
 # Samples and survey selections from lib/mexUsaFigures.R. The reasons for each
 # selection are listed there (WFS: no cohabitation before marriage; ENADID
-# 1992: no unions; EDER 2025: marriage dates not usable; ENADID 2009-2023:
+# 1992: no unions; ENADID 2006: too many missing first-union dates; EDER 2025: marriage dates not usable; ENADID 2009-2023:
 # first and last union only, so second unions come from ENADID 1997 and EDER).
 # varUnionCens: the union ends or the survey is reached, whichever comes first.
 MEX_union1_marr <- sampleUnionMarriage(selectSurveys(MEXICO_ENADID, "union1_marriage", "MEXICO"), u = 1)

@@ -43,6 +43,10 @@ plot_marriage_union1_mod_MEX_comp <- KaplanMeierPlot (df=MEX_union1_marr_comp, v
                                                  xTitle = "Duration in years after first union", maxX = 20, confInt=TRUE)
 plot_marriage_union1_mod_MEX_comp
 plot_marriage_union1_mod_MEX_comp + labs(title=NULL)
+# >>> Claude 2026-09-25
+# Figure 18 of the paper, saved to outputPath.
+saveFigure(plot_marriage_union1_mod_MEX_comp + labs(title = NULL), "MEX_union1_marriage_bySurvey.pdf")
+# <<< Claude 2026-09-25
 
 plot_marriage_union2_mod_MEX_comp <- KaplanMeierPlot (df=MEX_union2_marr_comp, varEnter="union_start_cmc2",
                                                  varEvent="marriage_start_cmc2", varCens="varUnionCens2", var_yBirth = "yUnion2",

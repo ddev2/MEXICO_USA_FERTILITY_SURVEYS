@@ -24,7 +24,7 @@
 #
 #   WFS 1976          no cohabitation before marriage
 #   ENADID 1992       no union history
-#   ENADID 2006       not used for the first-union transitions
+#   ENADID 2006       too many missing dates of first union
 #   EDER 2025         marriage dates not usable for the union -> marriage transition
 #   ENADID 2009-2023  first and last union only, so no second union
 #   NSFG 1973, 1976   ever-married women or mothers only, no cohabitation
@@ -73,7 +73,7 @@ SURVEY_SELECTION <- list(
   # NEW TRANSITIONS, period analysis. Check these selections before use.
   # birth of the woman -> first union: every survey with a first-union date
   union1_formation = list(
-    MEXICO = list(keep = NULL, drop = c("ENADID1992")),
+    MEXICO = list(keep = NULL, drop = c("ENADID1992", "ENADID2006")),
     USA    = list(keep = NULL, drop = c("NSFG1973", "NSFG1976"))),
   # separation of the first union -> second union: complete union histories only
   sep1_union2 = list(
