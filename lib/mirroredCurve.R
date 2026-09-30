@@ -240,7 +240,11 @@ mirroredCurve <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NUL
                                 varWeight=NULL, varEvent2=NULL, truncate=10,
                                 horizon=NULL, confLevel=0.95, confType="log-log",
                                 ties=c("simultaneous", "event", "event2"),
-                                naWeight="one") {
+                                naWeight="one",
+                                # >>> Claude 2026-09-25
+                                conditional=FALSE
+                                # <<< Claude 2026-09-25
+                                ) {
   #==> df_KM, varEnter, varEvent, varCens, varWeight: as in KaplanMeier()
   #==> varEvent2: the second event. Required here; without it use KaplanMeier().
   #==> truncate: hide a half's tail once fewer than 'truncate' UNWEIGHTED events remain
@@ -250,6 +254,13 @@ mirroredCurve <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NUL
   #    attribute and belongs in the figure caption.
   #==> confType: "log-log" (default), "log" or "plain", passed to survfit
   #==> ties: how to treat varEvent2 == varEvent. See .kmsPrepare().
+  # >>> Claude 2026-09-25
+  #==> conditional: TRUE divides the branch probabilities (and the same-month
+  #    share) by 1 - P(neither by horizon), so that the figure describes the
+  #    women with at least one event by the horizon, as in Billari (2001).
+  #    With observed counts this is exact only when every woman has reached
+  #    the horizon; the Aalen-Johansen ratio stays valid when some have not.
+  # <<< Claude 2026-09-25
   #<== a table with the same columns as KaplanMeier(), so KaplanMeierPlot() and
   #    anything else downstream needs no change.
 
@@ -273,6 +284,17 @@ mirroredCurve <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NUL
   if (is.null(horizon)) horizon <- max(prep$firstTime)
 
   p <- .kmsFirstProbs(prep$firstTime, prep$firstStatus, prep$d$weight, horizon, causes)
+  # >>> Claude 2026-09-25
+  propNeitherAll <- p$neither
+  if (isTRUE(conditional)) {
+    withEvent <- 1 - p$neither
+    if (!is.finite(withEvent) || (withEvent <= 0)) return (.kmsEmpty())
+    p$eventFirst   <- p$eventFirst / withEvent
+    p$event2First  <- p$event2First / withEvent
+    p$simultaneous <- p$simultaneous / withEvent
+    p$neither      <- 0
+  }
+  # <<< Claude 2026-09-25
 
   iE  <- which(prep$firstStatus == 1L)
   iE2 <- which(prep$firstStatus == 2L)
@@ -315,6 +337,10 @@ mirroredCurve <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, varCens=NUL
   attr(res, "gapAtZero")             <- p$neither + p$simultaneous
   attr(res, "horizon")               <- horizon
   attr(res, "ties")                  <- ties
+  # >>> Claude 2026-09-25
+  attr(res, "conditional")           <- isTRUE(conditional)
+  attr(res, "propNeitherAll")        <- propNeitherAll
+  # <<< Claude 2026-09-25
   attr(res, "ciMethod") <- paste0(
     "conditional ", confType, " intervals from survfit(), scaled by the ",
     "Aalen-Johansen branch probabilities. Uncertainty in those probabilities, ",
@@ -331,7 +357,11 @@ mirroredCurveBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, va
                                   ties=c("simultaneous", "event", "event2"),
                                   naWeight="one",
                                   replicates=500, varStrata=NULL, varCluster=NULL,
-                                  seed=NULL, progress=TRUE) {
+                                  seed=NULL, progress=TRUE,
+                                  # >>> Claude 2026-09-25
+                                  conditional=FALSE
+                                  # <<< Claude 2026-09-25
+                                  ) {
   #==> replicates: number of bootstrap replicates. 500 is a reasonable floor for
   #    a percentile interval; 1000 if the figure goes in a paper.
   #==> varStrata / varCluster: names of the design columns. When varCluster is
@@ -349,7 +379,8 @@ mirroredCurveBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, va
 
   point <- mirroredCurve(df_KM, varEnter, varEvent, varCens, varWeight, varEvent2,
                               truncate = truncate, horizon = horizon,
-                              confLevel = confLevel, ties = ties, naWeight = naWeight)
+                              confLevel = confLevel, ties = ties, naWeight = naWeight,
+                              conditional = conditional)   # Claude 2026-09-25
   if (nrow(point) == 0) return (point)
   if (is.null(horizon)) horizon <- attr(point, "horizon")   # hold tau fixed across replicates
 
@@ -389,7 +420,8 @@ mirroredCurveBootstrap <- function (df_KM=NULL, varEnter=NULL, varEvent=NULL, va
     rep_b <- try(suppressMessages(suppressWarnings(
       mirroredCurve(df_KM[idx, , drop = FALSE], varEnter, varEvent, varCens,
                          varWeight, varEvent2, truncate = NULL, horizon = horizon,
-                         confLevel = confLevel, ties = ties, naWeight = naWeight))),
+                         confLevel = confLevel, ties = ties, naWeight = naWeight,
+                         conditional = conditional))),   # Claude 2026-09-25
       silent = TRUE)
     if (inherits(rep_b, "try-error") || nrow(rep_b) == 0) next
     vB <- if (gridBefore > 0) evalOn(rep_b, point, "before") else numeric(0)

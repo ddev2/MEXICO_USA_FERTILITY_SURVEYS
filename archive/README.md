@@ -10,6 +10,8 @@ this folder sources these files.
 | `KaplanMeierMstate.R` | First version of the mirrored two-event curve, built on the `mstate` package. | Replaced by `lib/mirroredCurve.R`, which computes the same quantities with `survival` alone and one dependency fewer. |
 | `tests_kaplanMeierMstate.R` | Its tests. | As above. |
 | `tests_kaplanMeier_old_copy.R` | An older copy of `tests/tests_kaplanMeier.R`. | Superseded by the current test file. |
+| `KaplanMeier.R` | The former main script of union transitions: per-country Kaplan-Meier curves and occupancy plots, and the unused `goEDER()` and `goGGS()` functions. | Its figures are produced by `MEX_USA_figures_cohort.R` (checked to give identical curves) and its further analyses moved to `MEX_USA_union_models.R`. |
+| `ENADID_fertility_unused.R` | Three commented-out alternative TFR calculations for Mexico, one for the USA, and the function `plot10Years_child_1()`. | Nothing used them. |
 | `ReadEDER2017_old.R` | The first reader of the EDER 2017 survey. | Replaced by `ReadEDER2017.R`. |
 
 The scripts here were not updated when the rest of the code changed. They

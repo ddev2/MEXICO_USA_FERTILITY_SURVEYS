@@ -22,7 +22,8 @@ scripts load the two data frames themselves when they are not in memory.
 | `MEX_USA_lifecourse_AJ.R` | women from age 15 to 45, from single to the end of the first union | Aalen-Johansen, age scale |
 | `presentation_KM_AJ.R` | Mexico only, Kaplan-Meier against Aalen-Johansen | both, for the methods slides |
 | `KaplanMeier_compareSurveys.R` | Mexico, the same curve from each survey | Kaplan-Meier |
-| `KaplanMeier.R` | the per-country curves behind the cohort figures, and further analyses (Cox model, standardised survival) | Kaplan-Meier, Aalen-Johansen, Cox |
+| `MEX_USA_union_models.R` | further analyses of first unions, not in the paper (competing outcomes of cohabitations, Cox model, standardised survival) | Aalen-Johansen, Cox |
+| `MEX_USA_figures_mirrored.R` | first union and first birth, mirrored curve, by birth cohort of the woman; not in the paper | Aalen-Johansen branch probabilities, Kaplan-Meier between the two events |
 
 The survey selection and the sample of every Mexico-USA figure are defined
 once, in `lib/mexUsaFigures.R` (`SURVEY_SELECTION`, `sampleUnionMarriage()`,

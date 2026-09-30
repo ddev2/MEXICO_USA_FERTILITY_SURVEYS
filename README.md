@@ -96,7 +96,8 @@ one locates the other files from its own position through
 | `ENADID fertility.R` | total fertility rates (Figures 11 to 14) and the union setting of children (Figures 8 and 9, and their corrected versions) |
 | `MEX_USA_lifecourse_AJ.R` | women from age 15 to 45: single, in union, separated, widowed |
 | `presentation_KM_AJ.R` | Kaplan-Meier against Aalen-Johansen, Mexico (methods slides) |
-| `KaplanMeier.R` | the per-country curves, and further analyses of union transitions (Cox model, standardised curves, EDER and GGS comparisons) |
+| `MEX_USA_union_models.R` | further analyses of first unions, not in the paper: competing outcomes of cohabitations, Cox model of separation before and after marriage, standardised survival of direct and converted marriages |
+| `MEX_USA_figures_mirrored.R` | mirrored curves of first union and first birth, Mexico and the USA, by birth cohort of the woman (Aalen-Johansen branch probabilities, Kaplan-Meier between the two events) |
 | `KaplanMeier_compareSurveys.R` | the same curves for Mexico, one per survey (Figure 18) |
 | `union_birth_life_expectancy.R`, `union_birth_lifeexp_calc.R` | years lived between two ages in each union and birth state |
 | `women_births.R` | weighted counts of women and births by year and age |

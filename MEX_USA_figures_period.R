@@ -197,19 +197,19 @@ saveFigure(plot_mean_birth1, "MEX_USA_mean_age_birth1.pdf")
 
 PERIOD_TRANSITIONS <- list(
   union1_formation = list(
-    run = FALSE, build = createBirthUnion, selection = "union1_formation",
+    run = TRUE, build = createBirthUnion, selection = "union1_formation",
     varEnter = "yBirth", varEvent = "yUnion", duration = FALSE, ageTruncate = NULL,
     res_numYears = 50, res_finalYearsToDiscard = 1, yTitle = "probability of a first union",
     years = list(MEXICO = c(1965, 2022), USA = c(1968, 2021)),
     file = "MEX_USA_period_union1.pdf"),
   sep1_union2 = list(
-    run = FALSE, build = createSepUnion, selection = "sep1_union2",
+    run = TRUE, build = createSepUnion, selection = "sep1_union2",
     varEnter = "ySep", varEvent = "yUnion2", duration = TRUE, ageTruncate = 45,
     res_numYears = 40, res_finalYearsToDiscard = 1, yTitle = "probability of a second union",
     years = list(MEXICO = c(1965, 2022), USA = c(1968, 2016)),
     file = "MEX_USA_period_sep1_union2.pdf"),
   union2_separation = list(
-    run = FALSE, build = function (df) createUnionSep(df, u = 2), selection = "union2_separation_period",
+    run = TRUE, build = function (df) createUnionSep(df, u = 2), selection = "union2_separation_period",
     varEnter = "yUnion", varEvent = "ySep", duration = TRUE, ageTruncate = 45,
     res_numYears = 40, res_finalYearsToDiscard = 1, yTitle = "probability of separation, second union",
     years = list(MEXICO = c(1965, 2022), USA = c(1968, 2016)),

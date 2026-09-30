@@ -82,7 +82,7 @@ source(file.path(scriptDir, "lib", "unionEpisodes.R"))
 # >>> Claude 2026-09-25
 # mirroredCurve() and mirroredCurvePlot(), the two-event "mirrored" figure,
 # and the survey selections and helpers shared by the Mexico-USA figure
-# scripts (MEX_USA_figures_cohort.R, MEX_USA_figures_period.R, KaplanMeier.R).
+# scripts (MEX_USA_figures_cohort.R, MEX_USA_figures_period.R, MEX_USA_union_models.R).
 source(file.path(scriptDir, "lib", "mirroredCurve.R"))
 source(file.path(scriptDir, "lib", "mexUsaFigures.R"))
 # <<< Claude 2026-09-25

@@ -510,6 +510,9 @@ KaplanMeierPlot <- function(
     robustVar = NULL, naWeight = "drop",
     estimator = if (is.null(varEvent2)) "classic" else "survfit",
     horizon = NULL, ties = "simultaneous",
+    # >>> Claude 2026-09-25
+    conditional = FALSE,
+    # <<< Claude 2026-09-25
     bootstrap = 0L, varStrata = NULL, varCluster = NULL,
     # >>> Claude 2026-09-21
     anchorAtOne = TRUE
@@ -562,6 +565,10 @@ KaplanMeierPlot <- function(
   #    branch probabilities are read and belongs in the figure caption; 'ties' is one of
   #    "simultaneous", "event", "event2" and decides what happens when both events share a
   #    month. Ignored when estimator = "classic".
+  # >>> Claude 2026-09-25
+  #==> conditional: passed to mirroredCurve(). TRUE describes only the women
+  #    with at least one of the two events by the horizon (Billari 2001).
+  # <<< Claude 2026-09-25
   #==> bootstrap / varStrata / varCluster: with estimator = "survfit" and bootstrap > 0, the
   #    intervals come from that many bootstrap replicates of the complete estimator, resampling
   #    clusters within strata when those columns are named. This is the only interval here that
@@ -653,11 +660,13 @@ KaplanMeierPlot <- function(
                                             varWeight[1], varEvent2, truncate=truncate,
                                             horizon=horizon, ties=ties, naWeight=naWeight,
                                             replicates=bootstrap, varStrata=varStrata,
-                                            varCluster=varCluster)
+                                            varCluster=varCluster,
+                                            conditional=conditional)   # Claude 2026-09-25
             } else {
               data <- mirroredCurve (dfCountryCohort, varEnter, varEvent, varCens,
                                           varWeight[1], varEvent2, truncate=truncate,
-                                          horizon=horizon, ties=ties, naWeight=naWeight)
+                                          horizon=horizon, ties=ties, naWeight=naWeight,
+                                          conditional=conditional)   # Claude 2026-09-25
             }
           } else {
           data <- KaplanMeier (dfCountryCohort, varEnter, varEvent, varCens, varWeight[1], varEvent2,

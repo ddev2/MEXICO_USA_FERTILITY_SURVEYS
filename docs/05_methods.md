@@ -137,6 +137,16 @@ halves by the raw observed shares of women with each order of events; those
 shares are biased downward as soon as some women are censored before either
 event, which is why the Aalen-Johansen probabilities replaced them.
 
+**Billari's population.** Billari (2001) divides the counts by the number of
+persons with at least one event before a fixed age A, in cohorts whose members
+have all reached A. `mirroredCurve(..., horizon = A, conditional = TRUE)` gives
+the same shares (checked: identical to four decimals for Mexico, 1950-59,
+A = 30) and stays valid for cohorts in which some women are younger than A,
+because the Aalen-Johansen probabilities are divided by 1 - P(neither by A).
+The classic construction divided by all women, with no common age, which is
+where the old figures departed from Billari. `MEX_USA_figures_mirrored.R`
+draws both versions (`MIRROR_AT_LEAST_ONE`).
+
 Three points belong in the caption of any such figure:
 
 - **the horizon tau** at which the two probabilities are read (by default the
@@ -182,7 +192,52 @@ counted (`ageTruncate = 40`, and 45 for Figure 17); Figure 10 shows the
 maximum age present in each year.
 
 
-## 5.6 Date quality
+## 5.6 Confidence intervals
+
+Three variance methods are used, chosen by the estimator:
+
+| Estimate | Interval |
+|---|---|
+| Kaplan-Meier cohort curves (`KaplanMeier()`, `useSurvfit = TRUE`) | infinitesimal jackknife, from `survival::survfit()` |
+| Aalen-Johansen curves (`unionStateOccupancy()`, `unionCompetingRisks()`) | infinitesimal jackknife, from `survival::survfit()` |
+| Period indicators (`ppr_doIt()`) | bootstrap of the women, 200 replicates (Greenwood when `replicates = 0`) |
+| Children, stratified and standardised (`childStratifiedAJ()`) | bootstrap |
+| Mirrored curve | analytic, conditional on the branch probabilities; bootstrap with `mirroredCurveBootstrap()` |
+
+**Why not Greenwood for the weighted Kaplan-Meier curves.** Greenwood's
+formula treats each weight as a number of people. With `popWeight`, where one
+woman represents thousands, the formula believes the sample is enormous and
+the interval is far too narrow; with `weight` (mean 1) the scale problem
+disappears, but the loss of precision caused by unequal weights is still
+ignored. The infinitesimal jackknife does not depend on the scale of the
+weights and accounts for their inequality. `tests/tests_kaplanMeier.R` checks
+both properties: multiplying every weight by 10 changes the Greenwood standard
+error and leaves the jackknife one unchanged. Greenwood remains available
+(`useSurvfit = FALSE`) and is correct for unweighted data. The change was made
+for the weights; the Aalen-Johansen estimator did not require it.
+
+**What the infinitesimal jackknife is.** Despite its name, it deletes no
+observation. It measures the influence of each woman on the estimate (how much
+the estimate moves when her weight changes slightly) and sums the squared
+influences. It is the limit of the delete-one jackknife and, for survey data,
+the same as the Taylor linearization (sandwich) variance (Efron 1982; Lumley
+2010). It is computed once, is the same at every run, and for smooth
+estimators such as Kaplan-Meier and Aalen-Johansen gives practically the same
+interval as the bootstrap.
+
+**When the bootstrap is used instead.** For estimators that are complicated
+functions of the data, with no simple variance formula: the period life table,
+whose quantum is smoothed by loess; the child estimate, which is stratified and
+then standardised; the product of two estimated pieces in the mirrored curve.
+
+**The survey design.** Neither method, as used by default, accounts for the
+strata and clusters of the samples. `survfit()` accepts clusters through its
+`cluster` argument, and the bootstraps can resample primary sampling units
+within strata (`varStrata`, `varCluster`) once those variables are carried in
+the data frames.
+
+
+## 5.7 Date quality
 
 Women whose union dates cannot be used (unknown year, a date after the
 interview, dates out of order) are removed by `filterDateQuality()` before
@@ -190,7 +245,7 @@ every analysis; missing months are imputed within the constraints set by
 `capMonth` (`docs/01_build_data.md`, `docs/02_common_format.md`).
 
 
-## 5.7 References
+## 5.8 References
 
 - Aalen, O. O. and Johansen, S. (1978). An empirical transition matrix for
   non-homogeneous Markov chains based on censored observations. *Scandinavian
@@ -200,6 +255,10 @@ every analysis; missing months are imputed within the constraints set by
   Research* 18(2): 119-142.
 - Chiang, C. L. (1968). *Introduction to Stochastic Processes in Biostatistics.*
   New York: Wiley.
+- Efron, B. (1982). *The Jackknife, the Bootstrap and Other Resampling
+  Plans.* Philadelphia: SIAM.
+- Efron, B. and Tibshirani, R. J. (1993). *An Introduction to the Bootstrap.*
+  New York: Chapman and Hall.
 - Feeney, G. and Yu, J. (1987). Period parity progression measures of
   fertility in China. *Population Studies* 41(1): 77-102.
 - Hoem, J. M. and Kreyenfeld, M. (2006). Anticipatory analysis and its
@@ -207,10 +266,16 @@ every analysis; missing months are imputed within the constraints set by
 - Kaplan, E. L. and Meier, P. (1958). Nonparametric estimation from incomplete
   observations. *Journal of the American Statistical Association* 53(282):
   457-481.
+- Lumley, T. (2010). *Complex Surveys: A Guide to Analysis Using R.* Hoboken:
+  Wiley.
 - Preston, S. H., Heuveline, P. and Guillot, M. (2001). *Demography: Measuring
   and Modeling Population Processes.* Oxford: Blackwell. Chapter 4.
 - Putter, H., Fiocco, M. and Geskus, R. B. (2007). Tutorial in biostatistics:
   competing risks and multi-state models. *Statistics in Medicine* 26(11):
   2389-2430.
+- Therneau, T. M. and Grambsch, P. M. (2000). *Modeling Survival Data:
+  Extending the Cox Model.* New York: Springer.
 - Tsiatis, A. (1975). A nonidentifiability aspect of the problem of competing
   risks. *Proceedings of the National Academy of Sciences* 72(1): 20-22.
+- Wolter, K. M. (2007). *Introduction to Variance Estimation*, 2nd ed. New
+  York: Springer.

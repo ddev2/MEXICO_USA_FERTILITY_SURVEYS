@@ -5,10 +5,11 @@
 #
 #   MEX_USA_figures_cohort.R   Kaplan-Meier and Aalen-Johansen figures by union cohort
 #   MEX_USA_figures_period.R   period indicators computed with ppr_doIt()
-#   KaplanMeier.R              the country-by-country analysis behind them
+#   MEX_USA_union_models.R     further analyses of first unions (not in the paper)
+#   MEX_USA_figures_mirrored.R mirrored curves of first union and first birth
 #
 # It keeps, in one place, the choices that used to be repeated in every block
-# of KaplanMeier.R: which surveys enter each analysis, how each analysis sample
+# of the old KaplanMeier.R (now archive/KaplanMeier.R): which surveys enter each analysis, how each analysis sample
 # is built from MEXICO_ENADID or NSFG_ENADID, which union cohorts are drawn, and
 # how the Mexico and USA panels are put side by side. Change a survey selection
 # here and every figure that uses it follows.
@@ -74,7 +75,17 @@ SURVEY_SELECTION <- list(
   # birth of the woman -> first union: every survey with a first-union date
   union1_formation = list(
     MEXICO = list(keep = NULL, drop = c("ENADID1992", "ENADID2006")),
-    USA    = list(keep = NULL, drop = c("NSFG1973", "NSFG1976"))),
+    # >>> Claude 2026-09-25: NSFG 2017-19 has no union dates at all; kept, it
+    # counted every woman as never in union and pulled the US curve down.
+    USA    = list(keep = NULL, drop = c("NSFG1973", "NSFG1976", "NSFG2017_19"))),
+    # <<< Claude 2026-09-25
+  # >>> Claude 2026-09-25
+  # birth of the woman -> first union and first birth (MEX_USA_figures_mirrored.R):
+  # every survey with a first-union date and a birth history for all women
+  union1_birth1 = list(
+    MEXICO = list(keep = NULL, drop = c("ENADID1992", "ENADID2006")),
+    USA    = list(keep = NULL, drop = c("NSFG1973", "NSFG1976", "NSFG2017_19"))),
+  # <<< Claude 2026-09-25
   # separation of the first union -> second union: complete union histories only
   sep1_union2 = list(
     MEXICO = list(keep = c("WFS", "ENADID1997", "EDER2017", "EDER2025"), drop = NULL),
